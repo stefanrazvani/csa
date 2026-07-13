@@ -28,6 +28,7 @@ const LIST_ONLY_SYMBOL_IDS = new Set([
   'g3-circle-center',
   'g3-great-lights',
   'g3-master-board',
+  'g3-memory-veil',
   'g3-travel-lines',
 ]);
 

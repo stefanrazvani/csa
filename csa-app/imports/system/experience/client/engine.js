@@ -127,6 +127,107 @@ function makeGeometry(THREE, definition = {}) {
   }
 }
 
+// Texturi procedurale echirectangulare pentru Sfera Terestră (Boaz) și Sfera
+// Celestă (Jachin). Deterministe (fără Math.random), desenate pe canvas.
+function globeTexture(THREE, kind) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 512;
+  canvas.height = 256;
+  const context = canvas.getContext('2d');
+  const width = canvas.width;
+  const height = canvas.height;
+  const seeded = (index) => {
+    const value = Math.sin(index * 127.1 + 311.7) * 43758.5453;
+    return value - Math.floor(value);
+  };
+  if (kind === 'terrestrial') {
+    context.fillStyle = '#1d4d76';
+    context.fillRect(0, 0, width, height);
+    // Mase continentale stilizate (Americi, Europa, Africa, Asia, Australia).
+    const landmasses = [
+      [0.13, 0.30, 0.05, 0.09, 0.5], [0.16, 0.44, 0.028, 0.05, 0.2], [0.19, 0.62, 0.036, 0.11, -0.15],
+      [0.36, 0.15, 0.03, 0.04, 0], [0.475, 0.28, 0.036, 0.05, 0.3], [0.505, 0.48, 0.052, 0.12, 0.05],
+      [0.60, 0.27, 0.10, 0.08, 0.1], [0.68, 0.43, 0.04, 0.055, 0.4], [0.785, 0.65, 0.042, 0.045, 0.15],
+    ];
+    for (const [x, y, radiusX, radiusY, tilt] of landmasses) {
+      context.fillStyle = '#54793f';
+      context.beginPath();
+      context.ellipse(x * width, y * height, radiusX * width, radiusY * height, tilt, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = '#6e8a4a';
+      context.beginPath();
+      context.ellipse((x - 0.008) * width, (y - 0.02) * height, radiusX * width * 0.6, radiusY * height * 0.55, tilt, 0, Math.PI * 2);
+      context.fill();
+    }
+    // Calote polare.
+    context.fillStyle = 'rgba(234, 240, 244, 0.9)';
+    context.fillRect(0, 0, width, height * 0.05);
+    context.fillRect(0, height * 0.95, width, height * 0.05);
+    // Caroiaj auriu de glob cartografic.
+    context.strokeStyle = 'rgba(216, 186, 118, 0.4)';
+    context.lineWidth = 1;
+    for (let index = 1; index < 8; index += 1) {
+      context.beginPath();
+      context.moveTo((width * index) / 8, 0);
+      context.lineTo((width * index) / 8, height);
+      context.stroke();
+    }
+    for (let index = 1; index < 4; index += 1) {
+      context.beginPath();
+      context.moveTo(0, (height * index) / 4);
+      context.lineTo(width, (height * index) / 4);
+      context.stroke();
+    }
+  } else {
+    context.fillStyle = '#0b1d3f';
+    context.fillRect(0, 0, width, height);
+    // Câmp de stele determinist.
+    context.fillStyle = '#e9eefb';
+    for (let index = 0; index < 170; index += 1) {
+      const x = seeded(index) * width;
+      const y = seeded(index + 500) * height;
+      const radius = 0.4 + seeded(index + 900) * 1.2;
+      context.globalAlpha = 0.45 + seeded(index + 300) * 0.55;
+      context.beginPath();
+      context.arc(x, y, radius, 0, Math.PI * 2);
+      context.fill();
+    }
+    context.globalAlpha = 1;
+    // Constelații: linii care leagă stele mai strălucitoare.
+    context.strokeStyle = 'rgba(190, 206, 240, 0.55)';
+    context.lineWidth = 1;
+    for (let group = 0; group < 6; group += 1) {
+      let x = (0.08 + seeded(group * 17 + 3) * 0.84) * width;
+      let y = (0.15 + seeded(group * 29 + 7) * 0.7) * height;
+      context.beginPath();
+      context.moveTo(x, y);
+      for (let segment = 0; segment < 4; segment += 1) {
+        context.fillStyle = '#f4f6fd';
+        context.beginPath();
+        context.arc(x, y, 1.7, 0, Math.PI * 2);
+        context.fill();
+        x += (seeded(group * 31 + segment * 13 + 1) - 0.5) * 0.12 * width;
+        y += (seeded(group * 37 + segment * 11 + 5) - 0.5) * 0.2 * height;
+        context.lineTo(x, y);
+      }
+      context.stroke();
+    }
+    // Banda eclipticii, aurie, ondulată.
+    context.strokeStyle = 'rgba(216, 186, 118, 0.45)';
+    context.lineWidth = 1.4;
+    context.beginPath();
+    for (let x = 0; x <= width; x += 4) {
+      const y = height / 2 + Math.sin((x / width) * Math.PI * 2) * height * 0.18;
+      if (x === 0) context.moveTo(x, y);
+      else context.lineTo(x, y);
+    }
+    context.stroke();
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 function makeMaterial(THREE, definition = {}, fallback = '#6f7c82') {
   const opacity = bounded(definition.opacity, 1, 0.08, 1);
   const material = new THREE.MeshStandardMaterial({
@@ -138,6 +239,13 @@ function makeMaterial(THREE, definition = {}, fallback = '#6f7c82') {
     transparent: opacity < 1,
     opacity,
   });
+  if (definition.map === 'terrestrial' || definition.map === 'celestial') {
+    const texture = globeTexture(THREE, definition.map);
+    material.map = texture;
+    // Textura este folosită și ca emissiveMap: sferele rămân lizibile în
+    // lumina scăzută a templului, fără o sursă de lumină dedicată.
+    material.emissiveMap = texture;
+  }
   material.userData.baseEmissiveIntensity = material.emissiveIntensity;
   return material;
 }

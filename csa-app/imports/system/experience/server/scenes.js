@@ -51,6 +51,8 @@ function primitive(id, type, position, scale, color, options = {}) {
       opacity: options.opacity ?? 1,
       emissive: options.emissive || '#000000',
       emissiveIntensity: options.emissiveIntensity ?? 0,
+      // Textură procedurală generată de client: 'terrestrial' sau 'celestial'.
+      map: options.map || '',
     },
   };
 }
@@ -90,17 +92,19 @@ const BASE_GATE = Object.freeze({
 });
 
 // Pardoseala „lodge": piatră întunecată cu pavajul mozaicat central și bordura
-// dantelată aurie, conform planșei. Bolta este cerul înstelat (fundal + motes).
+// dantelată aurie. Conform ritualului, laturile pavajului sunt în raportul
+// „Secțiunii de aur", cu pătrate în raportul termenilor succesivi ai șirului
+// lui Fibonacci: 5 × 8, cu pătrate egale (3,6 × 5,76 m).
 const LODGE_FLOOR = Object.freeze({
   type: 'lodge',
   width: 18,
   depth: 23.2,
   color: '#131c26',
   carpet: {
-    width: 3.9,
-    depth: 5.8,
-    tilesX: 6,
-    tilesZ: 9,
+    width: 3.6,
+    depth: 5.76,
+    tilesX: 5,
+    tilesZ: 8,
     z: -2,
     colors: ['#e6dcc3', '#10181f'],
     border: '#c2a05a',
@@ -223,31 +227,68 @@ function tracingBoard(grade) {
   return items;
 }
 
+// Cei Trei Mari Stâlpi, strânși la colțurile pavajului, conform ritualului:
+// Ionic (Înțelepciunea) la S-E, Doric (Forța) la N-V, Corintic (Frumusețea)
+// la S-V, fiecare purtând câte o lumânare.
 function threePillars() {
   const spots = [
-    ['pillar-light-orient', 2.75, -4.35],
-    ['pillar-light-north', -2.75, 0.35],
-    ['pillar-light-south', 2.75, 0.35],
+    ['pillar-wisdom-se', 2.2, -5.25, 'ionic'],
+    ['pillar-strength-nw', -2.2, 1.25, 'doric'],
+    ['pillar-beauty-sw', 2.2, 1.25, 'corinthian'],
   ];
-  return spots.flatMap(([id, x, z]) => ([
-    primitive(`${id}-base`, 'box', [x, 0.11, z], [0.46, 0.22, 0.46], '#242e38'),
-    primitive(`${id}-shaft`, 'cylinder', [x, 1, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.09, radiusBottom: 0.13, height: 1.56, segments: 14 } }),
-    primitive(`${id}-flame`, 'cone', [x, 1.98, z], [1, 1, 1], COLORS.flame, { geometry: { radius: 0.11, height: 0.38, segments: 10 }, emissive: '#f3b74a', emissiveIntensity: 3.2 }),
-  ]));
+  return spots.flatMap(([id, x, z, order]) => {
+    const items = [
+      primitive(`${id}-base`, 'box', [x, 0.11, z], [0.46, 0.22, 0.46], '#242e38'),
+      primitive(`${id}-shaft`, 'cylinder', [x, 0.94, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.09, radiusBottom: 0.13, height: 1.44, segments: 14 } }),
+    ];
+    if (order === 'ionic') {
+      items.push(primitive(`${id}-capital`, 'torus', [x, 1.7, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.11, tube: 0.045, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }));
+    } else if (order === 'doric') {
+      items.push(primitive(`${id}-capital`, 'box', [x, 1.7, z], [0.3, 0.08, 0.3], COLORS.ivory));
+    } else {
+      items.push(primitive(`${id}-capital`, 'cone', [x, 1.7, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.15, height: 0.16, segments: 14 }, rotation: [Math.PI, 0, 0] }));
+    }
+    items.push(primitive(`${id}-candle`, 'cylinder', [x, 1.87, z], [1, 1, 1], '#e9dfc4', { geometry: { radiusTop: 0.04, radiusBottom: 0.04, height: 0.22, segments: 10 } }));
+    items.push(primitive(`${id}-flame`, 'cone', [x, 2.09, z], [1, 1, 1], COLORS.flame, { geometry: { radius: 0.08, height: 0.24, segments: 10 }, emissive: '#f3b74a', emissiveIntensity: 3.2 }));
+    return items;
+  });
 }
 
-function portalColumns() {
+// Coloanele Boaz (Miazănoapte) și Jachin (Miazăzi) de la Occident. Conform
+// ritualurilor, în gradul de Ucenic capitelurile poartă câte trei rodii
+// întredeschise; de la gradul de Calfă, pe Boaz stă Sfera Terestră, iar pe
+// Jachin Sfera Celestă.
+function portalColumns(grade) {
   const columns = [
-    ['column-b', -2.8, '#22364e', '#9fc0e8'],
-    ['column-j', 2.8, '#4c3113', '#e0a54e'],
+    ['column-b', -2.8, 'terrestrial'],
+    ['column-j', 2.8, 'celestial'],
   ];
-  return columns.flatMap(([id, x, globeColor, globeEmissive]) => ([
-    primitive(`${id}-base`, 'box', [x, 0.32, 8.3], [1.2, 0.64, 1.2], '#28313c'),
-    primitive(`${id}-shaft`, 'cylinder', [x, 2.55, 8.3], [1, 1, 1], '#b28f52', { geometry: { radiusTop: 0.38, radiusBottom: 0.46, height: 3.8, segments: 24 }, metalness: 0.35, roughness: 0.45 }),
-    primitive(`${id}-capital`, 'box', [x, 4.6, 8.3], [1.1, 0.3, 1.1], '#c8a55e', { metalness: 0.4, roughness: 0.42 }),
-    primitive(`${id}-globe`, 'sphere', [x, 5.12, 8.3], [1, 1, 1], globeColor, { geometry: { size: 0.36, segments: 24 }, emissive: globeEmissive, emissiveIntensity: 0.35, metalness: 0.25, roughness: 0.5 }),
-    primitive(`${id}-plaque`, 'box', [x, 1.5, 8.88], [0.36, 0.44, 0.06], COLORS.gold, { emissive: '#8a6a24', emissiveIntensity: 0.6, metalness: 0.55, roughness: 0.35 }),
-  ]));
+  return columns.flatMap(([id, x, sphere]) => {
+    const items = [
+      primitive(`${id}-base`, 'box', [x, 0.32, 8.3], [1.2, 0.64, 1.2], '#28313c'),
+      primitive(`${id}-shaft`, 'cylinder', [x, 2.55, 8.3], [1, 1, 1], '#b28f52', { geometry: { radiusTop: 0.38, radiusBottom: 0.46, height: 3.8, segments: 24 }, metalness: 0.35, roughness: 0.45 }),
+      primitive(`${id}-capital`, 'box', [x, 4.6, 8.3], [1.1, 0.3, 1.1], '#c8a55e', { metalness: 0.4, roughness: 0.42 }),
+      primitive(`${id}-plaque`, 'box', [x, 1.5, 8.88], [0.36, 0.44, 0.06], COLORS.gold, { emissive: '#8a6a24', emissiveIntensity: 0.6, metalness: 0.55, roughness: 0.35 }),
+    ];
+    if (grade === 1) {
+      const spots = [[-0.24, 0.14], [0.24, 0.14], [0, -0.24]];
+      spots.forEach(([dx, dz], index) => {
+        items.push(primitive(`${id}-pomegranate-${index + 1}`, 'sphere', [x + dx, 4.92, 8.3 + dz], [1, 1, 1], '#a64a35', { geometry: { size: 0.14, segments: 16 }, roughness: 0.6, emissive: '#3c150d', emissiveIntensity: 0.3 }));
+        items.push(primitive(`${id}-pomegranate-${index + 1}-crown`, 'cone', [x + dx, 5.1, 8.3 + dz], [1, 1, 1], '#7c3323', { geometry: { radius: 0.05, height: 0.08, segments: 8 }, roughness: 0.7 }));
+      });
+    } else {
+      items.push(primitive(`${id}-globe`, 'sphere', [x, 5.18, 8.3], [1, 1, 1], '#ffffff', {
+        geometry: { size: 0.42, segments: 32 },
+        map: sphere,
+        emissive: '#b8c2d4',
+        emissiveIntensity: 0.72,
+        roughness: 0.55,
+        rotation: [0, sphere === 'celestial' ? 2.2 : 0.6, 0],
+      }));
+      items.push(primitive(`${id}-globe-stand`, 'cylinder', [x, 4.8, 8.3], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.1, radiusBottom: 0.16, height: 0.14, segments: 14 }, metalness: 0.5, roughness: 0.4 }));
+    }
+    return items;
+  });
 }
 
 function wardenStations() {
@@ -317,13 +358,13 @@ function knottedRope() {
   return items;
 }
 
-// Firul cu plumb, suspendat lângă piatra brută, pe Coloana de Miazănoapte.
+// Firul cu plumb atârnă din boltă deasupra centrului Pavajului Mozaicat,
+// simbolizând Axis Mundi, conform ritualului.
 function plumbLine() {
   return [
-    primitive('plumb-post', 'cylinder', [-4.05, 1.15, -5.6], [1, 1, 1], '#3c4653', { geometry: { radiusTop: 0.05, radiusBottom: 0.07, height: 2.3, segments: 12 } }),
-    primitive('plumb-arm', 'box', [-3.62, 2.26, -5.6], [0.9, 0.07, 0.07], '#3c4653'),
-    primitive('plumb-cord', 'cylinder', [-3.2, 1.72, -5.6], [1, 1, 1], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 1.02, segments: 8 } }),
-    primitive('plumb-bob', 'cone', [-3.2, 1.06, -5.6], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.28, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
+    primitive('plumb-mount', 'cylinder', [0, 7.26, -2], [1, 1, 1], '#3c4653', { geometry: { radiusTop: 0.09, radiusBottom: 0.07, height: 0.12, segments: 12 } }),
+    primitive('plumb-cord', 'cylinder', [0, 4.85, -2], [1, 1, 1], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4.7, segments: 8 } }),
+    primitive('plumb-bob', 'cone', [0, 2.36, -2], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
   ];
 }
 
@@ -364,7 +405,7 @@ function lodgeArchitecture(grade) {
     ...tracingBoard(grade),
     ...threePillars(),
     ...plumbLine(),
-    ...portalColumns(),
+    ...portalColumns(grade),
     ...wardenStations(),
     ...officerTables(),
     ...ashlars(),

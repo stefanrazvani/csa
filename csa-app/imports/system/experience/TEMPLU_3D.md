@@ -138,6 +138,7 @@ Geometria actuală este procedurală. Nu sunt încărcate modele externe GLTF/GL
 
 - arhitectura folosește `MeshStandardMaterial`;
 - materialele acceptă culoare, emisivitate, rugozitate, metalicitate și opacitate;
+- materialele acceptă `map: 'terrestrial' | 'celestial'` — texturi procedurale deterministe desenate pe canvas de client (nu se încarcă imagini externe), aplicate și ca `emissiveMap` pentru lizibilitate în lumină scăzută;
 - scena folosește `HemisphereLight`, `DirectionalLight` și `PointLight`;
 - tonemapping-ul este `ACESFilmicToneMapping` în spațiul de culoare sRGB;
 - fiecare grad are culori, ceață, poziția luminii principale și cameră proprii;
@@ -194,12 +195,12 @@ Elementele comune, prezente la toate gradele (~121 de piese de arhitectură):
 - băncile demnitarilor și mesele în romb din Orient (Ospitalier la Miazănoapte, Trezorier la Miazăzi, conform catalogului);
 - mesele Secretarului (Miazănoapte) și Oratorului (Miazăzi), sub estradă;
 - altarul central cu Volumul Legii Sacre deschis, echerul și compasul;
-- pavajul mozaicat central (`6 × 9`, prin pardoseala `lodge`) cu bordura dantelată și planșa de trasat a gradului;
-- cele trei lumini pe coloane, așezate în jurul pavajului conform planșei;
-- firul cu plumb, suspendat lângă piatra brută pe Coloana de Miazănoapte;
+- pavajul mozaicat central, cu laturile în raportul „Secțiunii de aur" și pătrate `5 × 8` (termeni Fibonacci, conform ritualului), bordură dantelată și planșa de trasat a gradului;
+- Cei Trei Mari Stâlpi, strânși la colțurile pavajului conform ritualului — Ionic (Înțelepciunea) la S-E, Doric (Forța) la N-V, Corintic (Frumusețea) la S-V — fiecare cu capitel distinct și lumânare;
+- firul cu plumb care atârnă din boltă deasupra centrului pavajului (Axis Mundi, conform ritualului);
 - piatra brută (Miazănoapte) și piatra cubică cu vârf (Miazăzi), la limita Orientului;
 - pupitrele celor doi Supraveghetori (Occident, respectiv Miazăzi), fiecare cu coloana mică, și pupitrul Maestrului de Ceremonii lângă Primul Supraveghetor;
-- coloanele B și J la Occident, cu globuri distincte, și vestibulul în unghi al intrării;
+- coloanele Boaz (Miazănoapte) și Jachin (Miazăzi) la Occident, cu vestibulul în unghi al intrării; capitelurile diferă pe grad: la Ucenic câte trei rodii întredeschise, de la Calfă Sfera Terestră pe Boaz și Sfera Celestă pe Jachin, cu texturi procedurale (continente/graticulă, respectiv stele și constelații) desenate pe canvas și aplicate ca `map` + `emissiveMap`;
 - funia cu noduri (lacs d'amour) în partea de sus a pereților, cu ciucurii coborâți de o parte și de alta a intrării;
 - bolta cerească: tavan albastru-adânc cu stele fixe, sub care plutesc particulele;
 - rândurile de scaune ale Fraților pe Miazănoapte și Miazăzi.
