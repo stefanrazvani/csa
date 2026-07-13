@@ -1,0 +1,124 @@
+<template name="craftConvocatoare">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Convocatoare</h2>
+    {{#if canWrite}}<button class="btn btn-primary" id="newConvocator">Convocator nou</button>{{/if}}
+  </div>
+  {{#if Template.subscriptionsReady}}
+    <div class="list-group">
+      {{#each rows}}
+        <a class="list-group-item list-group-item-action" href="{{convocatorPath _id}}">
+          <strong>#{{nr}} {{nume}}</strong>
+          <span class="float-end">{{status}}</span>
+        </a>
+      {{else}}
+        <div class="alert alert-info">Nu există convocatoare.</div>
+      {{/each}}
+    </div>
+  {{else}}
+    <div class="spinner-border"></div>
+  {{/if}}
+</template>
+
+<template name="craftConvocatorEditor">
+  <h2>Convocator</h2>
+  {{#if document}}
+    {{#if canWrite}}
+    <form id="convocatorForm" class="row g-3 mb-4">
+      <div class="col-md-8"><label class="form-label">Nume</label><input class="form-control" name="nume" value="{{document.nume}}"></div>
+      <div class="col-md-4"><label class="form-label">Status</label><select class="form-select" name="status"><option {{statusSelected document.status "Creat"}}>Creat</option><option {{statusSelected document.status "Comunicat"}}>Comunicat</option><option {{statusSelected document.status "Finalizat"}}>Finalizat</option></select></div>
+      <div class="col-md-4"><label class="form-label">Loja</label><input class="form-control" name="numeLoja" value="{{document.numeLoja}}"></div>
+      <div class="col-md-2"><label class="form-label">Nr. loja</label><input class="form-control" name="nrLoja" value="{{document.nrLoja}}"></div>
+      <div class="col-md-3"><label class="form-label">Orient</label><input class="form-control" name="orientul" value="{{document.orientul}}"></div>
+      <div class="col-md-3"><label class="form-label">Nr. ținută</label><input type="number" class="form-control" name="numarTinuta" value="{{document.numarTinuta}}"></div>
+      <div class="col-md-4"><label class="form-label">Templu</label><input class="form-control" name="templu" value="{{document.templu}}"></div>
+      <div class="col-md-8"><label class="form-label">Adresa templului</label><input class="form-control" name="adresaTemplu" value="{{document.adresaTemplu}}"></div>
+      <div class="col-md-4"><label class="form-label">Data ținutei</label><input type="datetime-local" class="form-control" name="dataTinuta" value="{{dateTimeValue document.dataTinuta}}"></div>
+      <div class="col-md-4"><label class="form-label">Termen confirmare</label><input type="datetime-local" class="form-control" name="dataConfirmare" value="{{dateTimeValue document.dataConfirmare}}"></div>
+      <div class="col-md-4"><label class="form-label">Ora accesului</label><input type="time" class="form-control" name="data_access" value="{{accessTimeValue document}}"></div>
+      <div class="col-12"><label class="form-label">Observații</label><textarea class="form-control" name="observatii" rows="4">{{document.observatii}}</textarea></div>
+      <div class="col-12"><button class="btn btn-success">Salvează</button></div>
+    </form>
+    {{else}}
+      <div class="card mb-4"><div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-8"><div class="text-muted small">Denumire</div><strong>{{document.nume}}</strong></div>
+          <div class="col-md-4"><div class="text-muted small">Status</div><span class="badge text-bg-secondary">{{document.status}}</span></div>
+          <div class="col-md-4"><div class="text-muted small">Loja</div>{{document.numeLoja}}</div>
+          <div class="col-md-2"><div class="text-muted small">Număr</div>{{document.nrLoja}}</div>
+          <div class="col-md-3"><div class="text-muted small">Orient</div>{{document.orientul}}</div>
+          <div class="col-md-3"><div class="text-muted small">Număr ținută</div>{{document.numarTinuta}}</div>
+          <div class="col-md-4"><div class="text-muted small">Templu</div>{{document.templu}}</div>
+          <div class="col-md-8"><div class="text-muted small">Adresa templului</div>{{document.adresaTemplu}}</div>
+          <div class="col-md-4"><div class="text-muted small">Data ținutei</div>{{formatDateTime document.dataTinuta}}</div>
+          <div class="col-md-4"><div class="text-muted small">Termen confirmare</div>{{formatDateTime document.dataConfirmare}}</div>
+          <div class="col-md-4"><div class="text-muted small">Ora accesului</div>{{accessTimeValue document}}</div>
+          <div class="col-12"><div class="text-muted small">Observații</div><div class="text-break" style="white-space: pre-wrap;">{{document.observatii}}</div></div>
+        </div>
+      </div></div>
+    {{/if}}
+    {{#each grades}}
+      {{#if canReadLevel this}}
+      <section class="card mb-3">
+        <div class="card-header">Articole grad {{this}}</div>
+        <div class="card-body">
+          {{#if canWrite}}
+          <form class="articleForm row g-2" data-level="{{this}}">
+            <div class="col-md-2"><input class="form-control" name="nrArticol" placeholder="Nr. articol"></div>
+            <div class="col-md-2"><input class="form-control" name="order" type="number" min="1" placeholder="Ordine" required></div>
+            <div class="col-md-6"><input class="form-control" name="continut" placeholder="Conținut" required></div>
+            <div class="col-2"><button class="btn btn-outline-primary w-100">Adaugă</button></div>
+          </form>
+          {{/if}}
+          <div class="table-responsive mt-3"><table class="table table-sm align-middle mb-0">
+            <thead><tr><th>#</th><th>Nr. articol</th><th>Conținut</th><th>Ordine</th>{{#if canWrite}}<th>Acțiuni</th>{{/if}}</tr></thead>
+            <tbody>
+              {{#each articlesFor this}}
+                {{#if canWrite}}
+                <tr><td>{{nr}}</td><td colspan="4">
+                  <form class="articleEditForm row g-2 align-items-center" data-id="{{_id}}">
+                    <div class="col-md-2"><input class="form-control form-control-sm" name="nrArticol" value="{{nrArticol}}" aria-label="Număr articol"></div>
+                    <div class="col-md-6"><input class="form-control form-control-sm" name="continut" value="{{continut}}" aria-label="Conținut" required></div>
+                    <div class="col-md-1"><input class="form-control form-control-sm" name="order" type="number" min="1" value="{{order}}" aria-label="Ordine" required></div>
+                    <div class="col-md-3 d-flex gap-2"><button class="btn btn-sm btn-outline-success" type="submit">Salvează</button>{{#if canDelete}}<button class="btn btn-sm btn-outline-danger articleRemove" type="button">Șterge</button>{{/if}}</div>
+                  </form>
+                </td></tr>
+                {{else}}
+                <tr><td>{{nr}}</td><td>{{nrArticol}}</td><td class="text-break">{{continut}}</td><td>{{order}}</td></tr>
+                {{/if}}
+              {{else}}<tr><td colspan="5" class="text-muted">Nu există articole disponibile la acest nivel.</td></tr>{{/each}}
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+      {{/if}}
+    {{/each}}
+  {{else}}
+    <div class="spinner-border"></div>
+  {{/if}}
+</template>
+
+<template name="craftGradeAdmin">
+  <div class="mb-4"><h1 class="h2 mb-1">Grade de acces</h1><p class="text-muted mb-0">Gradul este stabilit separat pentru fiecare utilizator al tenantului activ.</p></div>
+  <div class="card mb-4"><div class="card-header fw-semibold">Alocare grad</div><div class="card-body">
+    <form id="gradeForm" class="row g-3 align-items-end">
+      <div class="col-lg-7"><label class="form-label">Utilizator</label><select class="form-select" name="userId" required><option value="">Selectați utilizatorul</option>{{#each users}}<option value="{{_id}}">{{name}} · {{email}} · grad curent {{currentGrade}}</option>{{/each}}</select></div>
+      <div class="col-lg-2"><label class="form-label">Grad</label><select class="form-select" name="grade"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+      <div class="col-lg-3"><button class="btn btn-primary w-100">Salvează gradul</button></div>
+    </form>
+  </div></div>
+  <div class="card"><div class="card-header fw-semibold">Grade configurate</div><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Utilizator</th><th>Email</th><th>Grad</th><th>Status</th></tr></thead><tbody>{{#each memberships}}<tr><td>{{name}}</td><td>{{email}}</td><td><span class="badge text-bg-primary">{{grade}}</span></td><td>{{status}}</td></tr>{{else}}<tr><td colspan="4" class="text-muted py-4 text-center">Nu a fost configurat încă niciun grad.</td></tr>{{/each}}</tbody></table></div></div>
+</template>
+
+<template name="csaMigrations">
+  <h2>Migrări CSA</h2>
+  <div class="alert alert-warning">Dry-run nu scrie date. Rularea reală necesită confirmarea explicită <code>MIGRATE_CSA</code>.</div>
+  <div class="d-flex flex-wrap gap-2 mb-3">
+    <button class="btn btn-outline-primary" id="migrationAudit">Audit sursă</button>
+    <button class="btn btn-outline-secondary" id="migrationDryRun">Dry-run complet</button>
+  </div>
+  <div class="input-group mb-3" style="max-width: 560px;">
+    <input class="form-control" id="migrationConfirmation" aria-label="Confirmare migrare" placeholder="Scrie MIGRATE_CSA">
+    <button class="btn btn-danger" id="migrationRun">Rulează migrarea</button>
+  </div>
+  <pre class="mt-3 bg-dark text-light p-3">{{result}}</pre>
+</template>

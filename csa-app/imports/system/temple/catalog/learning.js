@@ -1,0 +1,47 @@
+export const LEARNING_PATHS = Object.freeze({
+  1: {
+    id: 'path-observe-reflect',
+    grade: 1,
+    title: 'Observă și lucrează asupra ta',
+    stages: [
+      { id: 'observe', label: 'Observă', activity: 'Descoperă un simbol vizibil în contextul său spațial potrivit.' },
+      { id: 'reflect', label: 'Reflectează', activity: 'Răspunde în spațiul privat unei întrebări deschise, fără punctaj sau răspuns impus.' },
+      { id: 'journal', label: 'Așază în jurnal', activity: 'Păstrează o notă privată sau o intenție practică.' },
+      { id: 'discuss', label: 'Dezbate pe grad', activity: 'Deschide o discuție limitată la grad numai atunci când alegi să împărtășești.' },
+      { id: 'serve', label: 'Aplică prin faptă', activity: 'Leagă învățarea de o acțiune culturală, educativă sau de sprijin aprobată.' },
+    ],
+    completion: { type: 'reflection_evidence', grantsDegree: false, competitiveScoring: false },
+    sourceRefIds: ['ritual-apprentice-2012', 'constitution-mlnr-6016', 'guide-meetings-6019', 'leadership-keys-hermeneutics', 'statute-nova-reperta-2024'],
+    validation: { required: true, reason: 'Prompts and service links require mentor/editor approval.' },
+  },
+  2: {
+    id: 'path-observe-connect-apply',
+    grade: 2,
+    title: 'Măsoară, conectează și aplică',
+    stages: [
+      { id: 'perceive', label: 'Observă atent', activity: 'Parcurge un exercițiu accesibil de percepție sau comparație.' },
+      { id: 'measure', label: 'Măsoară', activity: 'Folosește geometria sau o comparație structurată pentru a face raționamentul explicit.' },
+      { id: 'connect', label: 'Leagă idei', activity: 'Propune o relație ancorată în surse între concepte deja revizuite.' },
+      { id: 'debate', label: 'Dezbate', activity: 'Participă la o discuție moderată și limitată la grad.' },
+      { id: 'project', label: 'Construiește', activity: 'Contribuie la un proiect de grup restrâns și aprobat.' },
+    ],
+    completion: { type: 'portfolio_and_mentor_feedback', grantsDegree: false, competitiveScoring: false },
+    sourceRefIds: ['ritual-fellowcraft-2012', 'constitution-mlnr-6016', 'guide-meetings-6019', 'leadership-keys-hermeneutics'],
+    validation: { required: true, reason: 'Exercises and concept links require pedagogical review.' },
+  },
+  3: {
+    id: 'path-synthesize-mentor-transmit',
+    grade: 3,
+    title: 'Sintetizează, asumă și transmite',
+    stages: [
+      { id: 'synthesize', label: 'Sintetizează', activity: 'Leagă observațiile anterioare într-o sinteză etică și practică.' },
+      { id: 'responsibility', label: 'Asumă', activity: 'Alege o responsabilitate potrivită funcției active, dacă există.' },
+      { id: 'mentor', label: 'Însoțește', activity: 'Oferă feedback revizuit fără a expune materialul unui grad superior.' },
+      { id: 'build', label: 'Construiește împreună', activity: 'Planifică sau sprijină un proiect de grup cu mandat auditat.' },
+      { id: 'transmit', label: 'Păstrează și transmite', activity: 'Îngrijește o contribuție susținută de surse pentru membrii viitori.' },
+    ],
+    completion: { type: 'synthesis_project_and_peer_review', grantsDegree: false, competitiveScoring: false },
+    sourceRefIds: ['ritual-master-2012', 'constitution-mlnr-6016', 'regulation-general-6016', 'guide-meetings-6019', 'leadership-keys-hermeneutics'],
+    validation: { required: true, reason: 'Mentorship and transmission workflows require authorized review.' },
+  },
+});

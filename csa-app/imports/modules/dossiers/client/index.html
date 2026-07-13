@@ -1,0 +1,170 @@
+<template name="dossierWorkspace">
+  <div class="dossiers-shell">
+    <header class="dossiers-hero">
+      <div>
+        <p class="dossiers-eyebrow">Arhiva vie · Secretariat</p>
+        <h1>Dosarele Fraților</h1>
+        <p>Registrul matricol este generat din apartenențe, grade, funcții și istoricul auditat.</p>
+      </div>
+      {{#if canManage}}
+        <button class="dossiers-button dossiers-button-secondary js-generate-registry" type="button">Generează registrul</button>
+      {{/if}}
+    </header>
+
+    {{#if message}}<div class="dossiers-alert" role="status">{{message}}</div>{{/if}}
+
+    {{#if registry}}
+      <section class="dossiers-registry" aria-labelledby="registry-title">
+        <div class="dossiers-section-heading">
+          <div><p class="dossiers-eyebrow">Proiecție la momentul curent</p><h2 id="registry-title">Registru matricol generat</h2></div>
+          <div class="dossiers-registry-actions"><button class="dossiers-button dossiers-button-secondary js-export-registry" type="button">Exportă CSV</button><button class="dossiers-icon-button js-close-registry" type="button" aria-label="Închide registrul">×</button></div>
+        </div>
+        <p>{{registrySummary}}</p>
+        <div class="dossiers-registry-grid">
+          {{#each registryRows}}
+            <article class="dossiers-registry-card">
+              <span class="dossiers-matriculation">{{matriculationNoLabel matriculationNo}}</span>
+              <h3>{{displayName}}</h3>
+              <div class="dossiers-badges"><span>Grad {{gradeLabel currentGrade}}</span><span>{{membershipStatusLabel membershipStatus}}</span></div>
+              <dl><div><dt>Funcții active</dt><dd>{{officeList activeOffices}}</dd></div><div><dt>Prezențe confirmate</dt><dd>{{participation.confirmed}} / {{participation.invitations}}</dd></div><div><dt>Calitatea datelor</dt><dd>{{dataQualityLabel dataQuality}}</dd></div></dl>
+            </article>
+          {{/each}}
+        </div>
+      </section>
+    {{/if}}
+
+    <div class="dossiers-workspace {{#unless canManage}}dossiers-workspace-self{{/unless}}">
+      {{#if canManage}}
+        <aside class="dossiers-directory" aria-label="Frații din Loja activă">
+          <label class="dossiers-search">
+            <span>Caută după nume sau matricol</span>
+            <input type="search" class="js-dossier-search" placeholder="Începe să scrii…" value="{{searchQuery}}">
+          </label>
+          <div class="dossiers-member-list">
+            {{#each memberRows}}
+              <button class="dossiers-member-card js-select-member {{selectedClass userId}}" type="button" data-user-id="{{userId}}">
+                <span class="dossiers-member-symbol" aria-hidden="true">{{initials displayName}}</span>
+                <span><strong>{{displayName}}</strong><small>{{matriculationNoLabel matriculationNo}} · Grad {{gradeLabel grade}}</small></span>
+                <i aria-hidden="true">›</i>
+              </button>
+            {{else}}
+              <p class="dossiers-empty">Nu există rezultate pentru această căutare.</p>
+            {{/each}}
+          </div>
+        </aside>
+      {{/if}}
+
+      <main class="dossiers-detail">
+        {{#if loading}}
+          <div class="dossiers-loading"><span></span><p>Se deschide dosarul…</p></div>
+        {{else}}
+          {{#with selectedMember}}
+            <section class="dossiers-member-header">
+              <div class="dossiers-seal" aria-hidden="true"><span>{{initials displayName}}</span></div>
+              <div>
+                <p class="dossiers-eyebrow">{{matriculationNoLabel membership.matriculationNo}}</p>
+                <h2>{{displayName}}</h2>
+                <div class="dossiers-badges"><span>Grad {{gradeLabel membership.currentGrade}}</span><span>{{membershipStatusLabel membership.status}}</span>{{#if dossierReviewed}}<span>Date verificate</span>{{/if}}</div>
+              </div>
+            </section>
+
+            <nav class="dossiers-tabs" aria-label="Secțiunile dosarului">
+              <button class="js-dossier-tab {{tabClass 'summary'}}" data-tab="summary" type="button">Rezumat</button>
+              <button class="js-dossier-tab {{tabClass 'timeline'}}" data-tab="timeline" type="button">Cronologie</button>
+              <button class="js-dossier-tab {{tabClass 'documents'}}" data-tab="documents" type="button">Documente</button>
+              <button class="js-dossier-tab {{tabClass 'participation'}}" data-tab="participation" type="button">Participare</button>
+            </nav>
+
+            {{#if activeTab 'summary'}}
+              <div class="dossiers-panel-grid">
+                <section class="dossiers-panel">
+                  <div class="dossiers-section-heading"><div><p class="dossiers-eyebrow">Identitate</p><h3>Date personale</h3></div><span class="dossiers-lock" title="Date restricționate">◆</span></div>
+                  <dl class="dossiers-definition-list">
+                    <div><dt>Nume complet</dt><dd>{{valueOrDash dossier.identity.familyName}} {{valueOrDash dossier.identity.givenName}}</dd></div>
+                    <div><dt>Nume la naștere</dt><dd>{{valueOrDash dossier.identity.birthName}}</dd></div>
+                    <div><dt>Data nașterii</dt><dd>{{formatDate dossier.identity.birthDate}}</dd></div>
+                    <div><dt>Locul nașterii</dt><dd>{{valueOrDash dossier.identity.birthPlace}}</dd></div>
+                    <div><dt>Stare civilă</dt><dd>{{valueOrDash dossier.identity.maritalStatus}}</dd></div>
+                    <div><dt>Profesie</dt><dd>{{valueOrDash dossier.professional.occupation}}</dd></div>
+                    <div><dt>Statut Asociație</dt><dd>{{associationStatusLabel dossier.association.status}}</dd></div>
+                  </dl>
+                </section>
+                <section class="dossiers-panel">
+                  <div class="dossiers-section-heading"><div><p class="dossiers-eyebrow">Contact</p><h3>Coordonate</h3></div></div>
+                  <dl class="dossiers-definition-list">
+                    <div><dt>Email</dt><dd>{{valueOrDash dossier.contact.email}}</dd></div>
+                    <div><dt>Telefon</dt><dd>{{valueOrDash dossier.contact.phone}}</dd></div>
+                    <div><dt>Localitate</dt><dd>{{valueOrDash dossier.contact.address.city}}</dd></div>
+                    <div><dt>Județ</dt><dd>{{valueOrDash dossier.contact.address.county}}</dd></div>
+                    <div><dt>Adresă</dt><dd>{{addressLabel dossier.contact.address}}</dd></div>
+                  </dl>
+                </section>
+              </div>
+
+              {{#if canManage}}
+                <details class="dossiers-editor">
+                  <summary>Editează datele dosarului</summary>
+                  <form class="js-dossier-personal-form dossiers-form">
+                    <fieldset><legend>Registru</legend><div class="dossiers-form-grid"><label>Număr matricol<input name="matriculationNo" value="{{membership.matriculationNo}}"></label><label>Statut<select name="membershipStatus"><option value="active" selected="{{selectedValue membership.status 'active'}}">Activ</option><option value="suspended" selected="{{selectedValue membership.status 'suspended'}}">Suspendat</option><option value="inactive" selected="{{selectedValue membership.status 'inactive'}}">Inactiv</option><option value="left" selected="{{selectedValue membership.status 'left'}}">Plecat</option></select></label><label>Data intrării<input type="date" name="joinedAt" value="{{dateInput membership.joinedAt}}"></label></div></fieldset>
+                    <fieldset><legend>Identitate</legend><div class="dossiers-form-grid"><label>Nume<input name="familyName" value="{{dossier.identity.familyName}}"></label><label>Prenume<input name="givenName" value="{{dossier.identity.givenName}}"></label><label>Nume la naștere<input name="birthName" value="{{dossier.identity.birthName}}"></label><label>Nume preferat<input name="preferredName" value="{{dossier.identity.preferredName}}"></label><label>Data nașterii<input type="date" name="birthDate" value="{{dateInput dossier.identity.birthDate}}"></label><label>Locul nașterii<input name="birthPlace" value="{{dossier.identity.birthPlace}}"></label><label>Cetățenie<input name="citizenship" value="{{dossier.identity.citizenship}}"></label><label>Stare civilă<input name="maritalStatus" value="{{dossier.identity.maritalStatus}}"></label></div></fieldset>
+                    <fieldset><legend>Contact și profesie</legend><div class="dossiers-form-grid"><label>Email<input type="email" name="email" value="{{dossier.contact.email}}"></label><label>Telefon<input name="phone" value="{{dossier.contact.phone}}"></label><label>Țară<input name="country" value="{{dossier.contact.address.country}}"></label><label>Județ<input name="county" value="{{dossier.contact.address.county}}"></label><label>Localitate<input name="city" value="{{dossier.contact.address.city}}"></label><label>Cod poștal<input name="postalCode" value="{{dossier.contact.address.postalCode}}"></label><label class="dossiers-span-2">Stradă și număr<input name="street" value="{{dossier.contact.address.street}}"></label><label>Profesie<input name="occupation" value="{{dossier.professional.occupation}}"></label><label>Angajator<input name="employer" value="{{dossier.professional.employer}}"></label></div></fieldset>
+                    <fieldset><legend>Asociație</legend><div class="dossiers-form-grid"><label>Număr membru<input name="associationMemberNo" value="{{dossier.association.memberNo}}"></label><label>Statut<select name="associationStatus"><option value="unknown" selected="{{selectedValue dossier.association.status 'unknown'}}">Necunoscut</option><option value="member" selected="{{selectedValue dossier.association.status 'member'}}">Membru</option><option value="non_member" selected="{{selectedValue dossier.association.status 'non_member'}}">Nemembru</option><option value="pending" selected="{{selectedValue dossier.association.status 'pending'}}">În curs</option><option value="former" selected="{{selectedValue dossier.association.status 'former'}}">Fost membru</option></select></label><label>Data intrării<input type="date" name="associationJoinedAt" value="{{dateInput dossier.association.joinedAt}}"></label><label class="dossiers-check"><input type="checkbox" name="reviewed" checked="{{reviewedChecked}}"><span>Marchează datele ca verificate</span></label></div></fieldset>
+                    <button class="dossiers-button" type="submit">Salvează dosarul</button>
+                  </form>
+                </details>
+              {{/if}}
+
+              {{#if hasNotes}}
+                <section class="dossiers-panel dossiers-notes-panel"><p class="dossiers-eyebrow">Însemnări</p><h3>Note în dosar</h3>{{#each notes}}<article><div><strong>{{titleOrDefault title}}</strong><span>{{visibilityLabel visibility}}</span></div><p>{{body}}</p><time>{{formatDate createdAt}}</time></article>{{/each}}</section>
+              {{/if}}
+              {{#if canManage}}
+                <details class="dossiers-editor dossiers-editor-compact"><summary>Adaugă o notă</summary><form class="js-dossier-note-form dossiers-form"><div class="dossiers-form-grid"><label>Titlu<input name="title"></label><label>Vizibilitate<select name="visibility"><option value="secretariat">Numai Secretariat</option><option value="member">Vizibilă Fratelui</option></select></label><label class="dossiers-span-2">Conținut<textarea name="body" rows="4" required></textarea></label></div><button class="dossiers-button" type="submit">Adaugă nota</button></form></details>
+              {{/if}}
+            {{/if}}
+
+            {{#if activeTab 'timeline'}}
+              <section class="dossiers-panel">
+                <div class="dossiers-section-heading"><div><p class="dossiers-eyebrow">Parcurs</p><h3>Cronologia dosarului</h3></div></div>
+                <ol class="dossiers-timeline">
+                  {{#each timelineRows}}
+                    <li><span class="dossiers-timeline-mark {{kind}}"></span><div><time>{{formatDate effectiveAt}}</time><h4>{{label}}</h4><p>{{description}}</p>{{#if removable}}{{#if canManage}}<button class="dossiers-text-button js-remove-membership-event" data-id="{{_id}}" type="button">Retrage înregistrarea</button>{{/if}}{{/if}}</div></li>
+                  {{else}}<li class="dossiers-empty">Nu există evenimente în cronologie.</li>{{/each}}
+                </ol>
+              </section>
+              {{#if canManage}}
+                <details class="dossiers-editor" open><summary>Înregistrează un eveniment administrativ</summary><form class="js-dossier-event-form dossiers-form"><div class="dossiers-form-grid"><label>Tip<select name="type"><option value="affiliation">Afiliere</option><option value="transfer_in">Transfer primit</option><option value="transfer_out">Transfer plecat</option><option value="leave_started">Început concediu</option><option value="leave_ended">Revenire din concediu</option><option value="demit">Adormire</option><option value="reinstatement">Reintegrare</option><option value="suspension">Suspendare</option><option value="radiation">Radiere</option><option value="deceased">Trecere la Orientul Etern</option><option value="administrative_note">Mențiune administrativă</option></select></label><label>Data<input type="date" name="effectiveAt" required></label><label>Loja de origine<input name="originLodgeName"></label><label>Loja destinație<input name="destinationLodgeName"></label><label>Vizibilitate<select name="visibility"><option value="member">Vizibilă Fratelui</option><option value="secretariat">Numai Secretariat</option></select></label><label class="dossiers-span-2">Notă<textarea name="note" rows="3"></textarea></label></div><button class="dossiers-button" type="submit">Înregistrează</button></form></details>
+              {{/if}}
+            {{/if}}
+
+            {{#if activeTab 'documents'}}
+              <section class="dossiers-panel">
+                <div class="dossiers-section-heading"><div><p class="dossiers-eyebrow">Documente</p><h3>Arhiva dosarului</h3></div><span class="dossiers-lock">◆</span></div>
+                <div class="dossiers-document-grid">
+                  {{#each documents}}
+                    <article class="dossiers-document-card"><div class="dossiers-document-icon" aria-hidden="true">◇</div><div><span>{{documentCategoryLabel category}}</span><h4>{{title}}</h4><p>{{valueOrDash issuer}}{{#if issuedAt}} · {{formatDate issuedAt}}{{/if}}</p><div class="dossiers-badges"><span>{{visibilityLabel visibility}}</span><span>{{storageLabel storageState}}</span></div></div>{{#if hasStoredFile this}}<button class="dossiers-icon-button js-download-dossier-document" data-id="{{_id}}" type="button" aria-label="Descarcă {{title}}">↓</button>{{/if}}</article>
+                  {{else}}<p class="dossiers-empty">Dosarul nu conține documente.</p>{{/each}}
+                </div>
+              </section>
+              {{#if canManage}}
+                <details class="dossiers-editor" open><summary>Înregistrează document</summary><form class="js-dossier-document-form dossiers-form"><p class="dossiers-form-hint">PDF-ul sau DOCX-ul este scanat antivirus și păstrat în MinIO prin gateway. Fără fișier se salvează numai metadatele.</p><div class="dossiers-form-grid"><label>Titlu<input name="title" required></label><label>Categorie<select name="category"><option value="request">Cerere</option><option value="certificate">Certificat</option><option value="diploma">Diplomă</option><option value="decision">Decizie</option><option value="identity_evidence">Dovadă identitate</option><option value="transfer">Transfer</option><option value="leave">Concediu</option><option value="correspondence">Corespondență</option><option value="other">Altul</option></select></label><label>Număr document<input name="documentNumber"></label><label>Emitent<input name="issuer"></label><label>Data emiterii<input type="date" name="issuedAt"></label><label>Expiră la<input type="date" name="expiresAt"></label><label>Vizibilitate<select name="visibility"><option value="secretariat">Numai Secretariat</option><option value="member">Vizibil Fratelui</option></select></label><label class="dossiers-span-2">Fișier securizat<input name="file" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><small>Maximum 250 MB. Uploadul de fișier este disponibil prin /portal.</small></label><label class="dossiers-span-2">Notă<textarea name="note" rows="3"></textarea></label></div><button class="dossiers-button" type="submit">Înregistrează documentul</button></form></details>
+              {{/if}}
+            {{/if}}
+
+            {{#if activeTab 'participation'}}
+              <div class="dossiers-panel-grid">
+                <section class="dossiers-panel"><p class="dossiers-eyebrow">Participare</p><h3>Prezențe și confirmări</h3><div class="dossiers-stat-grid"><article><strong>{{participationStats.total}}</strong><span>Invitații</span></article><article><strong>{{participationStats.confirmed}}</strong><span>Confirmate</span></article><article><strong>{{participationStats.pending}}</strong><span>În așteptare</span></article></div><div class="dossiers-participation-list">{{#each participationRows}}<article><div><strong>{{titleOrDefault nume}}</strong><span>Ținuta {{valueOrDash tinutaNr}}</span></div><time>{{formatDate dataTinuta}}</time><em>{{attendanceStatusLabel status confirmareFinala}}</em></article>{{else}}<p class="dossiers-empty">Nu există participări înregistrate.</p>{{/each}}</div></section>
+                <section class="dossiers-panel"><p class="dossiers-eyebrow">Mandate</p><h3>Funcții deținute</h3><div class="dossiers-office-list">{{#each officeRows}}<article><span class="dossiers-member-symbol">{{officeInitial officeCode}}</span><div><strong>{{officeLabel officeCode}}</strong><p>{{valueOrDash masonicYear}} · {{formatDate startAt}} – {{formatDate endAt}}</p></div><em>{{membershipStatusLabel status}}</em></article>{{else}}<p class="dossiers-empty">Nu există funcții înregistrate.</p>{{/each}}</div></section>
+              </div>
+              <section class="dossiers-panel"><p class="dossiers-eyebrow">Legături</p><h3>Nași și mentori consemnați</h3><div class="dossiers-sponsor-grid">{{#each sponsors}}<article><span class="dossiers-member-symbol">{{sponsorInitials this}}</span><div><strong>{{sponsorName this}}</strong><p>{{sponsorKindLabel kind}}{{#if fromAt}} · {{formatDate fromAt}}{{/if}}</p></div></article>{{else}}<p class="dossiers-empty">Nu există nași sau mentori consemnați.</p>{{/each}}</div></section>
+              {{#if canManage}}
+                <details class="dossiers-editor"><summary>Adaugă un naș sau mentor istoric</summary><form class="js-dossier-sponsor-form dossiers-form"><div class="dossiers-form-grid"><label>Nume istoric<input name="externalName" required></label><label>Tip<select name="kind"><option value="primary">Naș principal</option><option value="secondary">Al doilea naș</option><option value="historical">Mentor / consemnare istorică</option></select></label><label>Data<input type="date" name="fromAt"></label><label>Vizibilitate<select name="visibility"><option value="member">Vizibil Fratelui</option><option value="secretariat">Numai Secretariat</option></select></label><label class="dossiers-span-2">Notă<textarea name="note" rows="3"></textarea></label></div><button class="dossiers-button" type="submit">Adaugă legătura</button></form></details>
+              {{/if}}
+            {{/if}}
+          {{else}}
+            <div class="dossiers-empty-state"><span>◇</span><h2>Selectați un Frate</h2><p>Alegeți un dosar din listă pentru a vedea registrul și cronologia.</p></div>
+          {{/with}}
+        {{/if}}
+      </main>
+    </div>
+  </div>
+</template>

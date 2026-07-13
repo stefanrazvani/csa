@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Asociația Nova Reperta</title>
+  <meta name="description" content="Pagina oficială a Asociației Nova Reperta">
+  <link rel="stylesheet" href="/styles.css?v=20260713-platform">
+</head>
+<body>
+  <canvas id="particles" aria-hidden="true"></canvas>
+  <main class="page-shell">
+    <section class="public-card" aria-labelledby="site-title">
+      <img src="/img/nova-reperta.png" alt="Asociația Nova Reperta" class="logo">
+      <h1 id="site-title">Asociația Nova Reperta</h1>
+      <p class="lead">Bine ați venit pe pagina Asociației Nova Reperta.</p>
+      <button class="primary-button" id="showLogin" type="button">Autentificare</button>
+    </section>
+
+    <section class="login-card" id="loginPanel" aria-labelledby="login-title" hidden>
+      <button class="close-button" id="closeLogin" type="button" aria-label="Închide">×</button>
+      <h2 id="login-title">Autentificare</h2>
+      <p>Introduceți datele contului Nova Reperta.</p>
+      <div class="message" id="message" role="alert" hidden></div>
+      <form id="loginForm">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="username" required>
+        <label for="password">Parolă</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button class="primary-button" id="loginButton" type="submit">Autentificare</button>
+      </form>
+      <div class="login-links">
+        <a href="/recuperare-parola">Am uitat parola</a>
+        <a href="/inregistrare">Înregistrare cont nou</a>
+      </div>
+    </section>
+
+    <section class="login-card" id="registerPanel" aria-labelledby="register-title" hidden>
+      <a class="close-button" href="/" aria-label="Închide">×</a>
+      <h2 id="register-title">Înregistrare cont nou</h2>
+      <p>Contul devine activ după verificarea administratorului.</p>
+      <div class="message" id="registerMessage" role="alert" hidden></div>
+      <form id="registerForm">
+        <div class="form-row"><div><label for="prenume">Prenume</label><input id="prenume" name="prenume" autocomplete="given-name" required></div><div><label for="nume">Nume</label><input id="nume" name="nume" autocomplete="family-name" required></div></div>
+        <label for="registerEmail">Email</label><input id="registerEmail" name="email" type="email" autocomplete="email" required>
+        <label for="registerPassword">Parolă</label><input id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="12" required>
+        <label for="registerConfirm">Confirmați parola</label><input id="registerConfirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" required>
+        <div class="honeypot" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
+        <button class="primary-button" id="registerButton" type="submit">Trimite cererea</button>
+      </form>
+    </section>
+
+    <section class="login-card" id="forgotPanel" aria-labelledby="forgot-title" hidden>
+      <a class="close-button" href="/" aria-label="Închide">×</a>
+      <h2 id="forgot-title">Am uitat parola</h2>
+      <p>Dacă adresa aparține unui cont, veți primi un link de resetare.</p>
+      <div class="message" id="forgotMessage" role="alert" hidden></div>
+      <form id="forgotForm">
+        <label for="forgotEmail">Email</label><input id="forgotEmail" name="email" type="email" autocomplete="email" required>
+        <button class="primary-button" id="forgotButton" type="submit">Trimite linkul</button>
+      </form>
+    </section>
+
+    <section class="login-card" id="resetPanel" aria-labelledby="reset-title" hidden>
+      <h2 id="reset-title">Alegeți o parolă nouă</h2>
+      <p>Parola trebuie să conțină minimum 12 caractere.</p>
+      <div class="message" id="resetMessage" role="alert" hidden></div>
+      <form id="resetForm">
+        <label for="newPassword">Parolă nouă</label><input id="newPassword" name="password" type="password" autocomplete="new-password" minlength="12" required>
+        <label for="newPasswordConfirm">Confirmați parola</label><input id="newPasswordConfirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" required>
+        <button class="primary-button" id="resetButton" type="submit">Salvează parola</button>
+      </form>
+    </section>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "csa-content-worker",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node worker.js",
+    "check": "node --check worker.js && node --check healthcheck.js && node --check projection-utils.js",
+    "test": "node --test projection-utils.test.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "3.1085.0",
+    "cheerio": "1.1.2",
+    "mammoth": "1.12.0",
+    "mongodb": "6.19.0",
+    "sanitize-html": "2.17.0"
+  }
+}

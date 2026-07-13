@@ -1,0 +1,127 @@
+<template name="csaPortalGate">
+  {{#if gateVisible}}
+    <section class="csa-gate-overlay {{gateClass}}" role="dialog" aria-modal="true" aria-labelledby="csaGateTitle" aria-describedby="csaGateInstructions">
+      <div class="csa-gate-stars" aria-hidden="true"></div>
+      <div class="csa-gate-copy">
+        <p class="csa-gate-eyebrow">Spațiul privat</p>
+        <h1 id="csaGateTitle">Pragul interior</h1>
+        <p id="csaGateInstructions">Bateți de trei ori în poartă sau folosiți butonul de acces.</p>
+      </div>
+
+      <div class="csa-gate-frame" aria-hidden="true">
+        <div class="csa-gate-pediment">
+          <svg viewBox="0 0 120 66" focusable="false">
+            <path d="M8 58 60 8l52 50" />
+            <circle cx="60" cy="38" r="15" />
+            <path d="M44 55 60 23l16 32M49 45h22" />
+            <circle cx="34" cy="57" r="2.5" /><circle cx="60" cy="57" r="2.5" /><circle cx="86" cy="57" r="2.5" />
+          </svg>
+        </div>
+        <div class="csa-gate-door csa-gate-door--left"><span></span></div>
+        <div class="csa-gate-door csa-gate-door--right"><span></span></div>
+        <div class="csa-gate-light"></div>
+      </div>
+
+      <button class="csa-gate-knocker js-gate-knocker" type="button" aria-label="Bate în poartă de trei ori">
+        <span class="csa-gate-knocker-ring" aria-hidden="true"></span>
+        <span class="csa-gate-knocker-core" aria-hidden="true"></span>
+      </button>
+      <p class="csa-gate-status" role="status" aria-live="polite">{{knockStatus}}</p>
+      <div class="csa-gate-actions">
+        <button class="btn csa-gate-primary js-gate-enter" type="button">Intră</button>
+        <button class="btn csa-gate-secondary js-gate-skip" type="button">Sari peste animație</button>
+      </div>
+    </section>
+  {{/if}}
+</template>
+
+<template name="csaTemple">
+  <section class="csa-temple-page {{sceneClass}}">
+    {{#if loading}}
+      <div class="csa-temple-loading" role="status">
+        <span class="csa-temple-loader" aria-hidden="true"></span>
+        <p>Se pregătește harta autorizată…</p>
+      </div>
+    {{else}}
+      {{#with context}}
+        <header class="csa-temple-header">
+          <div>
+            <p class="csa-temple-eyebrow">{{tenantName}}</p>
+            <h1>{{../scene.title}}</h1>
+            <p>{{../scene.subtitle}}</p>
+          </div>
+          <div class="csa-temple-context" aria-label="Contextul de acces">
+            <span>{{gradeLabel}}</span>
+            {{#if platformAdmin}}<span class="is-admin">Mod administrator platformă</span>{{/if}}
+          </div>
+        </header>
+        {{#if hasOffices offices}}
+          <div class="csa-temple-offices" aria-label="Funcții active">
+            {{#each offices}}<span>{{this}}</span>{{/each}}
+          </div>
+        {{/if}}
+      {{/with}}
+
+      {{#if templeError}}
+        <div class="alert alert-warning csa-temple-alert" role="alert">
+          <span>{{templeError}}</span>
+          <button class="btn btn-sm btn-outline-dark js-temple-retry" type="button">Reîncearcă</button>
+        </div>
+      {{/if}}
+
+      {{#with scene}}
+        <div class="csa-temple-stage {{#if ../isFallback}}is-fallback{{/if}}">
+          <svg class="csa-temple-architecture" viewBox="0 0 1200 720" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="templeWall" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="currentColor" stop-opacity=".08"/><stop offset="1" stop-color="currentColor" stop-opacity=".32"/></linearGradient>
+              <radialGradient id="templeLight"><stop offset="0" stop-color="#f6dea0" stop-opacity=".72"/><stop offset="1" stop-color="#f6dea0" stop-opacity="0"/></radialGradient>
+              <filter id="templeGlow"><feGaussianBlur stdDeviation="10"/></filter>
+              <pattern id="templeFloor" width="100" height="70" patternUnits="userSpaceOnUse" patternTransform="skewX(-16)">
+                <rect width="50" height="35" fill="#d7c28b" fill-opacity=".13"/><rect x="50" y="35" width="50" height="35" fill="#d7c28b" fill-opacity=".13"/>
+              </pattern>
+            </defs>
+            <path class="temple-vault" d="M45 410V96Q600-85 1155 96v314Z" fill="url(#templeWall)"/>
+            <path class="temple-horizon" d="M45 410 600 236l555 174"/>
+            <path class="temple-floor" d="m45 410 1110 0 45 310H0Z" fill="url(#templeFloor)"/>
+            <path class="temple-floor-outline" d="m45 410 1110 0 45 310H0Z"/>
+            <g class="temple-columns">
+              <path d="M82 440V180m-28 0h56m-48 260h40"/><path d="M1118 440V180m-28 0h56m-48 260h40"/>
+              <path d="M238 390V135m-28 0h56m-48 255h40"/><path d="M962 390V135m-28 0h56m-48 255h40"/>
+            </g>
+            <g class="temple-east">
+              <path d="M488 276 600 188l112 88Z"/><circle cx="600" cy="245" r="28"/>
+              <path d="M565 272h70M578 254l22-38 22 38"/>
+            </g>
+            <g class="temple-tracing">
+              <circle cx="600" cy="517" r="82"/><path d="m600 452 58 101H542Z"/><circle cx="600" cy="517" r="10"/>
+            </g>
+            <g class="temple-lights" filter="url(#templeGlow)">
+              <circle cx="335" cy="370" r="88" fill="url(#templeLight)"/><circle cx="600" cy="300" r="105" fill="url(#templeLight)"/><circle cx="865" cy="370" r="88" fill="url(#templeLight)"/>
+            </g>
+            <g class="temple-stars"><circle cx="325" cy="85" r="2"/><circle cx="600" cy="54" r="2"/><circle cx="878" cy="91" r="2"/><circle cx="470" cy="119" r="1.5"/><circle cx="738" cy="132" r="1.5"/></g>
+          </svg>
+
+          <nav class="csa-temple-room-layer" aria-label="Zonele disponibile">
+            {{#each rooms}}
+              <a class="csa-temple-room {{roomClass}}" style="{{positionStyle}}" href="{{roomPath path}}">
+                <span class="csa-temple-room-icon" aria-hidden="true"><span>{{icon}}</span></span>
+                <span class="csa-temple-room-label">{{label}}</span>
+                <span class="csa-temple-room-description">{{description}}</span>
+              </a>
+            {{/each}}
+          </nav>
+        </div>
+
+        <nav class="csa-temple-mobile-list" aria-label="Lista zonelor disponibile">
+          {{#each rooms}}
+            <a href="{{roomPath path}}">
+              <span class="csa-temple-mobile-icon" aria-hidden="true"><span>{{icon}}</span></span>
+              <span><strong>{{label}}</strong><small>{{description}}</small></span>
+              <span aria-hidden="true">›</span>
+            </a>
+          {{/each}}
+        </nav>
+      {{/with}}
+    {{/if}}
+  </section>
+</template>

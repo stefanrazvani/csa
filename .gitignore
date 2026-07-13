@@ -1,0 +1,35 @@
+# Dependențe și builduri locale
+**/node_modules/
+**/.meteor/local/
+**/dist/
+**/coverage/
+**/__pycache__/
+*.py[cod]
+*.log
+
+# Configurație și secrete locale
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+**/settings.local.json
+deploy/secrets/*
+!deploy/secrets/*.example
+**/INITIAL_ADMIN.txt
+
+# Artefacte operaționale
+tmp/
+**/backups/
+*.tar
+*.tar.gz
+*.tgz
+*.zip
+
+# Fișiere editor/OS
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini

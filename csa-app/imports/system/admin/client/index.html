@@ -1,0 +1,56 @@
+<template name="globalAdmin">
+  <div class="d-flex justify-content-between align-items-center mb-4"><div><h1 class="h2 mb-1">Administrare Globală</h1><p class="text-muted mb-0">Tenanturi și utilizatori ai platformei CSA.</p></div></div>
+  {{#if message}}<div class="alert alert-info">{{message}}</div>{{/if}}
+  {{#if allowed}}
+    <div class="row g-4">
+      <div class="col-xl-5">
+        <div class="card h-100"><div class="card-header fw-semibold">Tenant nou</div><div class="card-body">
+          <form id="globalTenantCreate" class="row g-3">
+            <div class="col-8"><label class="form-label">Denumire</label><input class="form-control" name="name" required></div>
+            <div class="col-4"><label class="form-label">CUI</label><input class="form-control" name="cui"></div>
+            <div class="col-12"><button class="btn btn-primary" type="submit">Creează tenant</button></div>
+          </form>
+        </div></div>
+      </div>
+      <div class="col-xl-7">
+        <div class="card h-100"><div class="card-header fw-semibold">Utilizator nou / asociere</div><div class="card-body">
+          <form id="globalUserCreate" class="row g-3">
+            <div class="col-md-6"><label class="form-label">Email</label><input class="form-control" name="email" type="email" required></div>
+            <div class="col-md-6"><label class="form-label">Nume</label><input class="form-control" name="name" required></div>
+            <div class="col-md-6"><label class="form-label">Parolă inițială (min. 12)</label><input class="form-control" name="password" type="password" minlength="12" required></div>
+            <div class="col-md-6"><label class="form-label">Tenant</label><select class="form-select" name="eId" required><option value="">Selectați</option>{{#each tenantOptions}}<option value="{{_id}}">{{nume}}</option>{{/each}}</select></div>
+            <div class="col-12 form-check ms-2"><input class="form-check-input" type="checkbox" name="tenantAdmin" id="globalTenantAdmin"><label class="form-check-label" for="globalTenantAdmin">Administrator tenant</label></div>
+            <div class="col-12"><button class="btn btn-primary" type="submit">Salvează utilizator</button></div>
+          </form>
+        </div></div>
+      </div>
+      <div class="col-12"><div class="card"><div class="card-header fw-semibold">Tenanturi</div><div class="table-responsive"><table class="table table-hover mb-0"><thead><tr><th>Denumire</th><th>CUI</th><th>Status</th><th>ID</th><th></th></tr></thead><tbody>{{#each tenants}}<tr><td>{{nume}}</td><td>{{cui}}</td><td>{{status}}</td><td><code>{{_id}}</code></td><td><button class="btn btn-sm btn-outline-primary js-global-activate" data-id="{{_id}}">Activează</button></td></tr>{{/each}}</tbody></table></div></div></div>
+      <div class="col-12"><div class="card"><div class="card-header fw-semibold">Utilizatori</div><div class="table-responsive"><table class="table table-hover mb-0"><thead><tr><th>Nume</th><th>Email</th><th>ID</th></tr></thead><tbody>{{#each users}}<tr><td>{{name}}</td><td>{{email}}</td><td><code>{{_id}}</code></td></tr>{{/each}}</tbody></table></div></div></div>
+    </div>
+  {{else}}
+    {{#unless loading}}<div class="alert alert-danger">Acces permis numai rolului super_admin.</div>{{/unless}}
+  {{/if}}
+</template>
+
+<template name="tenantAdmin">
+  <div class="mb-4"><h1 class="h2 mb-1">Administrare Tenant</h1><p class="text-muted mb-0">Date tenant, utilizatori, grupuri și drepturi pe module.</p></div>
+  {{#if message}}<div class="alert alert-info">{{message}}</div>{{/if}}
+  {{#if allowed}}
+    {{#with activeTenant}}
+      <div class="card mb-4"><div class="card-header fw-semibold">Date tenant</div><div class="card-body"><form id="tenantDetailsForm" class="row g-3"><div class="col-md-8"><label class="form-label">Denumire</label><input class="form-control" name="name" value="{{nume}}" required></div><div class="col-md-4"><label class="form-label">CUI</label><input class="form-control" name="cui" value="{{cui}}"></div><div class="col-12"><button class="btn btn-primary" type="submit">Salvează</button></div></form></div></div>
+    {{/with}}
+    <div class="card mb-4"><div class="card-header fw-semibold">Utilizatori tenant</div><div class="card-body">
+      <form id="tenantUserCreate" class="row g-3 mb-4"><div class="col-md-3"><input class="form-control" name="email" type="email" placeholder="Email" required></div><div class="col-md-3"><input class="form-control" name="name" placeholder="Nume" required></div><div class="col-md-3"><input class="form-control" name="password" type="password" minlength="12" placeholder="Parolă inițială" required></div><div class="col-md-2 form-check mt-4 ms-2"><input class="form-check-input" name="tenantAdmin" type="checkbox" id="newTenantAdmin"><label class="form-check-label" for="newTenantAdmin">tenant_admin</label></div><div class="col-md-1"><button class="btn btn-primary mt-1" type="submit">+</button></div></form>
+      <div class="table-responsive"><table class="table table-sm align-middle"><thead><tr><th>Nume</th><th>Email</th><th>Status</th><th>Activare</th><th>Rol tenant</th></tr></thead><tbody>{{#each users}}<tr><td>{{name}}</td><td>{{email}}</td><td>{{statusLabel}}</td><td><button class="btn btn-sm btn-outline-success js-user-status" data-id="{{_id}}" data-enabled="1">Activează</button> <button class="btn btn-sm btn-outline-secondary js-user-status" data-id="{{_id}}" data-enabled="0">Dezactivează</button></td><td><button class="btn btn-sm btn-outline-success js-user-admin" data-id="{{_id}}" data-enabled="1">Acordă admin</button> <button class="btn btn-sm btn-outline-danger js-user-admin" data-id="{{_id}}" data-enabled="0">Retrage</button></td></tr>{{/each}}</tbody></table></div>
+    </div></div>
+    <div class="card mb-4"><div class="card-header fw-semibold">Grup nou</div><div class="card-body"><form id="tenantGroupCreate" class="d-flex gap-2"><input class="form-control" name="name" placeholder="Denumire grup" required><button class="btn btn-primary" type="submit">Creează</button></form></div></div>
+    {{#each groups}}
+      <div class="card mb-4"><div class="card-header d-flex justify-content-between align-items-center"><strong>{{nume}}</strong><button class="btn btn-sm btn-outline-danger js-group-remove" data-id="{{_id}}">Șterge grup</button></div><div class="card-body">
+        <div class="row g-4"><div class="col-lg-4"><h2 class="h6">Membri</h2><form class="js-group-member-add d-flex gap-2 mb-3"><input type="hidden" name="groupId" value="{{_id}}"><select class="form-select form-select-sm" name="userId" required><option value="">Selectați utilizator</option>{{#each users}}<option value="{{_id}}">{{name}}</option>{{/each}}</select><button class="btn btn-sm btn-primary">+</button></form><ul class="list-group">{{#each members}}<li class="list-group-item d-flex justify-content-between align-items-center">{{name}}<button class="btn btn-sm btn-outline-danger js-group-member-remove" data-group="{{../_id}}" data-user="{{_id}}">−</button></li>{{/each}}</ul></div>
+        <div class="col-lg-8"><h2 class="h6">Permisiuni module</h2>{{#each modules}}<form class="js-module-permissions border rounded p-2 mb-2"><input type="hidden" name="groupId" value="{{../_id}}"><input type="hidden" name="moduleId" value="{{_id}}"><div class="row align-items-center g-2"><div class="col-md-4 fw-semibold">{{nume}}</div><div class="col"><label class="form-check-label"><input class="form-check-input" type="checkbox" name="read" checked={{read}}> Read</label></div><div class="col"><label class="form-check-label"><input class="form-check-input" type="checkbox" name="write" checked={{write}}> Write</label></div><div class="col"><label class="form-check-label"><input class="form-check-input" type="checkbox" name="delete" checked={{delete}}> Delete</label></div><div class="col"><label class="form-check-label"><input class="form-check-input" type="checkbox" name="admin" checked={{admin}}> Admin</label></div><div class="col-auto"><button class="btn btn-sm btn-outline-primary" type="submit">Salvează</button></div></div></form>{{/each}}</div></div>
+      </div></div>
+    {{/each}}
+  {{else}}
+    {{#unless loading}}<div class="alert alert-danger">Selectați un tenant și autentificați-vă ca tenant_admin sau super_admin.</div>{{/unless}}
+  {{/if}}
+</template>

@@ -1,0 +1,10 @@
+import '/imports/api/collections.js';
+import '/imports/system/auth/server';
+import '/imports/system/gateway/server';
+import '/imports/system/dashboard/server';
+import '/imports/system/admin/server';
+import '/imports/system/governance/server';
+import '/imports/system/experience/server';
+import '/imports/modules/index-server.js';
+import '/imports/system/migrations/server';
+import '/imports/system/startup/server';

@@ -1,0 +1,240 @@
+<template name="csaLayout">
+  {{#if currentUser}}
+    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm csa-private-nav">
+      <div class="container-fluid">
+        <a class="navbar-brand fw-semibold csa-private-brand" href="{{appPath '/dashboard'}}">
+          <span class="csa-private-brand-mark" aria-hidden="true"><span></span></span>
+          <span>Nova Reperta</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#csaNavigation"><span class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="csaNavigation">
+          <div class="navbar-nav me-auto">
+            <a class="nav-link" href="{{appPath '/templu'}}">Templu</a>
+            <a class="nav-link" href="{{appPath '/biblioteca'}}">Bibliotecă</a>
+            <a class="nav-link" href="{{appPath '/concepte'}}">Concepte</a>
+            <a class="nav-link" href="{{appPath '/convocatoare'}}">Convocatoare</a>
+            <a class="nav-link" href="{{appPath '/dosare-frati'}}">Dosare</a>
+            {{#if isTenantAdmin}}<a class="nav-link" href="{{appPath '/registru'}}">Registru</a>{{/if}}
+            {{#if isTenantAdmin}}<a class="nav-link" href="{{appPath '/administrare-grade'}}">Grade de acces</a>{{/if}}
+            {{#if isTenantAdmin}}<a class="nav-link" href="{{appPath '/administrare-tenant'}}">Administrare Tenant</a>{{/if}}
+            {{#if isSuperAdmin}}<a class="nav-link" href="{{appPath '/administrare-globala'}}">Administrare Globală</a>{{/if}}
+            {{#if isSuperAdmin}}<a class="nav-link" href="{{appPath '/migrari'}}">Migrări</a>{{/if}}
+          </div>
+          {{#if hasTenants}}
+            <select class="form-select form-select-sm me-3 js-active-tenant" aria-label="Tenant activ">
+              {{#each tenantOptions}}<option value="{{id}}" selected="{{selected}}">{{name}}</option>{{/each}}
+            </select>
+          {{/if}}
+          <span class="navbar-text me-3">{{currentUserEmail}}</span>
+          <button class="btn btn-outline-light btn-sm js-logout" type="button">Ieșire</button>
+        </div>
+      </div>
+    </nav>
+  {{/if}}
+  <main class="{{#if currentUser}}container-fluid py-4 csa-private-main{{else}}csa-auth-main{{/if}}" id="page-content"></main>
+</template>
+
+<template name="csaGatewayLoading">
+  <div class="csa-auth-page">
+    <div class="card csa-auth-card"><div class="card-body text-center">
+      <img class="csa-auth-logo" src="/portal/img/nova-reperta.png" alt="Asociația Nova Reperta">
+      <h1 class="h5 csa-auth-title">Se verifică sesiunea…</h1>
+    </div></div>
+  </div>
+</template>
+
+<template name="csaLogin">
+  <div class="csa-auth-page">
+    <canvas class="csa-particles-canvas" aria-hidden="true"></canvas>
+    <div class="card csa-auth-card">
+      <div class="card-body">
+        <img class="csa-auth-logo" src="/img/nova-reperta.png" alt="Asociația Nova Reperta">
+        {{#if resetMode}}
+          <h1 class="h4 text-center csa-auth-title mb-2">Alegeți o parolă nouă</h1>
+          <p class="text-center csa-auth-subtitle mb-4">Parola trebuie să conțină minimum 12 caractere.</p>
+          {{#if resetError}}<div class="alert alert-danger" role="alert">{{resetError}}</div>{{/if}}
+          {{#if resetSuccess}}<div class="alert alert-success" role="status">{{resetSuccess}}</div>{{/if}}
+          <form id="csaResetPasswordForm">
+            <div class="mb-3"><label class="form-label" for="resetPassword">Parolă nouă</label><input class="form-control" id="resetPassword" name="password" type="password" autocomplete="new-password" minlength="12" required></div>
+            <div class="mb-3"><label class="form-label" for="resetPasswordConfirm">Confirmați parola</label><input class="form-control" id="resetPasswordConfirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></div>
+            <button class="btn btn-primary w-100" type="submit" disabled="{{resetBusy}}">{{#if resetBusy}}Se salvează…{{else}}Salvează parola{{/if}}</button>
+          </form>
+        {{else}}
+          <h1 class="h4 text-center csa-auth-title mb-2">Autentificare</h1>
+          <p class="text-center csa-auth-subtitle mb-4">Autentificați-vă în contul Nova Reperta</p>
+          {{#if loginError}}<div class="alert alert-danger" role="alert">{{loginError}}</div>{{/if}}
+          {{#if loginNotice}}<div class="alert alert-success" role="status">{{loginNotice}}</div>{{/if}}
+          <form id="csaLoginForm">
+            <div class="mb-3"><label class="form-label" for="loginEmail">Email</label><input class="form-control" id="loginEmail" name="email" type="email" autocomplete="username" required></div>
+            <div class="mb-3"><label class="form-label" for="loginPassword">Parolă</label><input class="form-control" id="loginPassword" name="password" type="password" autocomplete="current-password" required></div>
+            <button class="btn btn-primary w-100" type="submit" disabled="{{loginBusy}}">{{#if loginBusy}}Se verifică…{{else}}Autentificare{{/if}}</button>
+          </form>
+          <div class="csa-auth-links">
+            <button class="csa-auth-link" type="button" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Am uitat parola</button>
+            <button class="csa-auth-link" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">Înregistrare cont nou</button>
+          </div>
+        {{/if}}
+      </div>
+    </div>
+
+    <div class="modal fade csa-auth-modal" id="registerModal" tabindex="-1" aria-labelledby="registerModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title fs-5" id="registerModalTitle">Înregistrare cont nou</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Închide"></button></div>
+        <form id="csaRegisterForm">
+          <div class="modal-body">
+            <p class="text-muted small">Contul devine activ după verificarea și aprobarea administratorului.</p>
+            {{#if registerError}}<div class="alert alert-danger" role="alert">{{registerError}}</div>{{/if}}
+            {{#if registerSuccess}}<div class="alert alert-success" role="status">{{registerSuccess}}</div>{{/if}}
+            <div class="row g-3">
+              <div class="col-sm-6"><label class="form-label" for="registerPrenume">Prenume</label><input class="form-control" id="registerPrenume" name="prenume" autocomplete="given-name" required></div>
+              <div class="col-sm-6"><label class="form-label" for="registerNume">Nume</label><input class="form-control" id="registerNume" name="nume" autocomplete="family-name" required></div>
+              <div class="col-12"><label class="form-label" for="registerEmail">Email</label><input class="form-control" id="registerEmail" name="email" type="email" autocomplete="email" required></div>
+              <div class="col-sm-6"><label class="form-label" for="registerPassword">Parolă</label><input class="form-control" id="registerPassword" name="password" type="password" autocomplete="new-password" minlength="12" required></div>
+              <div class="col-sm-6"><label class="form-label" for="registerPasswordConfirm">Confirmare</label><input class="form-control" id="registerPasswordConfirm" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" required></div>
+            </div>
+            <div class="csa-auth-honeypot" aria-hidden="true"><label for="registerWebsite">Website</label><input id="registerWebsite" name="website" tabindex="-1" autocomplete="off"></div>
+          </div>
+          <div class="modal-footer"><button class="btn btn-primary" type="submit" disabled="{{registerBusy}}">{{#if registerBusy}}Se înregistrează…{{else}}Trimite cererea{{/if}}</button></div>
+        </form>
+      </div></div>
+    </div>
+
+    <div class="modal fade csa-auth-modal" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered"><div class="modal-content">
+        <div class="modal-header"><h2 class="modal-title fs-5" id="forgotPasswordModalTitle">Am uitat parola</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Închide"></button></div>
+        <form id="csaForgotForm">
+          <div class="modal-body">
+            <p class="text-muted">Introduceți adresa contului. Dacă există, veți primi un link de resetare.</p>
+            {{#if forgotError}}<div class="alert alert-danger" role="alert">{{forgotError}}</div>{{/if}}
+            {{#if forgotSuccess}}<div class="alert alert-success" role="status">{{forgotSuccess}}</div>{{/if}}
+            <label class="form-label" for="forgotEmail">Email</label><input class="form-control" id="forgotEmail" name="email" type="email" autocomplete="email" required>
+          </div>
+          <div class="modal-footer"><button class="btn btn-primary" type="submit" disabled="{{forgotBusy}}">{{#if forgotBusy}}Se procesează…{{else}}Trimite linkul{{/if}}</button></div>
+        </form>
+      </div></div>
+    </div>
+  </div>
+</template>
+
+<template name="csaHome">
+  <div class="csa-dashboard">
+    {{#if loading}}
+      <div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div><p class="text-muted mt-3">Se pregătește spațiul privat…</p></div>
+    {{else}}
+      {{#if dashboardError}}
+        <div class="alert alert-danger"><strong>Dashboard indisponibil.</strong> {{dashboardError}} <button class="btn btn-sm btn-outline-danger ms-2 js-dashboard-retry" type="button">Reîncearcă</button></div>
+      {{else}}
+        {{#with summary}}
+          <section class="dashboard-hero mb-4">
+            <p class="eyebrow">{{identity.tenantName}}</p>
+            <h1>Bine ați venit, {{identity.displayName}}</h1>
+            <div class="dashboard-badges">
+              {{#if identity.gradeConfigured}}<span class="dashboard-badge">Grad de acces {{identity.grade}}</span>{{else}}<span class="dashboard-badge">Grad neconfigurat</span>{{/if}}
+              {{#if identity.tenantAdmin}}<span class="dashboard-badge">Administrator tenant</span>{{/if}}
+              {{#if identity.superAdmin}}<span class="dashboard-badge">Administrator global</span>{{/if}}
+            </div>
+          </section>
+
+          {{#unless identity.gradeConfigured}}
+            <div class="alert alert-warning">
+              <strong>Accesul la articole nu este încă configurat.</strong>
+              Puteți vedea informațiile generale și istoricul propriu, însă conținutul pe niveluri va deveni disponibil după alocarea gradului de acces.
+              {{#if identity.tenantAdmin}}<a class="alert-link ms-1" href="{{homePath '/administrare-grade'}}">Configurați gradele</a>{{/if}}
+            </div>
+          {{/unless}}
+
+          <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3"><div class="card dashboard-stat"><div class="card-body"><div class="value">{{content.events.length}}</div><div class="label">Convocatoare afișate</div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card dashboard-stat"><div class="card-body"><div class="value">{{content.totalConfirmations}}</div><div class="label">Confirmările mele</div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card dashboard-stat"><div class="card-body"><div class="value">{{identity.grade}}</div><div class="label">Grad de acces</div></div></div></div>
+            <div class="col-6 col-lg-3"><div class="card dashboard-stat"><div class="card-body"><div class="value">{{content.documentsCount}}</div><div class="label">Documente în registru</div></div></div></div>
+          </div>
+
+          <div class="row g-4">
+            <div class="col-xl-8">
+              <section class="card dashboard-panel mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                  <div><h2 class="h5 mb-1">{{eventHeading content.eventMode}}</h2><p class="dashboard-muted mb-0">Informații generale și numărul articolelor permise gradului dumneavoastră.</p></div>
+                  <a class="btn btn-sm btn-outline-primary" href="{{homePath '/convocatoare'}}">Vezi toate</a>
+                </div>
+                <div class="card-body pt-1">
+                  {{#if hasEvents content.events}}
+                    {{#each content.events}}
+                      <div class="dashboard-event">
+                        <div><div class="dashboard-event-title">#{{nr}}</div><div class="dashboard-muted">{{status}}</div></div>
+                        <div><div class="dashboard-event-title">{{nume}}</div><div class="dashboard-muted">{{numeLoja}}{{#if orientul}} · {{orientul}}{{/if}}</div></div>
+                        <div><div>{{formatDate dataTinuta}}</div><div class="dashboard-muted">{{readableArticles}} articole accesibile</div></div>
+                        <a class="btn btn-sm btn-primary" href="{{homePath '/convocator/'}}{{_id}}">Deschide</a>
+                      </div>
+                    {{/each}}
+                  {{else}}
+                    <p class="text-muted mb-0 py-3">Nu există convocatoare disponibile.</p>
+                  {{/if}}
+                </div>
+              </section>
+
+              <section class="card dashboard-panel">
+                <div class="card-header"><h2 class="h5 mb-1">Confirmările mele recente</h2><p class="dashboard-muted mb-0">Istoricul asociat contului curent.</p></div>
+                <div class="card-body pt-1">
+                  {{#if hasConfirmations content.confirmations}}
+                    {{#each content.confirmations}}
+                      <div class="dashboard-event">
+                        <div><span class="badge text-bg-secondary">{{confirmationStatus status}}</span></div>
+                        <div><div class="dashboard-event-title">{{nume}}</div><div class="dashboard-muted">Ținuta {{tinutaNr}}</div></div>
+                        <div>{{formatDate dataTinuta}}</div><div></div>
+                      </div>
+                    {{/each}}
+                  {{else}}
+                    <p class="text-muted mb-0 py-3">Nu există confirmări asociate contului.</p>
+                  {{/if}}
+                </div>
+              </section>
+            </div>
+
+            <div class="col-xl-4">
+              <section class="card dashboard-panel mb-4">
+                <div class="card-header"><h2 class="h5 mb-1">Acces rapid</h2></div>
+                <div class="card-body dashboard-actions">
+                  <a class="btn btn-outline-primary" href="{{homePath '/convocatoare'}}">Convocatoare</a>
+                  {{#if identity.tenantAdmin}}<a class="btn btn-outline-secondary" href="{{homePath '/administrare-tenant'}}">Administrare tenant</a>{{/if}}
+                  {{#if identity.superAdmin}}<a class="btn btn-outline-secondary" href="{{homePath '/administrare-globala'}}">Administrare globală</a>{{/if}}
+                </div>
+              </section>
+
+              {{#if administration}}
+                <section class="card dashboard-panel mb-4">
+                  <div class="card-header"><h2 class="h5 mb-1">Situație administrativă</h2><p class="dashboard-muted mb-0">Date calculate pe server pentru tenantul activ.</p></div>
+                  <div class="card-body">
+                    <div class="row g-3">
+                      <div class="col-6"><strong class="d-block fs-4">{{administration.activeUsers}}</strong><span class="dashboard-muted">utilizatori activi</span></div>
+                      <div class="col-6"><strong class="d-block fs-4">{{administration.usersWithoutGrade}}</strong><span class="dashboard-muted">fără grad</span></div>
+                      <div class="col-6"><strong class="d-block fs-4">{{administration.convocatoare}}</strong><span class="dashboard-muted">convocatoare</span></div>
+                      <div class="col-6"><strong class="d-block fs-4">{{administration.confirmations}}</strong><span class="dashboard-muted">confirmări</span></div>
+                      <div class="col-4"><strong class="d-block">{{administration.articleLevel1}}</strong><span class="dashboard-muted">nivel 1</span></div>
+                      <div class="col-4"><strong class="d-block">{{administration.articleLevel2}}</strong><span class="dashboard-muted">nivel 2</span></div>
+                      <div class="col-4"><strong class="d-block">{{administration.articleLevel3}}</strong><span class="dashboard-muted">nivel 3</span></div>
+                    </div>
+                  </div>
+                </section>
+
+                {{#if administration.usersWithoutGrade}}
+                  <div class="alert alert-warning"><strong>{{administration.usersWithoutGrade}} utilizatori activi</strong> trebuie încadrați pe grade înainte de accesarea articolelor.</div>
+                {{/if}}
+                {{#if administration.pendingUsers}}
+                  <div class="alert alert-info"><strong>{{administration.pendingUsers}} cereri de cont</strong> așteaptă verificarea în Administrare Tenant.</div>
+                {{/if}}
+                {{#if administration.unresolvedPresence}}
+                  <div class="alert alert-danger"><strong>{{administration.unresolvedPresence}} prezență importată</strong> necesită asociere manuală la convocator.</div>
+                {{/if}}
+              {{/if}}
+            </div>
+          </div>
+        {{/with}}
+      {{/if}}
+    {{/if}}
+  </div>
+</template>
+
+<template name="csaNotAuthorized">
+  <div class="alert alert-warning">Autentificarea este necesară.</div>
+</template>

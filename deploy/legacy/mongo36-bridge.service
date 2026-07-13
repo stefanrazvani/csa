@@ -1,0 +1,22 @@
+[Unit]
+Description=CSA MongoDB 3.6 migration bridge
+After=network-online.target snap.rocketchat-server.rocketchat-mongo.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+DynamicUser=yes
+ExecStart=/usr/bin/python3 /usr/local/libexec/mongo36-bridge.py
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_UNIX
+
+[Install]
+WantedBy=multi-user.target

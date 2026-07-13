@@ -1,0 +1,28 @@
+{
+  "name": "csa-meteor3",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "meteor run",
+    "check": "meteor npm install && meteor --version"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.27.6",
+    "bootstrap": "^5.3.7",
+    "echarts": "^6.1.0",
+    "jquery": "^3.7.1",
+    "meteor-node-stubs": "^1.2.21",
+    "mongodb": "6.9.0",
+    "three": "^0.185.1",
+    "underscore": "1.13.8"
+  },
+  "overrides": {
+    "tar": "7.5.16"
+  },
+  "meteor": {
+    "mainModule": {
+      "client": "client/main.js",
+      "server": "server/main.js"
+    }
+  }
+}

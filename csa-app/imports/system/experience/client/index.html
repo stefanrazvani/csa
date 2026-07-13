@@ -1,0 +1,160 @@
+<template name="csaTempleExperience">
+  <section class="csa-xp {{experienceClass}}" aria-labelledby="csaXpTitle" aria-busy="{{loading}}">
+    <div class="csa-xp-canvas-host js-xp-canvas-host" aria-hidden="true">
+      <div class="csa-xp-plan" aria-hidden="true">
+        <i class="csa-xp-plan-delta"></i>
+        <i class="csa-xp-plan-moon"></i>
+        <i class="csa-xp-plan-sun"></i>
+        <i class="csa-xp-plan-star"></i>
+        <i class="csa-xp-plan-light is-orient"></i>
+        <i class="csa-xp-plan-light is-north"></i>
+        <i class="csa-xp-plan-light is-south"></i>
+        <i class="csa-xp-plan-column is-b"></i>
+        <i class="csa-xp-plan-column is-j"></i>
+      </div>
+    </div>
+    <div class="csa-xp-vignette" aria-hidden="true"></div>
+
+    {{#if loading}}
+      <div class="csa-xp-loading" role="status">
+        <span class="csa-xp-loader" aria-hidden="true"></span>
+        <strong>Se pregătește edificiul autorizat</strong>
+        <small>Scena este compusă numai pentru contextul tău activ.</small>
+      </div>
+    {{else}}
+      {{#with manifest}}
+        <header class="csa-xp-context">
+          <div>
+            <p class="csa-xp-eyebrow">{{tenant.name}}</p>
+            <h1 id="csaXpTitle">{{title}}</h1>
+          </div>
+          <div class="csa-xp-access" aria-label="Contextul de acces">
+            <span>{{access.gradeLabel}}</span>
+            {{#if access.platformAdmin}}<span class="is-admin">Mod administrator platformă</span>{{/if}}
+          </div>
+          {{#if showAtrium}}
+            <div class="csa-xp-toolbar">
+              {{#if showGradeSelector}}
+                <label class="csa-xp-tool csa-xp-grade-select" title="Vizualizează templul unui grad accesibil">
+                  <span class="visually-hidden">Gradul templului afișat</span>
+                  <select class="js-xp-grade">
+                    {{#each gradeOptions}}
+                      <option value="{{value}}" selected={{selected}}>{{label}}</option>
+                    {{/each}}
+                  </select>
+                </label>
+              {{/if}}
+              <button class="csa-xp-tool js-xp-quality" type="button" title="Schimbă nivelul de detaliu">{{qualityLabel}}</button>
+              <button class="csa-xp-tool js-xp-fullscreen" type="button" aria-label="Comută afișarea pe tot ecranul">{{fullscreenLabel}}</button>
+            </div>
+          {{/if}}
+        </header>
+      {{/with}}
+
+      {{#if experienceError}}
+        <div class="csa-xp-alert" role="alert">
+          <span>{{experienceError}}</span>
+          <button class="js-xp-retry" type="button">Reîncearcă</button>
+        </div>
+      {{/if}}
+
+      {{#if showGate}}
+        {{#with manifest.gate}}
+          <div class="csa-xp-gate-ui" role="dialog" aria-modal="true" aria-labelledby="csaXpGateTitle" aria-describedby="csaXpGateInstruction">
+            <div class="csa-xp-gate-copy">
+              <p class="csa-xp-eyebrow">{{eyebrow}}</p>
+              <h2 id="csaXpGateTitle">{{title}}</h2>
+              <p id="csaXpGateInstruction">{{instruction}}</p>
+              <div class="csa-xp-knock-trace knock-{{knockCount}}" aria-hidden="true"><i></i><i></i><i></i></div>
+              <p class="csa-xp-live" role="status" aria-live="polite">{{knockStatus}}</p>
+            </div>
+            <div class="csa-xp-gate-actions">
+              <button class="csa-xp-knock-button js-xp-knock" type="button">
+                <span aria-hidden="true">◇</span>
+                <strong>Bate în poartă</strong>
+                <small>{{knocksRemaining}}</small>
+              </button>
+              <div>
+                <button class="csa-xp-primary js-xp-enter" type="button">{{enterLabel}}</button>
+                <button class="csa-xp-secondary js-xp-skip" type="button">{{skipLabel}}</button>
+              </div>
+            </div>
+          </div>
+        {{/with}}
+      {{/if}}
+
+      {{#if showOpening}}
+        <div class="csa-xp-transition" role="status" aria-live="polite">
+          <span>Pragul se deschide</span>
+        </div>
+      {{/if}}
+
+      {{#if showAtrium}}
+        {{#with manifest}}
+          <div class="csa-xp-intro">
+            <p>{{subtitle}}</p>
+            <small>Atinge un reper luminos sau folosește lista accesibilă.</small>
+          </div>
+
+          <button class="csa-xp-mobile-explore js-xp-toggle-navigator" type="button" aria-expanded="{{navigatorExpanded}}" aria-controls="csaXpNavigator">
+            <span aria-hidden="true">✦</span> Explorează reperele
+          </button>
+
+          <nav class="csa-xp-navigator {{navigatorClass}}" id="csaXpNavigator" aria-label="Repere disponibile în templul activ">
+            <div class="csa-xp-navigator-head">
+              <div><span>Planșa activă</span><strong>{{access.gradeLabel}}</strong></div>
+              <button class="js-xp-close-navigator" type="button" aria-label="Închide lista reperelor">×</button>
+            </div>
+            {{#if hasOffices access.offices}}
+              <div class="csa-xp-offices" aria-label="Funcții active">
+                {{#each access.offices}}<span>{{label}}</span>{{/each}}
+              </div>
+            {{/if}}
+            <ol class="csa-xp-object-list">
+              {{#each interactives}}
+                <li>
+                  <button class="js-xp-select {{itemClass id}}" type="button" data-id="{{id}}" aria-pressed="{{itemSelected id}}">
+                    <span class="csa-xp-symbol" aria-hidden="true">{{itemSymbol kind}}</span>
+                    <span><strong>{{label}}</strong><small>{{description}}</small></span>
+                  </button>
+                </li>
+              {{/each}}
+            </ol>
+            {{#if hasLearningPath learningPath}}
+              <div class="csa-xp-learning-path">
+                <strong>Parcurs interactiv</strong>
+                <ol>{{#each learningPath}}<li>{{label}}</li>{{/each}}</ol>
+              </div>
+            {{/if}}
+          </nav>
+        {{/with}}
+
+        {{#if selectedItem}}
+          {{#with selectedItem}}
+            <aside class="csa-xp-sheet" role="complementary" aria-labelledby="csaXpSheetTitle" aria-describedby="csaXpSheetDescription" tabindex="-1">
+              <button class="csa-xp-sheet-close js-xp-close-sheet" type="button" aria-label="Închide detaliile">×</button>
+              <p class="csa-xp-eyebrow">{{education.objective}}</p>
+              <h2 id="csaXpSheetTitle">{{label}}</h2>
+              <p id="csaXpSheetDescription">{{description}}</p>
+              <blockquote>{{education.prompt}}</blockquote>
+              {{#if hasSteps education.steps}}
+                <ol class="csa-xp-steps">
+                  {{#each education.steps}}<li>{{this}}</li>{{/each}}
+                </ol>
+              {{/if}}
+              {{#if sourceRef}}<small class="csa-xp-source">{{sourceRef}}</small>{{/if}}
+              <a class="csa-xp-primary js-xp-follow" href="{{itemPath route}}">{{actionLabel}}</a>
+            </aside>
+          {{/with}}
+        {{/if}}
+      {{/if}}
+    {{/if}}
+
+    {{#if webglFallback}}
+      <div class="csa-xp-webgl-note" role="status">
+        Modul grafic simplificat este activ. Toate reperele rămân accesibile din listă.
+      </div>
+    {{/if}}
+    <span class="visually-hidden" role="status" aria-live="polite">{{screenReaderStatus}}</span>
+  </section>
+</template>

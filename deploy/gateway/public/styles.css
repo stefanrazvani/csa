@@ -1,0 +1,26 @@
+:root { color-scheme: light; font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; color: #233747; background: #d2d6de; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: #d2d6de; }
+#particles { position: fixed; inset: 0; width: 100%; height: 100%; }
+.page-shell { position: relative; z-index: 1; min-height: 100vh; display: grid; place-items: center; padding: 28px 16px; }
+.public-card, .login-card { width: min(430px, 100%); padding: 30px; border-radius: 22px; background: rgba(255,255,255,.96); box-shadow: 0 22px 60px rgba(31,45,61,.2); text-align: center; }
+.login-card { position: fixed; left: 50%; top: 50%; transform: translate(-50%,-50%); text-align: left; }
+.logo { display: block; width: 220px; max-width: 78%; height: auto; margin: 0 auto 12px; }
+h1 { margin: 0 0 12px; font-size: clamp(1.6rem, 5vw, 2.1rem); }
+h2 { margin: 0 0 8px; }
+.lead, .login-card p { color: #657787; }
+.primary-button { width: 100%; min-height: 44px; margin-top: 14px; border: 0; border-radius: 9px; padding: 12px 16px; color: white; background: #367fa9; font-size: 1rem; cursor: pointer; }
+.primary-button:hover { background: #286a91; }
+.primary-button:disabled { opacity: .65; cursor: wait; }
+label { display: block; margin: 14px 0 6px; font-weight: 600; }
+input { width: 100%; border: 1px solid #bdc8cf; border-radius: 8px; padding: 11px 12px; font: inherit; }
+input:focus { outline: 3px solid rgba(54,127,169,.2); border-color: #367fa9; }
+.close-button { position: absolute; top: 8px; right: 10px; min-width: 44px; min-height: 44px; border: 0; background: transparent; font-size: 1.8rem; color: #657787; cursor: pointer; }
+.close-button { text-decoration: none; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+.login-links { display: flex; justify-content: space-between; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e3e8ec; }
+.login-links a { min-height: 44px; padding: 10px 6px; display: inline-flex; align-items: center; justify-content: center; color: #367fa9; font-size: .9rem; }
+.message { margin-top: 14px; padding: 10px 12px; border-radius: 8px; background: #f8d7da; color: #842029; }
+[hidden] { display: none !important; }
+@media (max-width: 520px) { .public-card, .login-card { padding: 24px 20px; } .login-links { flex-direction: column; text-align: center; } .form-row { grid-template-columns: 1fr; gap: 0; } }

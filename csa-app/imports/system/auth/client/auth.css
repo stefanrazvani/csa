@@ -1,0 +1,16 @@
+.csa-auth-main { padding: 0 !important; }
+.csa-auth-page { position: relative; min-height: 100vh; overflow: hidden; display: grid; place-items: center; padding: 32px 16px; background: #d2d6de; }
+.csa-particles-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+.csa-auth-card { position: relative; z-index: 1; width: min(420px, 100%); border: 0; border-radius: 22px; box-shadow: 0 22px 60px rgba(31, 45, 61, .2); background: rgba(255, 255, 255, .95); backdrop-filter: blur(8px); }
+.csa-auth-card .card-body { padding: 30px; }
+.csa-auth-card .btn, .csa-auth-modal .btn { min-height: 44px; }
+.csa-auth-logo { display: block; width: 220px; max-width: 78%; height: auto; margin: 0 auto 12px; }
+.csa-auth-title { color: #233747; font-weight: 700; letter-spacing: .01em; }
+.csa-auth-subtitle { color: #657787; }
+.csa-auth-links { display: flex; justify-content: space-between; gap: 12px; margin-top: 18px; padding-top: 16px; border-top: 1px solid #e3e8ec; }
+.csa-auth-link { min-height: 44px; border: 0; padding: 10px 8px; display: inline-flex; align-items: center; justify-content: center; color: #367fa9; background: transparent; font-size: .92rem; text-decoration: none; }
+.csa-auth-link:hover { color: #245d7e; text-decoration: underline; }
+.csa-auth-modal .modal-content { border: 0; border-radius: 18px; box-shadow: 0 24px 70px rgba(22, 34, 48, .25); }
+.csa-auth-modal .modal-header { border-bottom-color: #e8edf0; }
+.csa-auth-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; }
+@media (max-width: 575.98px) { .csa-auth-card .card-body { padding: 24px 20px; } .csa-auth-links { flex-direction: column; align-items: center; } }

@@ -1,0 +1,21 @@
+#!/bin/bash
+set -e
+
+APP_DIR=/var/meteor/csa
+
+while [ ! -f "$APP_DIR/package.json" ]; do
+  echo "[csa-meteor] aștept sursa în $APP_DIR"
+  sleep 5
+done
+
+mkdir -p /var/log/csa
+chown -R 10000:10001 "$APP_DIR" /var/log/csa /home/urgentit
+
+cd "$APP_DIR"
+if [ ! -d node_modules ]; then
+  chpst -u urgentit:urgentit env HOME=/home/urgentit PATH=/usr/local/bin:/usr/bin:/bin meteor npm install
+fi
+exec chpst -u urgentit:urgentit env \
+  HOME=/home/urgentit \
+  PATH=/usr/local/bin:/usr/bin:/bin \
+  meteor run --production --port 3010 >>/var/log/csa/meteor.log 2>&1

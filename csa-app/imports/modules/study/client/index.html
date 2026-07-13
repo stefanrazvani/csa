@@ -1,0 +1,79 @@
+<template name="studyLibrary">
+  <div class="study-page">
+    <header class="study-hero">
+      <div><span class="study-kicker">Camera cărților</span><h1>Bibliotecă și studiu</h1><p>Cunoașterea se așază în straturi, iar fiecare idee poate deveni începutul unui dialog.</p></div>
+      <a class="btn btn-outline-light" href="{{conceptsPath}}">Harta conceptelor</a>
+    </header>
+    {{#if error}}<div class="alert alert-danger">{{error}}</div>{{/if}}
+    <section class="study-toolbar">
+      <label class="visually-hidden" for="studySearch">Caută în bibliotecă</label>
+      <input id="studySearch" class="form-control" placeholder="Caută în texte…">
+      <button class="btn btn-primary js-study-search">Caută</button>
+    </section>
+    {{#if searchResults.length}}
+      <section class="study-panel"><h2>Fragmente găsite</h2>{{#each searchResults}}<article class="study-search-hit"><span class="study-node-type">{{type}}</span><p>{{text}}</p></article>{{/each}}</section>
+    {{/if}}
+    {{#if canManage}}
+      <details class="study-panel study-create" open>
+        <summary>Adaugă o lucrare prin text direct</summary>
+        <form id="studyCreateWork" class="row g-3 mt-1">
+          <div class="col-md-6"><label class="form-label">Titlu</label><input class="form-control" name="title" required></div>
+          <div class="col-md-3"><label class="form-label">Autor</label><input class="form-control" name="author"></div>
+          <div class="col-md-3"><label class="form-label">Grad minim</label><select class="form-select" name="minGrade"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
+          <div class="col-md-4"><label class="form-label">Titular drepturi</label><input class="form-control" name="rightsHolder" required></div>
+          <div class="col-md-4"><label class="form-label">Licență / permisiune</label><input class="form-control" name="license" required></div>
+          <div class="col-md-4"><label class="form-label">Sursă</label><input class="form-control" name="source"></div>
+          <div class="col-12"><label class="form-label">Text direct</label><textarea class="form-control study-direct-text" name="content" rows="10" placeholder="# Titlu capitol&#10;&#10;Primul paragraf…"></textarea><div class="form-text">Folosește # înaintea titlurilor de capitol. Paragrafele se separă printr-un rând gol.</div></div>
+          <div class="col-12 study-source-divider"><span>sau</span></div>
+          <div class="col-12"><label class="form-label">Fișier DOCX/PDF cu text</label><input class="form-control" name="sourceFile" type="file" accept=".docx,.pdf,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"><div class="form-text">PDF-urile scanate sunt păstrate, dar marcate fără text; OCR nu este activ.</div></div>
+          <div class="col-12 d-flex gap-3 align-items-center"><label class="form-check"><input class="form-check-input" name="storageAllowed" type="checkbox" required> <span class="form-check-label">Stocarea este permisă</span></label><label class="form-check"><input class="form-check-input" name="processingAllowed" type="checkbox" required> <span class="form-check-label">Procesarea este permisă</span></label></div>
+          <div class="col-12"><button class="btn btn-primary" disabled="{{busy}}">{{#if busy}}Se structurează…{{else}}Creează și structurează{{/if}}</button></div>
+        </form>
+      </details>
+    {{/if}}
+    <section class="study-shelves" aria-label="Catalog">
+      {{#each works}}
+        <a class="study-book" href="{{workPath _id}}"><span class="study-book-grade">Grad {{minGrade}}</span><span class="study-book-spine"></span><strong>{{title}}</strong><span>{{author}}</span><small>{{statusLabel status}}</small></a>
+      {{else}}<div class="study-empty">Biblioteca așteaptă prima lucrare.</div>{{/each}}
+    </section>
+  </div>
+</template>
+
+<template name="studyReader">
+  <div class="study-reader-page">
+    {{#if work}}
+      <header class="study-reader-header"><a href="{{libraryPath}}" class="study-back">← Bibliotecă</a><span class="study-kicker">Grad {{work.minGrade}}</span><h1>{{work.title}}</h1><p>{{work.author}} {{work.edition}}</p>
+        {{#if canManage}}{{#if reviewVersion}}<button class="btn btn-sm btn-warning js-publish-work">Publică versiunea în verificare</button>{{/if}}{{/if}}
+      </header>
+      <div class="study-reader-layout">
+        <main class="study-text">
+          {{#each readableNodes}}
+            <article class="study-text-node study-{{type}}" data-id="{{_id}}">
+              {{#if isHeading type}}<h2>{{text}}</h2>{{else}}<p>{{text}}</p><button class="study-discuss js-start-debate" type="button" data-id="{{_id}}" data-type="{{type}}" data-text="{{text}}">Deschide dezbatere</button>{{/if}}
+            </article>
+          {{else}}<div class="study-empty">Versiunea publicată nu conține încă text.</div>{{/each}}
+        </main>
+        <aside class="study-side"><h2>Dezbateri</h2>{{#each debates}}<a href="{{debatePath _id}}"><strong>{{title}}</strong><small>Grad {{minGrade}}</small></a>{{else}}<p class="text-muted">Nu există dezbateri.</p>{{/each}}</aside>
+      </div>
+    {{else}}<div class="study-loading">Se deschide lucrarea…</div>{{/if}}
+  </div>
+</template>
+
+<template name="studyDebate">
+  <div class="study-debate-page">
+    {{#if debate}}
+      <header><a href="{{libraryPath}}" class="study-back">← Bibliotecă</a><span class="study-kicker">Dezbatere · grad {{debate.minGrade}}</span><h1>{{debate.title}}</h1>{{#if debate.quoteSnapshot}}<blockquote>{{debate.quoteSnapshot}}</blockquote>{{/if}}</header>
+      <section class="study-messages" aria-live="polite">{{#each messages}}<article><div class="study-message-meta">{{authorLabel createdBy}} · {{formatDate createdAt}}</div>{{#if quote}}<blockquote>{{quote}}</blockquote>{{/if}}<p>{{text}}</p></article>{{else}}<p class="text-muted">Deschide dialogul prin primul mesaj.</p>{{/each}}</section>
+      <form id="studyMessageForm" class="study-message-form"><textarea class="form-control" name="text" rows="3" placeholder="Scrie o contribuție…" required></textarea><button class="btn btn-primary">Trimite</button></form>
+    {{else}}<div class="study-loading">Se încarcă dezbaterea…</div>{{/if}}
+  </div>
+</template>
+
+<template name="studyConcepts">
+  <div class="study-page"><header class="study-hero"><div><span class="study-kicker">Planșa ideilor</span><h1>Harta conceptelor</h1><p>Relații create și validate de oameni, legate de sursele lor.</p></div><a class="btn btn-outline-light" href="{{libraryPath}}">Bibliotecă</a></header>
+    {{#if canManage}}<section class="study-panel"><form id="studyConceptCreate" class="row g-2"><div class="col-md-3"><input class="form-control" name="name" placeholder="Concept" required></div><div class="col-md-5"><input class="form-control" name="description" placeholder="Descriere"></div><div class="col-md-2"><select class="form-select" name="minGrade"><option value="1">Grad 1</option><option value="2">Grad 2</option><option value="3">Grad 3</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100">Adaugă</button></div></form><hr><form id="studyConceptLink" class="row g-2"><div class="col-md-3"><select class="form-select" name="fromConceptId" required><option value="">Concept sursă</option>{{#each concepts}}<option value="{{_id}}">{{name}}</option>{{/each}}</select></div><div class="col-md-2"><select class="form-select" name="type"><option value="asociat">asociat</option><option value="dezvolta">dezvoltă</option><option value="contrasteaza">contrastează</option><option value="exemplifica">exemplifică</option><option value="referinta">referință</option></select></div><div class="col-md-3"><select class="form-select" name="toConceptId" required><option value="">Concept destinație</option>{{#each concepts}}<option value="{{_id}}">{{name}}</option>{{/each}}</select></div><div class="col-md-3"><input class="form-control" name="justification" placeholder="Justificare"></div><div class="col-md-1"><button class="btn btn-primary w-100">Leagă</button></div></form></section>{{/if}}
+    <section class="study-panel"><div id="studyConceptGraph" class="study-concept-graph" role="img" aria-label="Graf interactiv al conceptelor"></div></section>
+    <section class="concept-map concept-map-fallback">{{#each concepts}}<article class="concept-node concept-grade-{{minGrade}}"><span>Grad {{minGrade}}</span><h2>{{name}}</h2><p>{{description}}</p></article>{{else}}<div class="study-empty">Nu există concepte publicate.</div>{{/each}}</section>
+    <section class="study-panel"><h2>Relații</h2>{{#each relations}}<div class="concept-relation"><strong>{{conceptName fromConceptId}}</strong><span>{{type}}</span><strong>{{conceptName toConceptId}}</strong><p>{{justification}}</p></div>{{else}}<p class="text-muted">Nu există relații.</p>{{/each}}</section>
+  </div>
+</template>
