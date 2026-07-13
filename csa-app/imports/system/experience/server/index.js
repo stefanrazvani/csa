@@ -21,7 +21,15 @@ const EXPERIENCE_VERSION = '2026.07.13-2';
 // nu au o reprezentare fizică fidelă planșei și încărcau vizual templul.
 // Funcțiile au deja pupitrele lor în arhitectură; markerele lor plutitoare
 // sunt toate doar în listă.
-const LIST_ONLY_SYMBOL_IDS = new Set(['g3-master-board', 'g3-travel-lines', 'g3-circle-center', 'g3-acacia']);
+const LIST_ONLY_SYMBOL_IDS = new Set([
+  'g1-great-lights',
+  'g2-great-lights',
+  'g3-acacia',
+  'g3-circle-center',
+  'g3-great-lights',
+  'g3-master-board',
+  'g3-travel-lines',
+]);
 
 function normalizeOfficeCode(value) {
   return String(value || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '').slice(0, 64);
