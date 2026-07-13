@@ -59,10 +59,10 @@ nu include OCR; documentele fără text suficient devin `unsupported_scan`.
 - datele migrate au rămas la 25 convocatoare, 559 articole, 24 prezențe și 462 confirmări;
 - backup logic complet valid: `post-platform-20260713`.
 - validare release curent: 67/67 fișiere JavaScript, 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
-- backup logic înainte de release: `pre-release-20260713-225300-f6dfa012a86a`;
+- backup logic înainte de release: `pre-release-20260713-234826-fa1982c5e24e`;
 - backup cod/gateway cu SHA-256: `pre-3d-dossiers-20260713T162926Z`;
-- release activ: `csa-app-release-20260713-225300-f6dfa012a86a`, SHA-256 `f68da94ee83a8cd5b3b3300337af4c76dc948eb213a7c5157d7083f321f29a07`;
-- sursă release: commit GitHub `f6dfa012a86a95247b88c10e4fa74e60c9b41db6`, tag `release-20260713-225300`;
+- release activ: `csa-app-release-20260713-234826-fa1982c5e24e`, SHA-256 `839eed20e169261d0ae87cae2479866f31f8c54e8e5bf397a796fe7b38c9d744`;
+- sursă release: commit GitHub `fa1982c5e24e2a9390b1916b9222c8eb52262d55`, tag `release-20260713-234826`;
 - după release: 10/10 containere `healthy`, fără erori runtime în ultimele loguri, swap 4 GiB liber integral.
 
 Documentele din `C:\Proiecte\CSA` au fost folosite exclusiv drept surse de proiectare și structurare. Nu au fost modificate și nu au fost importate în bibliotecă.
