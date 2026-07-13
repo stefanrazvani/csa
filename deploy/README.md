@@ -118,4 +118,8 @@ Limitări operaționale importante:
 
 Sursa rămâne în `/var/meteor/csa`, în `csa_meteor_data`, iar bundle-ul activ în `/var/meteor/csa-build/bundle`. Construiți cu `build-bundle.sh`, promovați atomic `csa-build.next`, păstrați bundle-ul anterior pentru rollback și recreați cele două servicii Meteor.
 
+Procedura completă de release de pe stația Windows `UITWin11Dev`, inclusiv
+cheia SSH dedicată, validarea, backupul, promovarea atomică și verificările
+post-deploy, este documentată în [`../DEPLOYMENT.md`](../DEPLOYMENT.md).
+
 În producție sunt obligatorii `CSA_GATEWAY_ORIGIN=https://reperta.via-nova.ro`, cookie `Secure`, TLS și limitarea portului direct `18600` la LAN/VPN.
