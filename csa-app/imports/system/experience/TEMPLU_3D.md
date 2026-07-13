@@ -162,7 +162,7 @@ Pe desktop, raycasting-ul identifică obiectul de sub cursor. La selectare, obie
 
 Fără `prefers-reduced-motion`, reperele plutesc discret, se rotesc lent, iar camera reacționează ușor la poziția cursorului.
 
-Reperele cu `presentation: 'list'` nu primesc corp 3D: rămân disponibile exclusiv în navigatorul semantic. Sunt marcate astfel reperele fără o reprezentare fizică fidelă planșei (planșele desenate, parcursurile, „cercurile" funcționale), pentru a nu încărca vizual templul.
+Reperele cu `presentation: 'list'` nu primesc corp 3D: rămân disponibile exclusiv în navigatorul semantic. Sunt marcate astfel reperele fără o reprezentare fizică fidelă planșei — planșele desenate, parcursurile, „cercurile" funcționale, „camerele" de studiu, Ramura de Acacia — și **toate markerele funcțiilor** (Conducerea Lojei, Arhiva Vie, Camera Măsurii, Vatra Fraternă, Biblioteca Vie, Legalitate și concluzii, Atelierul de instruire, Pregătirea Ținutei, Starea pragului, Cercul mentoratului, Parcursul Ucenicului/Calfei): funcțiile au deja pupitrele lor în arhitectura scenei, iar instrumentele se deschid din listă.
 
 Panoul de detalii este non-modal: scena rămâne interactivă cât timp panoul este deschis, iar selectarea altui reper (din scenă sau din listă) înlocuiește direct conținutul. Escape închide panoul.
 
@@ -299,7 +299,7 @@ Reperele funcțiilor sunt adăugate numai pentru funcțiile active și autorizat
 - Bibliotecar;
 - Mentor.
 
-În scena curentă acestea sunt markere 3D abstracte — cilindru, octaedru sau tor — poziționate conform catalogului server-side. Ele nu sunt încă jilțuri, pupitre sau personaje modelate.
+Reperele funcțiilor sunt publicate cu `presentation: 'list'`: apar exclusiv în navigatorul semantic, fără corp 3D plutitor. Reprezentarea fizică a funcțiilor în scenă este dată de pupitrele și jilțurile din arhitectură (tronul Venerabilului, pupitrele Supraveghetorilor, mesele Secretarului/Oratorului, romburile Ospitalierului și Trezorierului, pupitrul Maestrului de Ceremonii).
 
 Exemple de destinații:
 

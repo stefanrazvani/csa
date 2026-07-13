@@ -414,9 +414,9 @@ const SCENES = Object.freeze({
       interactive('vertical-reper', 'tool', 'Reperul verticalității', 'Explorează relația dintre intenție, faptă și consecvență.', [4.7, 1.15, -5.7], { type: 'cone', radius: 0.62, height: 1.85, segments: 4 }, ROUTES.library,
         learning('Aliniere', 'Unde există astăzi distanță între ceea ce afirmi și ceea ce faci?', ['Privește axa obiectului.', 'Alege o situație reală.', 'Scrie o acțiune mică și verificabilă.']), { sourceRef: 'Catalog intern · gradul 1' }),
       interactive('first-library', 'library', 'Camera studiului introductiv', 'Textele și planșele autorizate gradului activ.', [-4.9, 1, 1.6], { type: 'box', width: 1.65, height: 1.2, depth: 0.42 }, ROUTES.library,
-        learning('Studiu activ', 'Ce idee merită comparată cu propria experiență?', ['Citește un fragment scurt.', 'Selectează o propoziție.', 'Pornește o notă sau o dezbatere.']), { actionLabel: 'Deschide studiul' }),
+        learning('Studiu activ', 'Ce idee merită comparată cu propria experiență?', ['Citește un fragment scurt.', 'Selectează o propoziție.', 'Pornește o notă sau o dezbatere.']), { actionLabel: 'Deschide studiul', presentation: 'list' }),
       interactive('convocations-one', 'assembly', 'Cercul lucrării', 'Convocatoarele și informațiile permise nivelului tău de acces.', [4.9, 0.85, 3.4], { type: 'torus', radius: 0.68, tube: 0.16, segments: 32 }, ROUTES.convocations,
-        learning('Participare', 'Cum te pregătești pentru următoarea lucrare comună?', ['Consultă convocatorul.', 'Confirmă participarea.', 'Pregătește întrebarea pe care o aduci.']), { actionLabel: 'Vezi convocatoarele' }),
+        learning('Participare', 'Cum te pregătești pentru următoarea lucrare comună?', ['Consultă convocatorul.', 'Confirmă participarea.', 'Pregătește întrebarea pe care o aduci.']), { actionLabel: 'Vezi convocatoarele', presentation: 'list' }),
     ],
   },
   2: {
@@ -471,17 +471,17 @@ const SCENES = Object.freeze({
 
 const OFFICE_INTERACTIVES = Object.freeze({
   secretary: interactive('office-secretariat', 'office', 'Scriptoriumul Secretarului', 'Registru matricol, dosare, convocatoare, prezențe și documente oficiale.', [-6.7, 1.75, -5.7], { type: 'box', width: 1.25, height: 1.55, depth: 0.5 }, ROUTES.register,
-    learning('Memorie exactă', 'Ce înregistrare trebuie verificată înainte să devină stare canonică?', ['Consultă documentul-sursă.', 'Validează cronologia.', 'Înregistrează decizia în audit.']), { actionLabel: 'Deschide Secretariatul' }),
+    learning('Memorie exactă', 'Ce înregistrare trebuie verificată înainte să devină stare canonică?', ['Consultă documentul-sursă.', 'Validează cronologia.', 'Înregistrează decizia în audit.']), { actionLabel: 'Deschide Secretariatul', presentation: 'list' }),
   venerable: interactive('office-governance', 'office', 'Masa conducerii', 'Context anual, aprobări și supravegherea lucrării administrative.', [0, 2.1, -8.1], { type: 'cylinder', radius: 1, height: 0.35, segments: 8 }, ROUTES.register,
-    learning('Supraveghere', 'Ce decizie are nevoie de context, responsabil și urmă de audit?', ['Verifică temeiul.', 'Separă aprobarea de execuție.', 'Urmărește rezultatul.']), { actionLabel: 'Deschide registrul' }),
+    learning('Supraveghere', 'Ce decizie are nevoie de context, responsabil și urmă de audit?', ['Verifică temeiul.', 'Separă aprobarea de execuție.', 'Urmărește rezultatul.']), { actionLabel: 'Deschide registrul', presentation: 'list' }),
   treasurer: interactive('office-treasury', 'office', 'Camera Măsurii', 'Bugete, cotizații, mișcări și documente justificative.', [6.5, 2.05, -9.5], { type: 'cylinder', radius: 0.82, height: 0.42, segments: 32 }, ROUTES.treasury,
     learning('Trasabilitate', 'Poate fi reconstituită fiecare mișcare din documente și aprobări?', ['Verifică perioada și categoria.', 'Atașează justificarea.', 'Folosește reversarea, nu ștergerea.']), { actionLabel: 'Deschide Metalele', presentation: 'list' }),
   hospitalier: interactive('office-hospitality', 'office', 'Vatra fraternă', 'Evenimente și cazuri de sprijin cu acces strict.', [-6.5, 2.05, -9.5], { type: 'sphere', size: 0.83 }, ROUTES.hospitality,
-    learning('Discreție activă', 'Care este ajutorul potrivit, oferit cu minimum de expunere?', ['Clarifică nevoia.', 'Limitează accesul la informație.', 'Urmărește sprijinul cu respect.']), { actionLabel: 'Deschide Ospitalierul' }),
+    learning('Discreție activă', 'Care este ajutorul potrivit, oferit cu minimum de expunere?', ['Clarifică nevoia.', 'Limitează accesul la informație.', 'Urmărește sprijinul cu respect.']), { actionLabel: 'Deschide Ospitalierul', presentation: 'list' }),
   librarian: interactive('office-library', 'office', 'Arhiva studiului', 'Cărți, structură textuală, concepte și moderarea dezbaterilor.', [-5.6, 1.05, 3.9], { type: 'octahedron', size: 0.83 }, ROUTES.library,
-    learning('Sursă și sens', 'Este fiecare afirmație legată de o sursă și de nivelul corect de acces?', ['Verifică drepturile.', 'Validează structura.', 'Publică numai versiunea revizuită.']), { actionLabel: 'Deschide Biblioteca' }),
+    learning('Sursă și sens', 'Este fiecare afirmație legată de o sursă și de nivelul corect de acces?', ['Verifică drepturile.', 'Validează structura.', 'Publică numai versiunea revizuită.']), { actionLabel: 'Deschide Biblioteca', presentation: 'list' }),
   mentor: interactive('office-mentor', 'office', 'Pragul mentorului', 'Îndrumarea parcursului educativ fără automatizarea gradelor.', [-5.6, 1.05, 5.6], { type: 'torusKnot', radius: 0.62, tube: 0.14, segments: 56 }, ROUTES.library,
-    learning('Îndrumare', 'Cum poți susține progresul fără să înlocuiești descoperirea personală?', ['Propune o întrebare.', 'Indică o sursă accesibilă.', 'Oferă feedback concret.']), { actionLabel: 'Deschide studiul' }),
+    learning('Îndrumare', 'Cum poți susține progresul fără să înlocuiești descoperirea personală?', ['Propune o întrebare.', 'Indică o sursă accesibilă.', 'Oferă feedback concret.']), { actionLabel: 'Deschide studiul', presentation: 'list' }),
 });
 
 export function gradeName(grade) {
