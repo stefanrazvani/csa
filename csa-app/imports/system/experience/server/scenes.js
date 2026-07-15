@@ -229,29 +229,64 @@ function tracingBoard(grade) {
 
 // Cei Trei Mari Stâlpi, strânși la colțurile pavajului, conform ritualului:
 // Ionic (Înțelepciunea) la S-E, Doric (Forța) la N-V, Corintic (Frumusețea)
-// la S-V, fiecare purtând câte o lumânare.
+// la S-V, fiecare purtând câte o lumânare. Fiecare stâlp respectă trăsăturile
+// ordinului său arhitectural.
+function doricPillar(id, x, z) {
+  // Doric: fără bază proprie, fus masiv cu conicitate accentuată și fațete
+  // care sugerează canelurile, echin evazat și abacă pătrată.
+  return [
+    primitive(`${id}-base`, 'box', [x, 0.09, z], [0.44, 0.18, 0.44], '#242e38'),
+    primitive(`${id}-shaft`, 'cylinder', [x, 0.85, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.115, radiusBottom: 0.16, height: 1.34, segments: 12 }, roughness: 0.85 }),
+    primitive(`${id}-echinus`, 'cylinder', [x, 1.57, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.175, radiusBottom: 0.115, height: 0.1, segments: 16 } }),
+    primitive(`${id}-abacus`, 'box', [x, 1.665, z], [0.36, 0.09, 0.36], '#cfc4a4'),
+  ];
+}
+
+function ionicPillar(id, x, z) {
+  // Ionic: bază cu mulură torică, fus zvelt, capitel cu două volute laterale
+  // legate printr-o pernă, abacă subțire.
+  return [
+    primitive(`${id}-base`, 'box', [x, 0.08, z], [0.4, 0.16, 0.4], '#242e38'),
+    primitive(`${id}-base-torus`, 'torus', [x, 0.2, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.115, tube: 0.035, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }),
+    primitive(`${id}-shaft`, 'cylinder', [x, 0.86, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.085, radiusBottom: 0.105, height: 1.32, segments: 20 } }),
+    primitive(`${id}-echinus`, 'cylinder', [x, 1.55, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.12, radiusBottom: 0.085, height: 0.06, segments: 16 } }),
+    primitive(`${id}-volute-cushion`, 'box', [x, 1.62, z], [0.3, 0.07, 0.09], COLORS.ivory),
+    primitive(`${id}-volute-north`, 'torus', [x - 0.15, 1.62, z], [1, 1, 1], '#cfc4a4', { geometry: { radius: 0.055, tube: 0.028, segments: 20 } }),
+    primitive(`${id}-volute-south`, 'torus', [x + 0.15, 1.62, z], [1, 1, 1], '#cfc4a4', { geometry: { radius: 0.055, tube: 0.028, segments: 20 } }),
+    primitive(`${id}-abacus`, 'box', [x, 1.685, z], [0.3, 0.05, 0.26], '#cfc4a4'),
+  ];
+}
+
+function corinthianPillar(id, x, z) {
+  // Corintic: bază cu mulură, fusul cel mai zvelt, capitel-clopot îmbrăcat în
+  // frunze de acant și abacă evazată.
+  const leaves = [
+    [0.12, 0, [0, 0, -0.5]],
+    [-0.12, 0, [0, 0, 0.5]],
+    [0, 0.12, [0.5, 0, 0]],
+    [0, -0.12, [-0.5, 0, 0]],
+  ];
+  return [
+    primitive(`${id}-base`, 'box', [x, 0.08, z], [0.4, 0.16, 0.4], '#242e38'),
+    primitive(`${id}-base-torus`, 'torus', [x, 0.2, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.11, tube: 0.03, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }),
+    primitive(`${id}-shaft`, 'cylinder', [x, 0.79, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.08, radiusBottom: 0.1, height: 1.26, segments: 20 } }),
+    primitive(`${id}-bell`, 'cylinder', [x, 1.52, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.155, radiusBottom: 0.085, height: 0.2, segments: 18 } }),
+    ...leaves.map(([dx, dz, rotation], index) => primitive(`${id}-leaf-${index + 1}`, 'cone', [x + dx, 1.5, z + dz], [1, 1, 1], '#9aa07e', { geometry: { radius: 0.05, height: 0.15, segments: 8 }, rotation, roughness: 0.8 })),
+    primitive(`${id}-abacus`, 'box', [x, 1.67, z], [0.32, 0.06, 0.32], '#cfc4a4'),
+  ];
+}
+
 function threePillars() {
   const spots = [
-    ['pillar-wisdom-se', 2.2, -5.25, 'ionic'],
-    ['pillar-strength-nw', -2.2, 1.25, 'doric'],
-    ['pillar-beauty-sw', 2.2, 1.25, 'corinthian'],
+    ['pillar-wisdom-se', 2.2, -5.25, ionicPillar],
+    ['pillar-strength-nw', -2.2, 1.25, doricPillar],
+    ['pillar-beauty-sw', 2.2, 1.25, corinthianPillar],
   ];
-  return spots.flatMap(([id, x, z, order]) => {
-    const items = [
-      primitive(`${id}-base`, 'box', [x, 0.11, z], [0.46, 0.22, 0.46], '#242e38'),
-      primitive(`${id}-shaft`, 'cylinder', [x, 0.94, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.09, radiusBottom: 0.13, height: 1.44, segments: 14 } }),
-    ];
-    if (order === 'ionic') {
-      items.push(primitive(`${id}-capital`, 'torus', [x, 1.7, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.11, tube: 0.045, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }));
-    } else if (order === 'doric') {
-      items.push(primitive(`${id}-capital`, 'box', [x, 1.7, z], [0.3, 0.08, 0.3], COLORS.ivory));
-    } else {
-      items.push(primitive(`${id}-capital`, 'cone', [x, 1.7, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.15, height: 0.16, segments: 14 }, rotation: [Math.PI, 0, 0] }));
-    }
-    items.push(primitive(`${id}-candle`, 'cylinder', [x, 1.87, z], [1, 1, 1], '#e9dfc4', { geometry: { radiusTop: 0.04, radiusBottom: 0.04, height: 0.22, segments: 10 } }));
-    items.push(primitive(`${id}-flame`, 'cone', [x, 2.09, z], [1, 1, 1], COLORS.flame, { geometry: { radius: 0.08, height: 0.24, segments: 10 }, emissive: '#f3b74a', emissiveIntensity: 3.2 }));
-    return items;
-  });
+  return spots.flatMap(([id, x, z, builder]) => ([
+    ...builder(id, x, z),
+    primitive(`${id}-candle`, 'cylinder', [x, 1.82, z], [1, 1, 1], '#e9dfc4', { geometry: { radiusTop: 0.04, radiusBottom: 0.04, height: 0.22, segments: 10 } }),
+    primitive(`${id}-flame`, 'cone', [x, 2.04, z], [1, 1, 1], COLORS.flame, { geometry: { radius: 0.08, height: 0.24, segments: 10 }, emissive: '#f3b74a', emissiveIntensity: 3.2 }),
+  ]));
 }
 
 // Coloanele Boaz (Miazănoapte) și Jachin (Miazăzi) de la Occident. Conform

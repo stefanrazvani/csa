@@ -196,7 +196,7 @@ Elementele comune, prezente la toate gradele (~121 de piese de arhitectură):
 - mesele Secretarului (Miazănoapte) și Oratorului (Miazăzi), sub estradă;
 - altarul central cu Volumul Legii Sacre deschis, echerul și compasul;
 - pavajul mozaicat central, cu laturile în raportul „Secțiunii de aur" și pătrate `5 × 8` (termeni Fibonacci, conform ritualului), bordură dantelată și planșa de trasat a gradului;
-- Cei Trei Mari Stâlpi, strânși la colțurile pavajului conform ritualului — Ionic (Înțelepciunea) la S-E, Doric (Forța) la N-V, Corintic (Frumusețea) la S-V — fiecare cu capitel distinct și lumânare;
+- Cei Trei Mari Stâlpi, strânși la colțurile pavajului conform ritualului, fiecare construit în ordinul său arhitectural și purtând o lumânare: Ionic la S-E (Înțelepciunea — bază cu mulură torică, fus zvelt, capitel cu două volute), Doric la N-V (Forța — fus masiv fațetat cu conicitate accentuată, echin evazat și abacă pătrată), Corintic la S-V (Frumusețea — fusul cel mai zvelt, capitel-clopot cu frunze de acant și abacă evazată);
 - firul cu plumb care atârnă din boltă deasupra centrului pavajului (Axis Mundi, conform ritualului);
 - piatra brută (Miazănoapte) și piatra cubică cu vârf (Miazăzi), la limita Orientului;
 - pupitrele celor doi Supraveghetori (Occident, respectiv Miazăzi), fiecare cu coloana mică, și pupitrul Maestrului de Ceremonii lângă Primul Supraveghetor;
