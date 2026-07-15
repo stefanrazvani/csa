@@ -258,22 +258,43 @@ function ionicPillar(id, x, z) {
 }
 
 function corinthianPillar(id, x, z) {
-  // Corintic: bază cu mulură, fusul cel mai zvelt, capitel-clopot îmbrăcat în
-  // frunze de acant și abacă evazată.
-  const leaves = [
-    [0.12, 0, [0, 0, -0.5]],
-    [-0.12, 0, [0, 0, 0.5]],
-    [0, 0.12, [0.5, 0, 0]],
-    [0, -0.12, [-0.5, 0, 0]],
-  ];
-  return [
+  // Corintic, după modelul clasic: fus zvelt canelat, kalathos (clopot)
+  // îmbrăcat în două rânduri de frunze de acant răsfrânte în afară, volute
+  // (caulicoli) la colțuri sub abacă și abacă evazată, totul în piatră.
+  const stone = COLORS.ivory;
+  const stoneShade = '#c0b494';
+  const items = [
     primitive(`${id}-base`, 'box', [x, 0.08, z], [0.4, 0.16, 0.4], '#242e38'),
-    primitive(`${id}-base-torus`, 'torus', [x, 0.2, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.11, tube: 0.03, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }),
-    primitive(`${id}-shaft`, 'cylinder', [x, 0.79, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.08, radiusBottom: 0.1, height: 1.26, segments: 20 } }),
-    primitive(`${id}-bell`, 'cylinder', [x, 1.52, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.155, radiusBottom: 0.085, height: 0.2, segments: 18 } }),
-    ...leaves.map(([dx, dz, rotation], index) => primitive(`${id}-leaf-${index + 1}`, 'cone', [x + dx, 1.5, z + dz], [1, 1, 1], '#9aa07e', { geometry: { radius: 0.05, height: 0.15, segments: 8 }, rotation, roughness: 0.8 })),
-    primitive(`${id}-abacus`, 'box', [x, 1.67, z], [0.32, 0.06, 0.32], '#cfc4a4'),
+    primitive(`${id}-base-torus`, 'torus', [x, 0.2, z], [1, 1, 1], stone, { geometry: { radius: 0.11, tube: 0.03, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }),
+    primitive(`${id}-shaft`, 'cylinder', [x, 0.76, z], [1, 1, 1], stone, { geometry: { radiusTop: 0.08, radiusBottom: 0.1, height: 1.2, segments: 14 } }),
+    primitive(`${id}-bell`, 'cylinder', [x, 1.48, z], [1, 1, 1], stone, { geometry: { radiusTop: 0.15, radiusBottom: 0.085, height: 0.26, segments: 18 } }),
   ];
+  // Rândul inferior: șase frunze de acant, ușor răsfrânte.
+  for (let index = 0; index < 6; index += 1) {
+    const angle = (index / 6) * Math.PI * 2;
+    items.push(primitive(`${id}-leaf-low-${index + 1}`, 'cone',
+      [x + Math.cos(angle) * 0.105, 1.44, z + Math.sin(angle) * 0.105], [1, 1, 1], stoneShade,
+      { geometry: { radius: 0.05, height: 0.17, segments: 6 }, rotation: [0.4 * Math.sin(angle), 0, -0.4 * Math.cos(angle)], roughness: 0.85 }));
+  }
+  // Rândul superior: patru frunze mai înalte, pe diagonale, mai răsfrânte.
+  for (let index = 0; index < 4; index += 1) {
+    const angle = Math.PI / 4 + (index / 4) * Math.PI * 2;
+    items.push(primitive(`${id}-leaf-up-${index + 1}`, 'cone',
+      [x + Math.cos(angle) * 0.12, 1.56, z + Math.sin(angle) * 0.12], [1, 1, 1], stoneShade,
+      { geometry: { radius: 0.05, height: 0.2, segments: 6 }, rotation: [0.55 * Math.sin(angle), 0, -0.55 * Math.cos(angle)], roughness: 0.85 }));
+  }
+  // Volutele de colț (caulicoli), sub colțurile abacei.
+  for (let index = 0; index < 4; index += 1) {
+    const angle = Math.PI / 4 + (index / 4) * Math.PI * 2;
+    items.push(primitive(`${id}-volute-${index + 1}`, 'torus',
+      [x + Math.cos(angle) * 0.145, 1.64, z + Math.sin(angle) * 0.145], [1, 1, 1], stone,
+      { geometry: { radius: 0.045, tube: 0.018, segments: 18 }, rotation: [0, -angle, 0] }));
+  }
+  // Abaca evazată: două plăci suprapuse, rotite la 45°, cu rozete pe laturi.
+  items.push(primitive(`${id}-abacus`, 'box', [x, 1.74, z], [0.34, 0.05, 0.34], '#cfc4a4'));
+  items.push(primitive(`${id}-abacus-star`, 'box', [x, 1.742, z], [0.31, 0.044, 0.31], '#cfc4a4', { rotation: [0, Math.PI / 4, 0] }));
+  items.push(primitive(`${id}-fleuron`, 'cylinder', [x, 1.7, z + 0.165], [1, 1, 1], stoneShade, { geometry: { radiusTop: 0.045, radiusBottom: 0.045, height: 0.035, segments: 14 }, rotation: [Math.PI / 2, 0, 0], roughness: 0.8 }));
+  return items;
 }
 
 function threePillars() {
