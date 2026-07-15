@@ -59,11 +59,11 @@ nu include OCR; documentele fără text suficient devin `unsupported_scan`.
 - datele migrate au rămas la 25 convocatoare, 559 articole, 24 prezențe și 462 confirmări;
 - backup logic complet valid: `post-platform-20260713`.
 - validare release curent: 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
-- backup logic înainte de release: `pre-release-20260715-193952-97b280ef8848`;
+- backup logic înainte de release: `pre-release-20260715-200449-6e1d411b73ba`;
 - backup cod/gateway cu SHA-256: `pre-3d-dossiers-20260713T162926Z`;
-- release activ: `csa-app-release-20260715-193952-97b280ef8848`, SHA-256 `4d5b2938876931f5cb16dc9348a685ef4da3edc44ce7cfda54f3411be7768810`;
-- sursă release: commit GitHub `97b280ef8848d84df240856cf92eeb676e7448ca`, tag `release-20260715-193952`;
-- conținut release: Cei Trei Mari Stâlpi construiți în ordinele lor arhitecturale (Ionic/Înțelepciunea, Doric/Forța, Corintic/Frumusețea);
+- release activ: `csa-app-release-20260715-200449-6e1d411b73ba`, SHA-256 `122138b1034c6b636a44931d2af93262eb1107785842a2779fca2239693758a1`;
+- sursă release: commit GitHub `6e1d411b73babb3c8fc8150e8bc9152862da9d4f`, tag `release-20260715-200449`;
+- conținut release: Cei Trei Mari Stâlpi în ordinele lor arhitecturale, cu capitelul corintic sculptat după modelul clasic (două rânduri de frunze de acant, volute de colț, abacă evazată, rozetă);
 - după release: 10/10 containere `healthy`, `200` pentru `/templu` pe `18600` și pentru gateway pe `18610`, redirect la login pentru `/portal/` anonim, fără erori runtime în ultimele loguri.
 
 Documentele din `C:\Proiecte\CSA` au fost folosite exclusiv drept surse de proiectare și structurare. Nu au fost modificate și nu au fost importate în bibliotecă.
