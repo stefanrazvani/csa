@@ -58,12 +58,13 @@ nu include OCR; documentele fără text suficient devin `unsupported_scan`.
 - teste locale: 70 fișiere JavaScript validate sintactic, 14/14 teste gateway, schema import 9/9, contractul de securitate dossiers și catalogul editorial;
 - datele migrate au rămas la 25 convocatoare, 559 articole, 24 prezențe și 462 confirmări;
 - backup logic complet valid: `post-platform-20260713`.
-- validare release curent: 67/67 fișiere JavaScript, 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
-- backup logic înainte de release: `pre-release-20260713-234826-fa1982c5e24e`;
+- validare release curent: 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
+- backup logic înainte de release: `pre-release-20260715-193952-97b280ef8848`;
 - backup cod/gateway cu SHA-256: `pre-3d-dossiers-20260713T162926Z`;
-- release activ: `csa-app-release-20260713-234826-fa1982c5e24e`, SHA-256 `839eed20e169261d0ae87cae2479866f31f8c54e8e5bf397a796fe7b38c9d744`;
-- sursă release: commit GitHub `fa1982c5e24e2a9390b1916b9222c8eb52262d55`, tag `release-20260713-234826`;
-- după release: 10/10 containere `healthy`, fără erori runtime în ultimele loguri, swap 4 GiB liber integral.
+- release activ: `csa-app-release-20260715-193952-97b280ef8848`, SHA-256 `4d5b2938876931f5cb16dc9348a685ef4da3edc44ce7cfda54f3411be7768810`;
+- sursă release: commit GitHub `97b280ef8848d84df240856cf92eeb676e7448ca`, tag `release-20260715-193952`;
+- conținut release: Cei Trei Mari Stâlpi construiți în ordinele lor arhitecturale (Ionic/Înțelepciunea, Doric/Forța, Corintic/Frumusețea);
+- după release: 10/10 containere `healthy`, `200` pentru `/templu` pe `18600` și pentru gateway pe `18610`, redirect la login pentru `/portal/` anonim, fără erori runtime în ultimele loguri.
 
 Documentele din `C:\Proiecte\CSA` au fost folosite exclusiv drept surse de proiectare și structurare. Nu au fost modificate și nu au fost importate în bibliotecă.
 
