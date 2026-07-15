@@ -267,33 +267,34 @@ function corinthianPillar(id, x, z) {
     primitive(`${id}-base`, 'box', [x, 0.08, z], [0.4, 0.16, 0.4], '#242e38'),
     primitive(`${id}-base-torus`, 'torus', [x, 0.2, z], [1, 1, 1], stone, { geometry: { radius: 0.11, tube: 0.03, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }),
     primitive(`${id}-shaft`, 'cylinder', [x, 0.76, z], [1, 1, 1], stone, { geometry: { radiusTop: 0.08, radiusBottom: 0.1, height: 1.2, segments: 14 } }),
-    primitive(`${id}-bell`, 'cylinder', [x, 1.48, z], [1, 1, 1], stone, { geometry: { radiusTop: 0.15, radiusBottom: 0.085, height: 0.26, segments: 18 } }),
+    // Kalathos: clopotul cu evazare concavă, strunjit dintr-un profil.
+    primitive(`${id}-bell`, 'lathe', [x, 1.38, z], [1, 1, 1], stone, { geometry: { profile: [[0.085, 0], [0.088, 0.09], [0.096, 0.17], [0.112, 0.24], [0.138, 0.3], [0.16, 0.34]], segments: 22 } }),
   ];
-  // Rândul inferior: șase frunze de acant, ușor răsfrânte.
+  // Rândul inferior: șase frunze de acant lobate, ușor răsfrânte în afară.
   for (let index = 0; index < 6; index += 1) {
     const angle = (index / 6) * Math.PI * 2;
-    items.push(primitive(`${id}-leaf-low-${index + 1}`, 'cone',
-      [x + Math.cos(angle) * 0.105, 1.44, z + Math.sin(angle) * 0.105], [1, 1, 1], stoneShade,
-      { geometry: { radius: 0.05, height: 0.17, segments: 6 }, rotation: [0.4 * Math.sin(angle), 0, -0.4 * Math.cos(angle)], roughness: 0.85 }));
+    items.push(primitive(`${id}-leaf-low-${index + 1}`, 'leaf',
+      [x + Math.cos(angle) * 0.095, 1.4, z + Math.sin(angle) * 0.095], [1, 1, 1], stoneShade,
+      { geometry: { width: 0.1, height: 0.22, depth: 0.016, tilt: 0.3 }, rotation: [0, Math.PI / 2 - angle, 0], roughness: 0.85 }));
   }
   // Rândul superior: patru frunze mai înalte, pe diagonale, mai răsfrânte.
   for (let index = 0; index < 4; index += 1) {
     const angle = Math.PI / 4 + (index / 4) * Math.PI * 2;
-    items.push(primitive(`${id}-leaf-up-${index + 1}`, 'cone',
-      [x + Math.cos(angle) * 0.12, 1.56, z + Math.sin(angle) * 0.12], [1, 1, 1], stoneShade,
-      { geometry: { radius: 0.05, height: 0.2, segments: 6 }, rotation: [0.55 * Math.sin(angle), 0, -0.55 * Math.cos(angle)], roughness: 0.85 }));
+    items.push(primitive(`${id}-leaf-up-${index + 1}`, 'leaf',
+      [x + Math.cos(angle) * 0.105, 1.42, z + Math.sin(angle) * 0.105], [1, 1, 1], stoneShade,
+      { geometry: { width: 0.11, height: 0.28, depth: 0.016, tilt: 0.45 }, rotation: [0, Math.PI / 2 - angle, 0], roughness: 0.85 }));
   }
-  // Volutele de colț (caulicoli), sub colțurile abacei.
+  // Volutele de colț (caulicoli): suluri spiralate sub colțurile abacei.
   for (let index = 0; index < 4; index += 1) {
     const angle = Math.PI / 4 + (index / 4) * Math.PI * 2;
-    items.push(primitive(`${id}-volute-${index + 1}`, 'torus',
-      [x + Math.cos(angle) * 0.145, 1.64, z + Math.sin(angle) * 0.145], [1, 1, 1], stone,
-      { geometry: { radius: 0.045, tube: 0.018, segments: 18 }, rotation: [0, -angle, 0] }));
+    items.push(primitive(`${id}-volute-${index + 1}`, 'spiral',
+      [x + Math.cos(angle) * 0.15, 1.66, z + Math.sin(angle) * 0.15], [1, 1, 1], stone,
+      { geometry: { radius: 0.05, innerRadius: 0.012, tube: 0.014, turns: 1.9 }, rotation: [0, Math.PI / 2 - angle, 0] }));
   }
-  // Abaca evazată: două plăci suprapuse, rotite la 45°, cu rozete pe laturi.
-  items.push(primitive(`${id}-abacus`, 'box', [x, 1.74, z], [0.34, 0.05, 0.34], '#cfc4a4'));
-  items.push(primitive(`${id}-abacus-star`, 'box', [x, 1.742, z], [0.31, 0.044, 0.31], '#cfc4a4', { rotation: [0, Math.PI / 4, 0] }));
-  items.push(primitive(`${id}-fleuron`, 'cylinder', [x, 1.7, z + 0.165], [1, 1, 1], stoneShade, { geometry: { radiusTop: 0.045, radiusBottom: 0.045, height: 0.035, segments: 14 }, rotation: [Math.PI / 2, 0, 0], roughness: 0.8 }));
+  // Abaca evazată: două plăci subțiri suprapuse, rotite la 45°, cu rozetă.
+  items.push(primitive(`${id}-abacus`, 'box', [x, 1.75, z], [0.36, 0.04, 0.36], '#cfc4a4'));
+  items.push(primitive(`${id}-abacus-star`, 'box', [x, 1.752, z], [0.33, 0.036, 0.33], '#cfc4a4', { rotation: [0, Math.PI / 4, 0] }));
+  items.push(primitive(`${id}-fleuron`, 'cylinder', [x, 1.72, z + 0.175], [1, 1, 1], stoneShade, { geometry: { radiusTop: 0.045, radiusBottom: 0.045, height: 0.035, segments: 14 }, rotation: [Math.PI / 2, 0, 0], roughness: 0.8 }));
   return items;
 }
 

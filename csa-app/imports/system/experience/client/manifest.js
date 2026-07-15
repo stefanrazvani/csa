@@ -4,8 +4,11 @@ const GEOMETRY_TYPES = new Set([
   'cylinder',
   'dodecahedron',
   'icosahedron',
+  'lathe',
+  'leaf',
   'octahedron',
   'sphere',
+  'spiral',
   'star',
   'torus',
   'torusKnot',
@@ -54,17 +57,25 @@ function geometry(value = {}) {
   return {
     type,
     size: number(source.size, 0.75, 0.08, 8),
-    width: number(source.width, 1, 0.08, 20),
-    height: number(source.height, 1, 0.08, 20),
-    depth: number(source.depth, 1, 0.08, 20),
-    radius: number(source.radius, 0.72, 0.05, 8),
+    width: number(source.width, 1, 0.02, 20),
+    height: number(source.height, 1, 0.04, 20),
+    depth: number(source.depth, 1, 0.01, 20),
+    radius: number(source.radius, 0.72, 0.01, 8),
     radiusTop: number(source.radiusTop, 0.72, 0.02, 8),
     radiusBottom: number(source.radiusBottom, 0.82, 0.02, 8),
-    tube: number(source.tube, 0.16, 0.015, 2),
+    tube: number(source.tube, 0.16, 0.004, 2),
     segments: Math.round(number(source.segments, 24, 4, 96)),
     detail: Math.round(number(source.detail, 0, 0, 2)),
     points: Math.round(number(source.points, 5, 3, 12)),
-    innerRadius: number(source.innerRadius, 0.32, 0.02, 8),
+    innerRadius: number(source.innerRadius, 0.32, 0.002, 8),
+    turns: number(source.turns, 1.75, 0.5, 6),
+    tilt: number(source.tilt, 0, -1, 1),
+    profile: Array.isArray(source.profile)
+      ? source.profile.slice(0, 24).map((pair) => [
+        number(Array.isArray(pair) ? pair[0] : NaN, 0.3, 0.01, 8),
+        number(Array.isArray(pair) ? pair[1] : NaN, 0, -8, 8),
+      ])
+      : [],
   };
 }
 

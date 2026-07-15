@@ -84,6 +84,55 @@ function makeGeometry(THREE, definition = {}) {
         bounded(definition.size, 0.75, 0.04, 8),
         Math.round(bounded(definition.detail, 0, 0, 2)),
       );
+    case 'lathe': {
+      // Profil de strung: perechi [rază, înălțime] rotite în jurul axei Y.
+      const source = Array.isArray(definition.profile) && definition.profile.length >= 2
+        ? definition.profile
+        : [[0.4, 0], [0.5, 0.5]];
+      const points = source.slice(0, 24).map((pair) => new THREE.Vector2(
+        bounded(pair?.[0], 0.3, 0.01, 8),
+        bounded(pair?.[1], 0, -8, 8),
+      ));
+      return new THREE.LatheGeometry(points, segments);
+    }
+    case 'leaf': {
+      // Frunză de acant: siluetă lobată extrudată, cu vârful în sus și
+      // aplecare opțională spre exterior (tilt) coaptă în geometrie.
+      const width = bounded(definition.width, 0.12, 0.02, 4);
+      const height = bounded(definition.height, 0.22, 0.04, 6);
+      const depth = bounded(definition.depth, 0.02, 0.01, 1);
+      const tilt = bounded(definition.tilt, 0, -1, 1);
+      const half = width / 2;
+      const shape = new THREE.Shape();
+      shape.moveTo(0, 0);
+      shape.bezierCurveTo(half * 0.9, height * 0.05, half, height * 0.3, half * 0.55, height * 0.42);
+      shape.bezierCurveTo(half * 1.05, height * 0.45, half * 0.95, height * 0.68, half * 0.4, height * 0.72);
+      shape.bezierCurveTo(half * 0.55, height * 0.8, half * 0.3, height * 0.95, 0, height);
+      shape.bezierCurveTo(-half * 0.3, height * 0.95, -half * 0.55, height * 0.8, -half * 0.4, height * 0.72);
+      shape.bezierCurveTo(-half * 0.95, height * 0.68, -half * 1.05, height * 0.45, -half * 0.55, height * 0.42);
+      shape.bezierCurveTo(-half, height * 0.3, -half * 0.9, height * 0.05, 0, 0);
+      const geometry = new THREE.ExtrudeGeometry(shape, { depth, bevelEnabled: false });
+      geometry.translate(0, 0, -depth / 2);
+      if (tilt) geometry.rotateX(tilt);
+      return geometry;
+    }
+    case 'spiral': {
+      // Volută: tub de-a lungul unei spirale arhimedice, în planul XY.
+      const turns = bounded(definition.turns, 1.75, 0.5, 6);
+      const startRadius = bounded(definition.radius, 0.055, 0.01, 8);
+      const endRadius = bounded(definition.innerRadius, startRadius * 0.2, 0.002, 8);
+      const tube = bounded(definition.tube, 0.015, 0.004, 2);
+      const points = [];
+      const steps = 64;
+      for (let index = 0; index <= steps; index += 1) {
+        const t = index / steps;
+        const angle = t * turns * Math.PI * 2;
+        const radius = startRadius + (endRadius - startRadius) * t;
+        points.push(new THREE.Vector3(Math.cos(angle) * radius, Math.sin(angle) * radius, 0));
+      }
+      const curve = new THREE.CatmullRomCurve3(points);
+      return new THREE.TubeGeometry(curve, 72, tube, 8, false);
+    }
     case 'sphere':
       return new THREE.SphereGeometry(bounded(definition.size, 0.75, 0.04, 8), segments, Math.max(6, Math.floor(segments / 2)));
     case 'star': {
