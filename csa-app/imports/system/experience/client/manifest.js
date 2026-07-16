@@ -88,7 +88,7 @@ function material(value = {}, fallback = '#6f7c82') {
     roughness: number(source.roughness, 0.78, 0, 1),
     metalness: number(source.metalness, 0.05, 0, 1),
     opacity: number(source.opacity, 1, 0.08, 1),
-    map: source.map === 'terrestrial' || source.map === 'celestial' ? source.map : '',
+    map: ['terrestrial', 'celestial', 'board-apprentice', 'board-fellowcraft', 'board-master'].includes(source.map) ? source.map : '',
   };
 }
 

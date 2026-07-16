@@ -94,15 +94,16 @@ const BASE_GATE = Object.freeze({
 // Pardoseala „lodge": piatră întunecată cu pavajul mozaicat central și bordura
 // dantelată aurie. Conform ritualului, laturile pavajului sunt în raportul
 // „Secțiunii de aur", cu pătrate în raportul termenilor succesivi ai șirului
-// lui Fibonacci: 5 × 8, cu pătrate egale (3,6 × 5,76 m).
+// lui Fibonacci: 5 × 8. Pavajul este un covor mic, în centrul Templului,
+// cu spațiu liber între el și Altar.
 const LODGE_FLOOR = Object.freeze({
   type: 'lodge',
   width: 18,
   depth: 23.2,
   color: '#131c26',
   carpet: {
-    width: 3.6,
-    depth: 5.76,
+    width: 1.08,
+    depth: 1.728,
     tilesX: 5,
     tilesZ: 8,
     z: -2,
@@ -187,11 +188,12 @@ function orientSeating() {
     primitive('orient-bench-south', 'box', [3.7, 1.02, -10.4], [3.4, 0.6, 0.75], COLORS.woodDark),
     primitive('orient-bench-south-back', 'box', [3.7, 1.55, -10.72], [3.4, 0.8, 0.14], COLORS.woodDark),
     primitive('orient-seat-adjunct', 'box', [-1.75, 1, -9.55], [0.7, 0.56, 0.66], COLORS.woodDark),
-    // Mesele în romb din Orient (Ospitalierul la Miazănoapte, Trezorierul la Miazăzi).
-    primitive('hospitalier-desk', 'box', [-6.5, 1.14, -9.55], [1.45, 0.84, 1.45], COLORS.wood, { rotation: [0, Math.PI / 4, 0] }),
-    primitive('hospitalier-chair', 'box', [-7.45, 1.05, -10.35], [0.62, 0.66, 0.62], COLORS.woodDark, { rotation: [0, Math.PI / 4, 0] }),
-    primitive('treasurer-desk', 'box', [6.5, 1.14, -9.55], [1.45, 0.84, 1.45], COLORS.wood, { rotation: [0, Math.PI / 4, 0] }),
-    primitive('treasurer-chair', 'box', [7.45, 1.05, -10.35], [0.62, 0.66, 0.62], COLORS.woodDark, { rotation: [0, Math.PI / 4, 0] }),
+    // Pupitrele Ospitalierului (Miazănoapte) și Trezorierului (Miazăzi) din
+    // Orient, așezate cu fața unul spre celălalt, cu scaunele spre ziduri.
+    primitive('hospitalier-desk', 'box', [-6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
+    primitive('hospitalier-chair', 'box', [-7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
+    primitive('treasurer-desk', 'box', [6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
+    primitive('treasurer-chair', 'box', [7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
   ];
 }
 
@@ -209,22 +211,17 @@ function altarOfLights() {
 }
 
 function tracingBoard(grade) {
-  const accents = { 1: '#54728a', 2: '#c99a3f', 3: '#8a7444' };
-  const accent = accents[grade] || accents[1];
-  const items = [
-    primitive('tracing-board', 'box', [0, 0.1, -2], [1.85, 0.08, 2.75], '#1d2a35', { roughness: 0.62 }),
-    primitive('tracing-frame', 'box', [0, 0.145, -2], [1.3, 0.02, 2.1], accent, { emissive: accent, emissiveIntensity: 0.18 }),
+  // Tabloul Lojii: o planșă mică pe pavaj, cu desenul stilizat al gradului
+  // pictat ca textură procedurală (nu forme 3D), conform planșelor.
+  const kinds = { 1: 'board-apprentice', 2: 'board-fellowcraft', 3: 'board-master' };
+  return [
+    primitive('tracing-board', 'box', [0, 0.1, -2], [0.72, 0.035, 1.15], '#e8dcc0', {
+      map: kinds[grade] || kinds[1],
+      emissive: '#9a8f74',
+      emissiveIntensity: 0.4,
+      roughness: 0.75,
+    }),
   ];
-  if (grade === 1) {
-    items.push(primitive('board-emblem-rough', 'dodecahedron', [0, 0.32, -2], [1, 1, 1], '#7c776a', { geometry: { size: 0.2 }, roughness: 0.95, rotation: [0.5, 0.9, 0.2] }));
-  }
-  if (grade === 2) {
-    items.push(primitive('board-emblem-star', 'star', [0, 0.24, -2], [1, 1, 1], '#f5ce6d', { geometry: { points: 5, radius: 0.26, innerRadius: 0.11, depth: 0.08 }, emissive: '#f0b93f', emissiveIntensity: 1.1, rotation: [-Math.PI / 2, 0, 0] }));
-  }
-  if (grade === 3) {
-    items.push(primitive('board-emblem-acacia', 'cone', [0, 0.3, -2], [1, 1, 1], '#5f7d4f', { geometry: { radius: 0.14, height: 0.4, segments: 8 }, roughness: 0.8 }));
-  }
-  return items;
 }
 
 // Cei Trei Mari Stâlpi, strânși la colțurile pavajului, conform ritualului:
@@ -299,10 +296,11 @@ function corinthianPillar(id, x, z) {
 }
 
 function threePillars() {
+  // Strânși la colțurile covorului mozaicat, în jurul acestuia.
   const spots = [
-    ['pillar-wisdom-se', 2.2, -5.25, ionicPillar],
-    ['pillar-strength-nw', -2.2, 1.25, doricPillar],
-    ['pillar-beauty-sw', 2.2, 1.25, corinthianPillar],
+    ['pillar-wisdom-se', 0.95, -3.2, ionicPillar],
+    ['pillar-strength-nw', -0.95, -0.8, doricPillar],
+    ['pillar-beauty-sw', 0.95, -0.8, corinthianPillar],
   ];
   return spots.flatMap(([id, x, z, builder]) => ([
     ...builder(id, x, z),
@@ -360,10 +358,11 @@ function wardenStations() {
     primitive('warden2-top', 'box', [6.4, 1.14, 0.6], [1.15, 0.09, 1.85], COLORS.woodDark),
     primitive('warden2-chair', 'box', [7.5, 0.62, 0.6], [0.6, 1.24, 0.66], COLORS.woodDark),
     primitive('warden2-column', 'cylinder', [6.25, 1.4, 0.15], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.045, radiusBottom: 0.055, height: 0.42, segments: 10 } }),
-    // Maestrul de Ceremonii, cu pupitrul lângă Primul Supraveghetor.
-    primitive('mc-desk', 'box', [-0.85, 0.6, 5.1], [0.8, 0.9, 0.6], COLORS.wood),
-    primitive('mc-desk-top', 'box', [-0.85, 1.12, 5.06], [0.9, 0.07, 0.72], COLORS.woodDark, { rotation: [-0.18, 0, 0] }),
-    primitive('mc-seat', 'box', [-0.85, 0.5, 5.95], [0.55, 1, 0.55], COLORS.woodDark),
+    // Maestrul de Ceremonii, lângă Coloana Boaz: scaun și sceptrul de
+    // ceremonii, fără pupitru.
+    primitive('mc-seat', 'box', [-1.6, 0.5, 6.3], [0.6, 1, 0.6], COLORS.woodDark),
+    primitive('mc-sceptre-shaft', 'cylinder', [-1.15, 0.8, 6.15], [1, 1, 1], COLORS.wood, { geometry: { radiusTop: 0.022, radiusBottom: 0.028, height: 1.5, segments: 10 }, rotation: [0, 0, 0.1], roughness: 0.6 }),
+    primitive('mc-sceptre-head', 'sphere', [-1.225, 1.57, 6.15], [1, 1, 1], COLORS.gold, { geometry: { size: 0.08, segments: 14 }, metalness: 0.55, roughness: 0.35, emissive: '#4d3a12', emissiveIntensity: 0.3 }),
     // Scaunul ofițerului de prag din planșă (lângă Occident, Miazăzi).
     primitive('officer-seat-west-south', 'box', [1.95, 0.5, 6.7], [0.6, 1, 0.6], COLORS.woodDark),
   ];
@@ -390,24 +389,33 @@ function starryVault() {
   ];
 }
 
-// Funia cu noduri (lacs d'amour) în partea de sus a pereților, cu ciucurii
-// coborâți la Occident, de o parte și de alta a intrării.
+// Funia cu noduri în partea de sus a pereților, cu ciucurii coborâți la
+// Occident. Conform ritualului, are trei „noduri de dragoste" (lacs d'amour,
+// în formă de opt), câte unul pe laturile de Miazănoapte, Orient și Miazăzi.
 function knottedRope() {
   const rope = '#b38f57';
   const ropeGeometry = (height) => ({ geometry: { radiusTop: 0.045, radiusBottom: 0.045, height, segments: 10 }, roughness: 0.6 });
-  const knot = (id, position, rotation) => primitive(id, 'torus', position, [1, 1, 1], rope, { geometry: { radius: 0.17, tube: 0.05, segments: 24 }, rotation, roughness: 0.6 });
+  // Nod în formă de opt: două bucle suprapuse de-a lungul funiei.
+  const knotEight = (id, position, alongZ) => {
+    const rotation = alongZ ? [0, Math.PI / 2, 0] : [0, 0, 0];
+    const offset = 0.082;
+    const delta = alongZ ? [0, 0, offset] : [offset, 0, 0];
+    return [
+      primitive(`${id}-a`, 'torus', [position[0] - delta[0], position[1], position[2] - delta[2]], [1, 1, 1], rope, { geometry: { radius: 0.095, tube: 0.034, segments: 22 }, rotation, roughness: 0.6 }),
+      primitive(`${id}-b`, 'torus', [position[0] + delta[0], position[1], position[2] + delta[2]], [1, 1, 1], rope, { geometry: { radius: 0.095, tube: 0.034, segments: 22 }, rotation, roughness: 0.6 }),
+    ];
+  };
   const items = [
     primitive('rope-east', 'cylinder', [0, 6.6, -11.02], [1, 1, 1], rope, { ...ropeGeometry(17.6), rotation: [0, 0, Math.PI / 2] }),
-    primitive('rope-north', 'cylinder', [-8.92, 6.6, 0], [1, 1, 1], rope, { ...ropeGeometry(22.6), rotation: [Math.PI / 2, 0, 0] }),
-    primitive('rope-south', 'cylinder', [8.92, 6.6, 0], [1, 1, 1], rope, { ...ropeGeometry(22.6), rotation: [Math.PI / 2, 0, 0] }),
+    // Funia rămâne în fața zidurilor laterale (fața interioară este la ±8,8).
+    primitive('rope-north', 'cylinder', [-8.68, 6.6, 0], [1, 1, 1], rope, { ...ropeGeometry(22.6), rotation: [Math.PI / 2, 0, 0] }),
+    primitive('rope-south', 'cylinder', [8.68, 6.6, 0], [1, 1, 1], rope, { ...ropeGeometry(22.6), rotation: [Math.PI / 2, 0, 0] }),
     primitive('rope-west-north', 'cylinder', [-5.9, 6.6, 11.02], [1, 1, 1], rope, { ...ropeGeometry(6.6), rotation: [0, 0, Math.PI / 2] }),
     primitive('rope-west-south', 'cylinder', [5.9, 6.6, 11.02], [1, 1, 1], rope, { ...ropeGeometry(6.6), rotation: [0, 0, Math.PI / 2] }),
+    ...knotEight('rope-knot-east', [0, 6.6, -11.02], false),
+    ...knotEight('rope-knot-north', [-8.68, 6.6, 0], true),
+    ...knotEight('rope-knot-south', [8.68, 6.6, 0], true),
   ];
-  [-6, -2, 2, 6].forEach((x, index) => items.push(knot(`rope-knot-east-${index + 1}`, [x, 6.6, -11.02], [0, 0, 0])));
-  [-6, 0, 6].forEach((z, index) => {
-    items.push(knot(`rope-knot-north-${index + 1}`, [-8.92, 6.6, z], [0, Math.PI / 2, 0]));
-    items.push(knot(`rope-knot-south-${index + 1}`, [8.92, 6.6, z], [0, Math.PI / 2, 0]));
-  });
   for (const [id, x] of [['north', -2.6], ['south', 2.6]]) {
     items.push(primitive(`rope-tassel-${id}`, 'cylinder', [x, 6.05, 11.02], [1, 1, 1], rope, { geometry: { radiusTop: 0.03, radiusBottom: 0.06, height: 1.2, segments: 8 }, roughness: 0.6 }));
     items.push(primitive(`rope-tassel-${id}-end`, 'cone', [x, 5.28, 11.02], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.11, height: 0.34, segments: 10 }, rotation: [Math.PI, 0, 0], metalness: 0.4, roughness: 0.45 }));

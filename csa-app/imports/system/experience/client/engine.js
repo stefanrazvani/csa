@@ -176,9 +176,191 @@ function makeGeometry(THREE, definition = {}) {
   }
 }
 
-// Texturi procedurale echirectangulare pentru Sfera Terestră (Boaz) și Sfera
-// Celestă (Jachin). Deterministe (fără Math.random), desenate pe canvas.
+const PROCEDURAL_TEXTURES = new Set(['terrestrial', 'celestial', 'board-apprentice', 'board-fellowcraft', 'board-master']);
+
+// Tabloul Lojii: desen stilizat pe pergament — chenar, pavaj, coloanele B/J,
+// trepte, Soare/Lună/Delta și motivele gradului. Determinist, fără text.
+function drawTracingBoard(context, width, height, kind) {
+  const ink = '#4a3f2c';
+  const parchment = '#e6d9b8';
+  const seeded = (index) => {
+    const value = Math.sin(index * 91.7 + 47.3) * 24634.634;
+    return value - Math.floor(value);
+  };
+  context.fillStyle = parchment;
+  context.fillRect(0, 0, width, height);
+  context.fillStyle = '#b09f78';
+  for (let index = 0; index < 14; index += 1) {
+    context.globalAlpha = 0.04 + seeded(index) * 0.05;
+    context.beginPath();
+    context.ellipse(seeded(index + 40) * width, seeded(index + 80) * height, 12 + seeded(index + 120) * 22, 8 + seeded(index + 160) * 14, seeded(index) * 3, 0, Math.PI * 2);
+    context.fill();
+  }
+  context.globalAlpha = 1;
+  context.strokeStyle = ink;
+  context.fillStyle = ink;
+  context.lineWidth = 4;
+  context.strokeRect(8, 8, width - 16, height - 16);
+  context.lineWidth = 1.5;
+  context.strokeRect(16, 16, width - 32, height - 32);
+  context.lineWidth = 2;
+  // Pavajul mozaicat, ca bandă la baza tabloului.
+  const bandTop = height - 70;
+  const cell = (width - 48) / 8;
+  for (let col = 0; col < 8; col += 1) {
+    for (let row = 0; row < 2; row += 1) {
+      if ((col + row) % 2 === 0) context.fillRect(24 + col * cell, bandTop + row * 20, cell, 20);
+    }
+  }
+  context.strokeRect(24, bandTop, width - 48, 40);
+  // Coloanele de la intrare, pe pavaj.
+  for (const x of [52, width - 52]) {
+    context.strokeRect(x - 9, bandTop - 96, 18, 84);
+    context.strokeRect(x - 14, bandTop - 106, 28, 10);
+    context.beginPath();
+    context.arc(x, bandTop - 114, 8, 0, Math.PI * 2);
+    context.stroke();
+  }
+  // Soarele, Delta cu ochiul și Luna, la partea de sus.
+  const topY = 58;
+  context.beginPath();
+  context.arc(52, topY, 13, 0, Math.PI * 2);
+  context.stroke();
+  for (let index = 0; index < 8; index += 1) {
+    const angle = (index * Math.PI) / 4;
+    context.beginPath();
+    context.moveTo(52 + Math.cos(angle) * 16, topY + Math.sin(angle) * 16);
+    context.lineTo(52 + Math.cos(angle) * 22, topY + Math.sin(angle) * 22);
+    context.stroke();
+  }
+  context.beginPath();
+  context.moveTo(width / 2, topY - 18);
+  context.lineTo(width / 2 + 21, topY + 13);
+  context.lineTo(width / 2 - 21, topY + 13);
+  context.closePath();
+  context.stroke();
+  context.beginPath();
+  context.arc(width / 2, topY + 3, 4, 0, Math.PI * 2);
+  context.fill();
+  context.beginPath();
+  context.arc(width - 52, topY, 13, 0, Math.PI * 2);
+  context.stroke();
+  context.fillStyle = parchment;
+  context.beginPath();
+  context.arc(width - 46, topY - 5, 11, 0, Math.PI * 2);
+  context.fill();
+  context.fillStyle = ink;
+  // Treptele care urcă spre Orient: 3 / 5 / 7 după grad.
+  const steps = kind === 'board-apprentice' ? 3 : kind === 'board-fellowcraft' ? 5 : 7;
+  let stepY = bandTop - 10;
+  let stepWidth = 96;
+  for (let index = 0; index < steps; index += 1) {
+    context.strokeRect(width / 2 - stepWidth / 2, stepY - 11, stepWidth, 11);
+    stepY -= 11;
+    stepWidth -= 12;
+  }
+  const tools = (cx, cy, size) => {
+    context.beginPath();
+    context.moveTo(cx - size, cy + size);
+    context.lineTo(cx, cy - size);
+    context.lineTo(cx + size, cy + size);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(cx - size, cy - size * 0.2);
+    context.lineTo(cx, cy + size * 0.9);
+    context.lineTo(cx + size, cy - size * 0.2);
+    context.stroke();
+  };
+  const midY = Math.round(height * 0.42);
+  if (kind === 'board-apprentice') {
+    // Piatra brută, piatra cubică, firul cu plumb și uneltele.
+    context.beginPath();
+    const roughX = 58;
+    const roughY = midY + 66;
+    const cornersRough = [[-16, 6], [-9, -12], [4, -15], [15, -6], [13, 10], [-2, 15]];
+    cornersRough.forEach(([dx, dy], index) => (index === 0 ? context.moveTo(roughX + dx, roughY + dy) : context.lineTo(roughX + dx, roughY + dy)));
+    context.closePath();
+    context.stroke();
+    context.strokeRect(width - 74, midY + 52, 30, 28);
+    context.beginPath();
+    context.moveTo(width - 59, midY + 52);
+    context.lineTo(width - 59, midY + 40);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(width / 2, midY - 48);
+    context.lineTo(width / 2, midY + 18);
+    context.stroke();
+    context.beginPath();
+    context.moveTo(width / 2 - 6, midY + 18);
+    context.lineTo(width / 2 + 6, midY + 18);
+    context.lineTo(width / 2, midY + 32);
+    context.closePath();
+    context.fill();
+    tools(width / 2, midY - 70, 17);
+  } else if (kind === 'board-fellowcraft') {
+    // Steaua înflăcărată, scara în spirală și nivela.
+    const starX = width / 2;
+    const starY = midY - 34;
+    context.beginPath();
+    for (let index = 0; index < 10; index += 1) {
+      const radius = index % 2 === 0 ? 26 : 11;
+      const angle = (index / 10) * Math.PI * 2 - Math.PI / 2;
+      const px = starX + Math.cos(angle) * radius;
+      const py = starY + Math.sin(angle) * radius;
+      if (index === 0) context.moveTo(px, py);
+      else context.lineTo(px, py);
+    }
+    context.closePath();
+    context.stroke();
+    context.beginPath();
+    context.arc(starX, starY, 5, 0, Math.PI * 2);
+    context.stroke();
+    for (let index = 0; index < 3; index += 1) {
+      context.beginPath();
+      context.arc(74, midY + 44, 26 - index * 8, Math.PI * 1.2, Math.PI * 1.95);
+      context.stroke();
+    }
+    context.beginPath();
+    context.moveTo(width - 84, midY + 66);
+    context.lineTo(width - 66, midY + 30);
+    context.lineTo(width - 48, midY + 66);
+    context.closePath();
+    context.stroke();
+    context.beginPath();
+    context.moveTo(width - 75, midY + 52);
+    context.lineTo(width - 57, midY + 52);
+    context.stroke();
+  } else {
+    // Ramura de acacia și uneltele reunite.
+    const acaciaX = width / 2;
+    context.beginPath();
+    context.moveTo(acaciaX, midY + 62);
+    context.quadraticCurveTo(acaciaX + 8, midY + 10, acaciaX, midY - 40);
+    context.stroke();
+    for (let index = 0; index < 6; index += 1) {
+      const t = index / 6;
+      const leafY = midY + 48 - t * 92;
+      const side = index % 2 ? 1 : -1;
+      context.beginPath();
+      context.ellipse(acaciaX + side * 11, leafY, 9, 4.5, side * 0.55, 0, Math.PI * 2);
+      context.stroke();
+    }
+    tools(width / 2, midY - 66, 18);
+  }
+}
+
+// Texturi procedurale: sferele coloanelor (echirectangulare) și Tabloul
+// Lojii pe grade. Deterministe (fără Math.random), desenate pe canvas.
 function globeTexture(THREE, kind) {
+  if (kind.indexOf('board-') === 0) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 400;
+    drawTracingBoard(canvas.getContext('2d'), canvas.width, canvas.height, kind);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }
   const canvas = document.createElement('canvas');
   canvas.width = 512;
   canvas.height = 256;
@@ -288,11 +470,11 @@ function makeMaterial(THREE, definition = {}, fallback = '#6f7c82') {
     transparent: opacity < 1,
     opacity,
   });
-  if (definition.map === 'terrestrial' || definition.map === 'celestial') {
+  if (PROCEDURAL_TEXTURES.has(definition.map)) {
     const texture = globeTexture(THREE, definition.map);
     material.map = texture;
-    // Textura este folosită și ca emissiveMap: sferele rămân lizibile în
-    // lumina scăzută a templului, fără o sursă de lumină dedicată.
+    // Textura este folosită și ca emissiveMap: rămâne lizibilă în lumina
+    // scăzută a templului, fără o sursă de lumină dedicată.
     material.emissiveMap = texture;
   }
   material.userData.baseEmissiveIntensity = material.emissiveIntensity;
@@ -557,13 +739,15 @@ class ExperienceRenderer {
         color: carpet.border, roughness: 0.5, metalness: 0.4,
         emissive: carpet.border, emissiveIntensity: 0.08,
       });
-      const borderWidth = carpet.width + 0.34;
-      const borderDepth = carpet.depth + 0.34;
+      // Bordura dantelată este proporțională cu covorul.
+      const stripSize = Math.max(0.05, Math.min(0.17, carpet.width * 0.08));
+      const borderWidth = carpet.width + stripSize * 2;
+      const borderDepth = carpet.depth + stripSize * 2;
       const strips = [
-        [0, carpet.z - borderDepth / 2, borderWidth, 0.17],
-        [0, carpet.z + borderDepth / 2, borderWidth, 0.17],
-        [-borderWidth / 2, carpet.z, 0.17, borderDepth],
-        [borderWidth / 2, carpet.z, 0.17, borderDepth],
+        [0, carpet.z - borderDepth / 2, borderWidth, stripSize],
+        [0, carpet.z + borderDepth / 2, borderWidth, stripSize],
+        [-borderWidth / 2, carpet.z, stripSize, borderDepth],
+        [borderWidth / 2, carpet.z, stripSize, borderDepth],
       ];
       for (const [stripX, stripZ, stripWidth, stripDepth] of strips) {
         const strip = new THREE.Mesh(new THREE.BoxGeometry(stripWidth, 0.02, stripDepth), borderMaterial);
