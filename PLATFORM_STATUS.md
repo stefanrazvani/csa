@@ -59,12 +59,12 @@ nu include OCR; documentele fără text suficient devin `unsupported_scan`.
 - datele migrate au rămas la 25 convocatoare, 559 articole, 24 prezențe și 462 confirmări;
 - backup logic complet valid: `post-platform-20260713`.
 - validare release curent: 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
-- backup logic înainte de release: `pre-release-20260716-192914-a816ff8d3985`;
+- backup logic înainte de release: `pre-release-20260718-010841-9d6e7d886c8f`;
 - backup cod/gateway cu SHA-256: `pre-3d-dossiers-20260713T162926Z`;
-- release activ: `csa-app-release-20260716-192914-a816ff8d3985`, SHA-256 `ba4bb805ae14b39c282b216c24e132c47ee18a6478b693c3f35a180257c36789`;
-- sursă release: commit GitHub `a816ff8d3985b761edca043446addf1381d46217`, tag `release-20260716-192914`;
-- conținut release: noduri-opt pe funia de pe Miazănoapte/Orient/Miazăzi (funia scoasă din grosimea zidurilor), Maestrul de Ceremonii cu scaun și sceptru lângă Boaz, pupitrele Trezorier/Ospitalier față în față, pavajul mozaicat redus la covor central (~30%) cu spațiu liber până la Altar, stâlpii strânși în jurul lui și Tabloul Lojii pictat ca textură procedurală pe grad;
-- incident în timpul release-ului: backend-ul `urgentit-apps` de pe portul `3008` (alt stack, pe același host) nu a răspuns câteva ore și a blocat canalul de comenzi Sentinel; release-ul a fost reluat fără impact asupra aplicației CSA după revenirea backend-ului;
+- release activ: `csa-app-release-20260718-010841-9d6e7d886c8f`, SHA-256 `c3bf7dc450cd59e654d9dc6a276d2f64ed6076014f51d4a86023a7f1fc78d5d7`;
+- sursă release: commit GitHub `9d6e7d886c8f42d6baf60589f86afa7ce1510ffa`, tag `release-20260718-010841`;
+- conținut release: Secretarul și Oratorul cu fața spre Occident, Ospitalierul și Trezorierul față în față cu blaturi înclinate, Primul Supraveghetor spre colțul de Miazănoapte al intrării, Maestrul de Ceremonii în stânga Coloanei Boaz și Acoperitorul cu spada verticală în dreapta Coloanei Jachin, pavajul cu colonetele, firul cu plumb și Tabloul Lojii mutate în mijlocul Templului, camera adusă în față cu rotire aproape completă spre coloane și markerele-piramidă fără reprezentare eliminate din scenă;
+- incident anterior (16 iulie): backend-ul `urgentit-apps` de pe portul `3008` (alt stack, pe același host) nu a răspuns câteva ore și a blocat canalul de comenzi Sentinel; fără impact asupra aplicației CSA;
 - după release: 10/10 containere `healthy`, `200` pentru `/templu` pe `18600` și pentru gateway pe `18610`, redirect la login pentru `/portal/` anonim, fără erori runtime în ultimele loguri.
 
 Documentele din `C:\Proiecte\CSA` au fost folosite exclusiv drept surse de proiectare și structurare. Nu au fost modificate și nu au fost importate în bibliotecă.
