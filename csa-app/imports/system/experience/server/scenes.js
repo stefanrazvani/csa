@@ -137,10 +137,11 @@ function orientPlatform() {
     primitive('orient-step-north-low', 'box', [-3.6, 0.12, -6.4], [2.2, 0.24, 0.7], COLORS.stepLow),
     primitive('orient-step-south-mid', 'box', [3.6, 0.24, -7.1], [2.2, 0.48, 0.85], COLORS.stepMid),
     primitive('orient-step-south-low', 'box', [3.6, 0.12, -6.4], [2.2, 0.24, 0.7], COLORS.stepLow),
-    primitive('orient-balustrade-north', 'box', [-5.8, 0.86, -7.45], [5.4, 0.34, 0.12], '#25313f'),
-    primitive('orient-balustrade-south', 'box', [5.8, 0.86, -7.45], [5.4, 0.34, 0.12], '#25313f'),
-    primitive('orient-rail-north', 'box', [-5.8, 1.08, -7.45], [5.5, 0.08, 0.16], COLORS.gold, { metalness: 0.5, roughness: 0.42 }),
-    primitive('orient-rail-south', 'box', [5.8, 1.08, -7.45], [5.5, 0.08, 0.16], COLORS.gold, { metalness: 0.5, roughness: 0.42 }),
+    // Balustrada nu traversează scările laterale: rămâne numai în afara lor.
+    primitive('orient-balustrade-north', 'box', [-6.8, 0.86, -7.45], [3.4, 0.34, 0.12], '#25313f'),
+    primitive('orient-balustrade-south', 'box', [6.8, 0.86, -7.45], [3.4, 0.34, 0.12], '#25313f'),
+    primitive('orient-rail-north', 'box', [-6.8, 1.08, -7.45], [3.5, 0.08, 0.16], COLORS.gold, { metalness: 0.5, roughness: 0.42 }),
+    primitive('orient-rail-south', 'box', [6.8, 1.08, -7.45], [3.5, 0.08, 0.16], COLORS.gold, { metalness: 0.5, roughness: 0.42 }),
   ];
 }
 
@@ -192,15 +193,14 @@ function orientSeating() {
     primitive('orient-bench-south', 'box', [3.7, 1.02, -10.4], [3.4, 0.6, 0.75], COLORS.woodDark),
     primitive('orient-bench-south-back', 'box', [3.7, 1.55, -10.72], [3.4, 0.8, 0.14], COLORS.woodDark),
     primitive('orient-seat-adjunct', 'box', [-1.75, 1, -9.55], [0.7, 0.56, 0.66], COLORS.woodDark),
-    // Pupitrele Ospitalierului (Miazănoapte) și Trezorierului (Miazăzi) din
-    // Orient, față în față peste axul sălii: scaunele spre ziduri, blaturile
-    // înclinate spre titular.
-    primitive('hospitalier-desk', 'box', [-6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
-    primitive('hospitalier-desk-top', 'box', [-6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, -0.18] }),
-    primitive('hospitalier-chair', 'box', [-7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
-    primitive('treasurer-desk', 'box', [6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
-    primitive('treasurer-desk-top', 'box', [6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, 0.18] }),
-    primitive('treasurer-chair', 'box', [7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
+    // Pe estradă: Secretarul (Miazănoapte) și Oratorul (Miazăzi), cu blatul
+    // înclinat spre pupitrele de jos (spre Occident) și scaunele spre Orient.
+    primitive('secretary-desk', 'box', [-6.5, 1.14, -9.55], [1.5, 0.84, 1], COLORS.wood),
+    primitive('secretary-desk-top', 'box', [-6.5, 1.62, -9.55], [1.4, 0.07, 0.95], COLORS.woodDark, { rotation: [0.18, 0, 0] }),
+    primitive('secretary-chair', 'box', [-6.5, 1.05, -10.35], [0.62, 0.66, 0.62], COLORS.woodDark),
+    primitive('orator-desk', 'box', [6.5, 1.14, -9.55], [1.5, 0.84, 1], COLORS.wood),
+    primitive('orator-desk-top', 'box', [6.5, 1.62, -9.55], [1.4, 0.07, 0.95], COLORS.woodDark, { rotation: [0.18, 0, 0] }),
+    primitive('orator-chair', 'box', [6.5, 1.05, -10.35], [0.62, 0.66, 0.62], COLORS.woodDark),
   ];
 }
 
@@ -381,15 +381,20 @@ function wardenStations() {
 }
 
 function officerTables() {
-  // Secretarul și Oratorul stau cu fața spre Occident (spre intrare):
-  // scaunele sunt pe partea dinspre Orient a meselor.
+  // Sub estradă: Ospitalierul (Miazănoapte) și Trezorierul (Miazăzi), cu
+  // fața unul spre celălalt peste sală — blatul înclinat spre centru,
+  // scaunele spre ziduri. Lângă Ospitalier, spre intrare, stă spada
+  // Expertului, la primul scaun al Coloanei de Miazănoapte.
   return [
-    primitive('secretary-table', 'box', [-6.7, 0.55, -5.75], [1.9, 0.82, 1.15], COLORS.wood),
-    primitive('secretary-desk-top', 'box', [-6.7, 1.02, -5.75], [1.7, 0.06, 1], COLORS.woodDark, { rotation: [0.15, 0, 0] }),
-    primitive('secretary-chair', 'box', [-6.7, 0.55, -6.85], [0.62, 1.1, 0.6], COLORS.woodDark),
-    primitive('orator-table', 'box', [6.7, 0.55, -5.75], [1.9, 0.82, 1.15], COLORS.wood),
-    primitive('orator-desk-top', 'box', [6.7, 1.02, -5.75], [1.7, 0.06, 1], COLORS.woodDark, { rotation: [0.15, 0, 0] }),
-    primitive('orator-chair', 'box', [6.7, 0.55, -6.85], [0.62, 1.1, 0.6], COLORS.woodDark),
+    primitive('hospitalier-table', 'box', [-6.7, 0.55, -5.75], [1, 0.82, 1.6], COLORS.wood),
+    primitive('hospitalier-desk-top', 'box', [-6.7, 1.02, -5.75], [0.95, 0.06, 1.45], COLORS.woodDark, { rotation: [0, 0, -0.15] }),
+    primitive('hospitalier-chair', 'box', [-7.55, 0.55, -5.75], [0.62, 1.1, 0.6], COLORS.woodDark),
+    primitive('treasurer-table', 'box', [6.7, 0.55, -5.75], [1, 0.82, 1.6], COLORS.wood),
+    primitive('treasurer-desk-top', 'box', [6.7, 1.02, -5.75], [0.95, 0.06, 1.45], COLORS.woodDark, { rotation: [0, 0, 0.15] }),
+    primitive('treasurer-chair', 'box', [7.55, 0.55, -5.75], [0.62, 1.1, 0.6], COLORS.woodDark),
+    primitive('expert-sword-blade', 'box', [-6.15, 0.95, -4.45], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
+    primitive('expert-sword-guard', 'box', [-6.15, 1.58, -4.45], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
+    primitive('expert-sword-grip', 'cylinder', [-6.15, 1.72, -4.45], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
   ];
 }
 
