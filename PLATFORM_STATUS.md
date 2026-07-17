@@ -59,11 +59,12 @@ nu include OCR; documentele fără text suficient devin `unsupported_scan`.
 - datele migrate au rămas la 25 convocatoare, 559 articole, 24 prezențe și 462 confirmări;
 - backup logic complet valid: `post-platform-20260713`.
 - validare release curent: 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
-- backup logic înainte de release: `pre-release-20260716-005310-6d4e8cdd445e`;
+- backup logic înainte de release: `pre-release-20260716-192914-a816ff8d3985`;
 - backup cod/gateway cu SHA-256: `pre-3d-dossiers-20260713T162926Z`;
-- release activ: `csa-app-release-20260716-005310-6d4e8cdd445e`, SHA-256 `fc15d1ed39e2e0a075ceb1b134bdc87e254c27b62ab78bcb33b9613b56f3001e`;
-- sursă release: commit GitHub `6d4e8cdd445e8539bd29aee63507d64114f86d34`, tag `release-20260716-005310`;
-- conținut release: geometrii sculpturale noi în motor (profil de strung, frunză de acant extrudată, volută spiralată) și capitelul corintic refăcut după modelul clasic;
+- release activ: `csa-app-release-20260716-192914-a816ff8d3985`, SHA-256 `ba4bb805ae14b39c282b216c24e132c47ee18a6478b693c3f35a180257c36789`;
+- sursă release: commit GitHub `a816ff8d3985b761edca043446addf1381d46217`, tag `release-20260716-192914`;
+- conținut release: noduri-opt pe funia de pe Miazănoapte/Orient/Miazăzi (funia scoasă din grosimea zidurilor), Maestrul de Ceremonii cu scaun și sceptru lângă Boaz, pupitrele Trezorier/Ospitalier față în față, pavajul mozaicat redus la covor central (~30%) cu spațiu liber până la Altar, stâlpii strânși în jurul lui și Tabloul Lojii pictat ca textură procedurală pe grad;
+- incident în timpul release-ului: backend-ul `urgentit-apps` de pe portul `3008` (alt stack, pe același host) nu a răspuns câteva ore și a blocat canalul de comenzi Sentinel; release-ul a fost reluat fără impact asupra aplicației CSA după revenirea backend-ului;
 - după release: 10/10 containere `healthy`, `200` pentru `/templu` pe `18600` și pentru gateway pe `18610`, redirect la login pentru `/portal/` anonim, fără erori runtime în ultimele loguri.
 
 Documentele din `C:\Proiecte\CSA` au fost folosite exclusiv drept surse de proiectare și structurare. Nu au fost modificate și nu au fost importate în bibliotecă.
