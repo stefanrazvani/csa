@@ -59,11 +59,11 @@ nu include OCR; documentele fără text suficient devin `unsupported_scan`.
 - datele migrate au rămas la 25 convocatoare, 559 articole, 24 prezențe și 462 confirmări;
 - backup logic complet valid: `post-platform-20260713`.
 - validare release curent: 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
-- backup logic înainte de release: `pre-release-20260718-010841-9d6e7d886c8f`;
+- backup logic înainte de release: `pre-release-20260718-015326-36bf8a4d1c76`;
 - backup cod/gateway cu SHA-256: `pre-3d-dossiers-20260713T162926Z`;
-- release activ: `csa-app-release-20260718-010841-9d6e7d886c8f`, SHA-256 `c3bf7dc450cd59e654d9dc6a276d2f64ed6076014f51d4a86023a7f1fc78d5d7`;
-- sursă release: commit GitHub `9d6e7d886c8f42d6baf60589f86afa7ce1510ffa`, tag `release-20260718-010841`;
-- conținut release: Secretarul și Oratorul cu fața spre Occident, Ospitalierul și Trezorierul față în față cu blaturi înclinate, Primul Supraveghetor spre colțul de Miazănoapte al intrării, Maestrul de Ceremonii în stânga Coloanei Boaz și Acoperitorul cu spada verticală în dreapta Coloanei Jachin, pavajul cu colonetele, firul cu plumb și Tabloul Lojii mutate în mijlocul Templului, camera adusă în față cu rotire aproape completă spre coloane și markerele-piramidă fără reprezentare eliminate din scenă;
+- release activ: `csa-app-release-20260718-015326-36bf8a4d1c76`, SHA-256 `25ce214acfdce420f38d0f1618a7cf0c601fd0821a8ba8407c3c4af82bb86ceb`;
+- sursă release: commit GitHub `36bf8a4d1c76837dfe0ea983f3102ff553f62e77`, tag `release-20260718-015326`;
+- conținut release: Altarul Jurămintelor lipit de estrada Maestrului Venerabil cu axul central liber (trepte laterale), blaturi înclinate care arată orientarea pupitrelor, Maestrul de Ceremonii și Acoperitorul aduși în interiorul Templului, funia cu mai multe noduri-opt; anterior: Secretarul și Oratorul cu fața spre Occident, Ospitalierul și Trezorierul față în față cu blaturi înclinate, Primul Supraveghetor spre colțul de Miazănoapte al intrării, Maestrul de Ceremonii în stânga Coloanei Boaz și Acoperitorul cu spada verticală în dreapta Coloanei Jachin, pavajul cu colonetele, firul cu plumb și Tabloul Lojii mutate în mijlocul Templului, camera adusă în față cu rotire aproape completă spre coloane și markerele-piramidă fără reprezentare eliminate din scenă;
 - incident anterior (16 iulie): backend-ul `urgentit-apps` de pe portul `3008` (alt stack, pe același host) nu a răspuns câteva ore și a blocat canalul de comenzi Sentinel; fără impact asupra aplicației CSA;
 - după release: 10/10 containere `healthy`, `200` pentru `/templu` pe `18600` și pentru gateway pe `18610`, redirect la login pentru `/portal/` anonim, fără erori runtime în ultimele loguri.
 
