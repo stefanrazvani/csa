@@ -933,7 +933,9 @@ class ExperienceRenderer {
     if (drag && drag.pointerId === event.pointerId && this.phase === 'atrium') {
       const deltaX = event.clientX - drag.x;
       const deltaY = event.clientY - drag.y;
-      this.orbitTargetYaw = Math.max(-1.35, Math.min(1.35, drag.startYaw + deltaX * 0.0042));
+      // Privirea se poate întoarce aproape complet, inclusiv spre coloanele
+      // B și J din spatele punctului de observație.
+      this.orbitTargetYaw = Math.max(-3.05, Math.min(3.05, drag.startYaw + deltaX * 0.0042));
       this.orbitTargetPitch = Math.max(-0.32, Math.min(0.44, drag.startPitch + deltaY * 0.0028));
       return;
     }

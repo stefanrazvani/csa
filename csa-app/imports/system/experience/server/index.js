@@ -23,6 +23,7 @@ const EXPERIENCE_VERSION = '2026.07.13-2';
 // sunt toate doar în listă.
 const LIST_ONLY_SYMBOL_IDS = new Set([
   'g1-great-lights',
+  'g1-plumb-axis',
   'g2-great-lights',
   'g3-acacia',
   'g3-circle-center',

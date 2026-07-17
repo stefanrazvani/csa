@@ -106,7 +106,7 @@ const LODGE_FLOOR = Object.freeze({
     depth: 1.728,
     tilesX: 5,
     tilesZ: 8,
-    z: -2,
+    z: 1.4,
     colors: ['#e6dcc3', '#10181f'],
     border: '#c2a05a',
   },
@@ -189,10 +189,13 @@ function orientSeating() {
     primitive('orient-bench-south-back', 'box', [3.7, 1.55, -10.72], [3.4, 0.8, 0.14], COLORS.woodDark),
     primitive('orient-seat-adjunct', 'box', [-1.75, 1, -9.55], [0.7, 0.56, 0.66], COLORS.woodDark),
     // Pupitrele Ospitalierului (Miazănoapte) și Trezorierului (Miazăzi) din
-    // Orient, așezate cu fața unul spre celălalt, cu scaunele spre ziduri.
+    // Orient, față în față peste axul sălii: scaunele spre ziduri, blaturile
+    // înclinate spre titular.
     primitive('hospitalier-desk', 'box', [-6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
+    primitive('hospitalier-desk-top', 'box', [-6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, 0.18] }),
     primitive('hospitalier-chair', 'box', [-7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
     primitive('treasurer-desk', 'box', [6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
+    primitive('treasurer-desk-top', 'box', [6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, -0.18] }),
     primitive('treasurer-chair', 'box', [7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
   ];
 }
@@ -215,7 +218,7 @@ function tracingBoard(grade) {
   // pictat ca textură procedurală (nu forme 3D), conform planșelor.
   const kinds = { 1: 'board-apprentice', 2: 'board-fellowcraft', 3: 'board-master' };
   return [
-    primitive('tracing-board', 'box', [0, 0.1, -2], [0.72, 0.035, 1.15], '#e8dcc0', {
+    primitive('tracing-board', 'box', [0, 0.1, 1.4], [0.72, 0.035, 1.15], '#e8dcc0', {
       map: kinds[grade] || kinds[1],
       emissive: '#9a8f74',
       emissiveIntensity: 0.4,
@@ -298,9 +301,9 @@ function corinthianPillar(id, x, z) {
 function threePillars() {
   // Strânși la colțurile covorului mozaicat, în jurul acestuia.
   const spots = [
-    ['pillar-wisdom-se', 0.95, -3.2, ionicPillar],
-    ['pillar-strength-nw', -0.95, -0.8, doricPillar],
-    ['pillar-beauty-sw', 0.95, -0.8, corinthianPillar],
+    ['pillar-wisdom-se', 0.95, 0.2, ionicPillar],
+    ['pillar-strength-nw', -0.95, 2.75, doricPillar],
+    ['pillar-beauty-sw', 0.95, 2.75, corinthianPillar],
   ];
   return spots.flatMap(([id, x, z, builder]) => ([
     ...builder(id, x, z),
@@ -348,32 +351,39 @@ function portalColumns(grade) {
 
 function wardenStations() {
   return [
-    // Primul Supraveghetor, la Occident, cu fața spre Orient.
-    primitive('warden1-desk', 'box', [-2.7, 0.62, 5.7], [1.7, 0.95, 1], COLORS.wood),
-    primitive('warden1-top', 'box', [-2.7, 1.14, 5.7], [1.85, 0.09, 1.15], COLORS.woodDark),
-    primitive('warden1-chair', 'box', [-2.7, 0.62, 6.85], [0.66, 1.24, 0.6], COLORS.woodDark),
-    primitive('warden1-column', 'cylinder', [-2.25, 1.4, 5.55], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.045, radiusBottom: 0.055, height: 0.42, segments: 10 } }),
+    // Primul Supraveghetor, la Occident, spre colțul de Miazănoapte al
+    // intrării (stânga cum intri), cu fața spre Orient.
+    primitive('warden1-desk', 'box', [-5.4, 0.62, 6.7], [1.7, 0.95, 1], COLORS.wood),
+    primitive('warden1-top', 'box', [-5.4, 1.14, 6.7], [1.85, 0.09, 1.15], COLORS.woodDark),
+    primitive('warden1-chair', 'box', [-5.4, 0.62, 7.8], [0.66, 1.24, 0.6], COLORS.woodDark),
+    primitive('warden1-column', 'cylinder', [-4.95, 1.4, 6.55], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.045, radiusBottom: 0.055, height: 0.42, segments: 10 } }),
     // Al Doilea Supraveghetor, la Miazăzi.
     primitive('warden2-desk', 'box', [6.4, 0.62, 0.6], [1, 0.95, 1.7], COLORS.wood),
     primitive('warden2-top', 'box', [6.4, 1.14, 0.6], [1.15, 0.09, 1.85], COLORS.woodDark),
     primitive('warden2-chair', 'box', [7.5, 0.62, 0.6], [0.6, 1.24, 0.66], COLORS.woodDark),
     primitive('warden2-column', 'cylinder', [6.25, 1.4, 0.15], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.045, radiusBottom: 0.055, height: 0.42, segments: 10 } }),
-    // Maestrul de Ceremonii, lângă Coloana Boaz: scaun și sceptrul de
-    // ceremonii, fără pupitru.
-    primitive('mc-seat', 'box', [-1.6, 0.5, 6.3], [0.6, 1, 0.6], COLORS.woodDark),
-    primitive('mc-sceptre-shaft', 'cylinder', [-1.15, 0.8, 6.15], [1, 1, 1], COLORS.wood, { geometry: { radiusTop: 0.022, radiusBottom: 0.028, height: 1.5, segments: 10 }, rotation: [0, 0, 0.1], roughness: 0.6 }),
-    primitive('mc-sceptre-head', 'sphere', [-1.225, 1.57, 6.15], [1, 1, 1], COLORS.gold, { geometry: { size: 0.08, segments: 14 }, metalness: 0.55, roughness: 0.35, emissive: '#4d3a12', emissiveIntensity: 0.3 }),
-    // Scaunul ofițerului de prag din planșă (lângă Occident, Miazăzi).
-    primitive('officer-seat-west-south', 'box', [1.95, 0.5, 6.7], [0.6, 1, 0.6], COLORS.woodDark),
+    // Maestrul de Ceremonii, în stânga Coloanei Boaz (spre Miazănoapte,
+    // cum intri): scaun și sceptrul de ceremonii.
+    primitive('mc-seat', 'box', [-4.1, 0.5, 8.35], [0.6, 1, 0.6], COLORS.woodDark),
+    primitive('mc-sceptre-shaft', 'cylinder', [-3.7, 0.8, 8.2], [1, 1, 1], COLORS.wood, { geometry: { radiusTop: 0.022, radiusBottom: 0.028, height: 1.5, segments: 10 }, rotation: [0, 0, 0.1], roughness: 0.6 }),
+    primitive('mc-sceptre-head', 'sphere', [-3.775, 1.57, 8.2], [1, 1, 1], COLORS.gold, { geometry: { size: 0.08, segments: 14 }, metalness: 0.55, roughness: 0.35, emissive: '#4d3a12', emissiveIntensity: 0.3 }),
+    // Acoperitorul, în dreapta Coloanei Jachin (spre Miazăzi, cum intri),
+    // cu fața spre Orient și spada verticală alături.
+    primitive('tyler-seat', 'box', [4.1, 0.5, 8.35], [0.6, 1, 0.6], COLORS.woodDark),
+    primitive('tyler-sword-blade', 'box', [4.55, 0.95, 8.2], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
+    primitive('tyler-sword-guard', 'box', [4.55, 1.58, 8.2], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
+    primitive('tyler-sword-grip', 'cylinder', [4.55, 1.72, 8.2], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
   ];
 }
 
 function officerTables() {
+  // Secretarul și Oratorul stau cu fața spre Occident (spre intrare):
+  // scaunele sunt pe partea dinspre Orient a meselor.
   return [
     primitive('secretary-table', 'box', [-6.7, 0.55, -5.75], [1.9, 0.82, 1.15], COLORS.wood),
-    primitive('secretary-chair', 'box', [-6.7, 0.55, -4.65], [0.62, 1.1, 0.6], COLORS.woodDark),
+    primitive('secretary-chair', 'box', [-6.7, 0.55, -6.85], [0.62, 1.1, 0.6], COLORS.woodDark),
     primitive('orator-table', 'box', [6.7, 0.55, -5.75], [1.9, 0.82, 1.15], COLORS.wood),
-    primitive('orator-chair', 'box', [6.7, 0.55, -4.65], [0.62, 1.1, 0.6], COLORS.woodDark),
+    primitive('orator-chair', 'box', [6.7, 0.55, -6.85], [0.62, 1.1, 0.6], COLORS.woodDark),
   ];
 }
 
@@ -427,9 +437,9 @@ function knottedRope() {
 // simbolizând Axis Mundi, conform ritualului.
 function plumbLine() {
   return [
-    primitive('plumb-mount', 'cylinder', [0, 7.26, -2], [1, 1, 1], '#3c4653', { geometry: { radiusTop: 0.09, radiusBottom: 0.07, height: 0.12, segments: 12 } }),
-    primitive('plumb-cord', 'cylinder', [0, 4.85, -2], [1, 1, 1], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4.7, segments: 8 } }),
-    primitive('plumb-bob', 'cone', [0, 2.36, -2], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
+    primitive('plumb-mount', 'cylinder', [0, 7.26, 1.4], [1, 1, 1], '#3c4653', { geometry: { radiusTop: 0.09, radiusBottom: 0.07, height: 0.12, segments: 12 } }),
+    primitive('plumb-cord', 'cylinder', [0, 4.85, 1.4], [1, 1, 1], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4.7, segments: 8 } }),
+    primitive('plumb-bob', 'cone', [0, 2.36, 1.4], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
   ];
 }
 
@@ -509,7 +519,7 @@ const SCENES = Object.freeze({
       background: '#020a13', fog: '#061420', fogNear: 11, fogFar: 42,
       ambient: '#5b7c93', ambientIntensity: 0.4,
       keyLight: '#f0d79b', keyIntensity: 2.5, keyPosition: [-1.5, 7.5, -7.5],
-      camera: [0, 3.9, 10.9], target: [0, 1.8, -6],
+      camera: [0, 3.1, 6.6], target: [0, 1.5, -5.2],
       floor: { ...LODGE_FLOOR },
       motes: { count: 90, color: '#cfdae8', spread: [16, 6, 21] },
     },
@@ -518,7 +528,7 @@ const SCENES = Object.freeze({
       interactive('rough-stone', 'symbol', 'Piatra lucrării', 'Un reper pentru observație, disciplină și transformare personală.', [-4.7, 1, -5.7], { type: 'dodecahedron', size: 0.76, detail: 0 }, ROUTES.library,
         learning('Observă înainte să interpretezi', 'Ce asperitate interioară alegi să lucrezi fără grabă?', ['Rotește privirea în jurul obiectului.', 'Notează o observație concretă.', 'Formulează o întrebare, nu o concluzie.']), { sourceRef: 'Catalog intern · gradul 1' }),
       interactive('vertical-reper', 'tool', 'Reperul verticalității', 'Explorează relația dintre intenție, faptă și consecvență.', [4.7, 1.15, -5.7], { type: 'cone', radius: 0.62, height: 1.85, segments: 4 }, ROUTES.library,
-        learning('Aliniere', 'Unde există astăzi distanță între ceea ce afirmi și ceea ce faci?', ['Privește axa obiectului.', 'Alege o situație reală.', 'Scrie o acțiune mică și verificabilă.']), { sourceRef: 'Catalog intern · gradul 1' }),
+        learning('Aliniere', 'Unde există astăzi distanță între ceea ce afirmi și ceea ce faci?', ['Privește axa obiectului.', 'Alege o situație reală.', 'Scrie o acțiune mică și verificabilă.']), { sourceRef: 'Catalog intern · gradul 1', presentation: 'list' }),
       interactive('first-library', 'library', 'Camera studiului introductiv', 'Textele și planșele autorizate gradului activ.', [-4.9, 1, 1.6], { type: 'box', width: 1.65, height: 1.2, depth: 0.42 }, ROUTES.library,
         learning('Studiu activ', 'Ce idee merită comparată cu propria experiență?', ['Citește un fragment scurt.', 'Selectează o propoziție.', 'Pornește o notă sau o dezbatere.']), { actionLabel: 'Deschide studiul', presentation: 'list' }),
       interactive('convocations-one', 'assembly', 'Cercul lucrării', 'Convocatoarele și informațiile permise nivelului tău de acces.', [4.9, 0.85, 3.4], { type: 'torus', radius: 0.68, tube: 0.16, segments: 32 }, ROUTES.convocations,
@@ -533,7 +543,7 @@ const SCENES = Object.freeze({
       background: '#03101b', fog: '#07202f', fogNear: 11, fogFar: 44,
       ambient: '#6b8ca1', ambientIntensity: 0.48,
       keyLight: '#f5cd72', keyIntensity: 2.9, keyPosition: [2, 8, -8],
-      camera: [0, 3.9, 10.9], target: [0, 1.8, -6],
+      camera: [0, 3.1, 6.6], target: [0, 1.5, -5.2],
       floor: { ...LODGE_FLOOR },
       motes: { count: 120, color: '#ffd98f', spread: [17, 6.2, 22] },
     },
@@ -557,13 +567,13 @@ const SCENES = Object.freeze({
       background: '#01060f', fog: '#0a1526', fogNear: 12, fogFar: 46,
       ambient: '#71809f', ambientIntensity: 0.46,
       keyLight: '#f2d089', keyIntensity: 3.15, keyPosition: [0, 8.5, -9],
-      camera: [0, 3.9, 10.9], target: [0, 1.8, -6],
+      camera: [0, 3.1, 6.6], target: [0, 1.5, -5.2],
       floor: { ...LODGE_FLOOR },
       motes: { count: 160, color: '#dde5f4', spread: [18, 6.4, 23] },
     },
     architecture: lodgeArchitecture(3),
     interactives: [
-      interactive('living-plan', 'symbol', 'Planșa vie', 'Sinteze, conexiuni și întrebări care traversează întregul parcurs autorizat.', [-2.2, 1.15, 2.9], { type: 'icosahedron', size: 1.08, detail: 1 }, ROUTES.concepts,
+      interactive('living-plan', 'symbol', 'Planșa vie', 'Sinteze, conexiuni și întrebări care traversează întregul parcurs autorizat.', [-2.8, 1.15, 3.6], { type: 'icosahedron', size: 1.08, detail: 1 }, ROUTES.concepts,
         learning('Sinteză', 'Ce legătură poate transforma cunoașterea într-o lucrare utilă?', ['Privește mai multe surse.', 'Separă faptele de interpretări.', 'Propune un proiect verificabil.']), { actionLabel: 'Explorează legăturile', sourceRef: 'Catalog intern · gradul 3' }),
       interactive('mentor-circle', 'mentor', 'Cercul mentoratului', 'Spațiul pentru orientare, întrebări și continuitatea studiului.', [-4.9, 0.9, -0.4], { type: 'torus', radius: 0.9, tube: 0.2, segments: 48 }, ROUTES.library,
         learning('Însoțire', 'Ce întrebare îl ajută pe celălalt să descopere singur?', ['Ascultă înainte să explici.', 'Întreabă fără să conduci răspunsul.', 'Leagă reflecția de o sursă accesibilă.']), { actionLabel: 'Deschide studiul', presentation: 'list' }),
