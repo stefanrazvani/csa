@@ -131,8 +131,12 @@ function wallsAndEntrance() {
 function orientPlatform() {
   return [
     primitive('orient-dais', 'box', [0, 0.36, -9.4], [18, 0.72, 3.8], COLORS.daisStone),
-    primitive('orient-step-mid', 'box', [0, 0.24, -7.1], [7.6, 0.48, 0.85], COLORS.stepMid),
-    primitive('orient-step-low', 'box', [0, 0.12, -6.4], [8.8, 0.24, 0.7], COLORS.stepLow),
+    // Treptele spre Orient sunt laterale; axul central rămâne liber pentru
+    // Altarul Jurămintelor, lipit de estrada pupitrului Maestrului Venerabil.
+    primitive('orient-step-north-mid', 'box', [-3.6, 0.24, -7.1], [2.2, 0.48, 0.85], COLORS.stepMid),
+    primitive('orient-step-north-low', 'box', [-3.6, 0.12, -6.4], [2.2, 0.24, 0.7], COLORS.stepLow),
+    primitive('orient-step-south-mid', 'box', [3.6, 0.24, -7.1], [2.2, 0.48, 0.85], COLORS.stepMid),
+    primitive('orient-step-south-low', 'box', [3.6, 0.12, -6.4], [2.2, 0.24, 0.7], COLORS.stepLow),
     primitive('orient-balustrade-north', 'box', [-5.8, 0.86, -7.45], [5.4, 0.34, 0.12], '#25313f'),
     primitive('orient-balustrade-south', 'box', [5.8, 0.86, -7.45], [5.4, 0.34, 0.12], '#25313f'),
     primitive('orient-rail-north', 'box', [-5.8, 1.08, -7.45], [5.5, 0.08, 0.16], COLORS.gold, { metalness: 0.5, roughness: 0.42 }),
@@ -192,24 +196,24 @@ function orientSeating() {
     // Orient, față în față peste axul sălii: scaunele spre ziduri, blaturile
     // înclinate spre titular.
     primitive('hospitalier-desk', 'box', [-6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
-    primitive('hospitalier-desk-top', 'box', [-6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, 0.18] }),
+    primitive('hospitalier-desk-top', 'box', [-6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, -0.18] }),
     primitive('hospitalier-chair', 'box', [-7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
     primitive('treasurer-desk', 'box', [6.5, 1.14, -9.55], [1, 0.84, 1.5], COLORS.wood),
-    primitive('treasurer-desk-top', 'box', [6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, -0.18] }),
+    primitive('treasurer-desk-top', 'box', [6.5, 1.62, -9.55], [0.95, 0.07, 1.4], COLORS.woodDark, { rotation: [0, 0, 0.18] }),
     primitive('treasurer-chair', 'box', [7.35, 1.05, -9.55], [0.62, 0.66, 0.62], COLORS.woodDark),
   ];
 }
 
 function altarOfLights() {
   return [
-    primitive('altar-plinth', 'box', [0, 0.09, -5.6], [1, 0.18, 1], '#20282f'),
-    primitive('altar-shaft', 'cylinder', [0, 0.62, -5.6], [1, 1, 1], '#c7bb9d', { geometry: { radiusTop: 0.36, radiusBottom: 0.46, height: 0.9, segments: 20 } }),
-    primitive('altar-top', 'box', [0, 1.11, -5.6], [0.95, 0.08, 0.8], '#d6cbab'),
+    primitive('altar-plinth', 'box', [0, 0.09, -6.95], [1, 0.18, 1], '#20282f'),
+    primitive('altar-shaft', 'cylinder', [0, 0.62, -6.95], [1, 1, 1], '#c7bb9d', { geometry: { radiusTop: 0.36, radiusBottom: 0.46, height: 0.9, segments: 20 } }),
+    primitive('altar-top', 'box', [0, 1.11, -6.95], [0.95, 0.08, 0.8], '#d6cbab'),
     // Volumul Legii Sacre deschis, cu echerul și compasul suprapuse.
-    primitive('vsl-page-north', 'box', [-0.2, 1.2, -5.6], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, 0.18] }),
-    primitive('vsl-page-south', 'box', [0.2, 1.2, -5.6], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, -0.18] }),
-    primitive('vsl-square', 'box', [0.02, 1.27, -5.52], [0.42, 0.02, 0.05], COLORS.gold, { rotation: [0, 0.7, 0], emissive: '#6b5116', emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.35 }),
-    primitive('vsl-compass', 'box', [-0.02, 1.29, -5.6], [0.42, 0.02, 0.05], COLORS.gold, { rotation: [0, -0.7, 0], emissive: '#6b5116', emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.35 }),
+    primitive('vsl-page-north', 'box', [-0.2, 1.2, -6.95], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, 0.18] }),
+    primitive('vsl-page-south', 'box', [0.2, 1.2, -6.95], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, -0.18] }),
+    primitive('vsl-square', 'box', [0.02, 1.27, -6.87], [0.42, 0.02, 0.05], COLORS.gold, { rotation: [0, 0.7, 0], emissive: '#6b5116', emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.35 }),
+    primitive('vsl-compass', 'box', [-0.02, 1.29, -6.95], [0.42, 0.02, 0.05], COLORS.gold, { rotation: [0, -0.7, 0], emissive: '#6b5116', emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.35 }),
   ];
 }
 
@@ -364,15 +368,15 @@ function wardenStations() {
     primitive('warden2-column', 'cylinder', [6.25, 1.4, 0.15], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.045, radiusBottom: 0.055, height: 0.42, segments: 10 } }),
     // Maestrul de Ceremonii, în stânga Coloanei Boaz (spre Miazănoapte,
     // cum intri): scaun și sceptrul de ceremonii.
-    primitive('mc-seat', 'box', [-4.1, 0.5, 8.35], [0.6, 1, 0.6], COLORS.woodDark),
-    primitive('mc-sceptre-shaft', 'cylinder', [-3.7, 0.8, 8.2], [1, 1, 1], COLORS.wood, { geometry: { radiusTop: 0.022, radiusBottom: 0.028, height: 1.5, segments: 10 }, rotation: [0, 0, 0.1], roughness: 0.6 }),
-    primitive('mc-sceptre-head', 'sphere', [-3.775, 1.57, 8.2], [1, 1, 1], COLORS.gold, { geometry: { size: 0.08, segments: 14 }, metalness: 0.55, roughness: 0.35, emissive: '#4d3a12', emissiveIntensity: 0.3 }),
+    primitive('mc-seat', 'box', [-3.9, 0.5, 6.6], [0.6, 1, 0.6], COLORS.woodDark),
+    primitive('mc-sceptre-shaft', 'cylinder', [-3.5, 0.8, 6.45], [1, 1, 1], COLORS.wood, { geometry: { radiusTop: 0.022, radiusBottom: 0.028, height: 1.5, segments: 10 }, rotation: [0, 0, 0.1], roughness: 0.6 }),
+    primitive('mc-sceptre-head', 'sphere', [-3.575, 1.57, 6.45], [1, 1, 1], COLORS.gold, { geometry: { size: 0.08, segments: 14 }, metalness: 0.55, roughness: 0.35, emissive: '#4d3a12', emissiveIntensity: 0.3 }),
     // Acoperitorul, în dreapta Coloanei Jachin (spre Miazăzi, cum intri),
     // cu fața spre Orient și spada verticală alături.
-    primitive('tyler-seat', 'box', [4.1, 0.5, 8.35], [0.6, 1, 0.6], COLORS.woodDark),
-    primitive('tyler-sword-blade', 'box', [4.55, 0.95, 8.2], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
-    primitive('tyler-sword-guard', 'box', [4.55, 1.58, 8.2], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
-    primitive('tyler-sword-grip', 'cylinder', [4.55, 1.72, 8.2], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
+    primitive('tyler-seat', 'box', [3.9, 0.5, 6.6], [0.6, 1, 0.6], COLORS.woodDark),
+    primitive('tyler-sword-blade', 'box', [4.35, 0.95, 6.45], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
+    primitive('tyler-sword-guard', 'box', [4.35, 1.58, 6.45], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
+    primitive('tyler-sword-grip', 'cylinder', [4.35, 1.72, 6.45], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
   ];
 }
 
@@ -381,8 +385,10 @@ function officerTables() {
   // scaunele sunt pe partea dinspre Orient a meselor.
   return [
     primitive('secretary-table', 'box', [-6.7, 0.55, -5.75], [1.9, 0.82, 1.15], COLORS.wood),
+    primitive('secretary-desk-top', 'box', [-6.7, 1.02, -5.75], [1.7, 0.06, 1], COLORS.woodDark, { rotation: [0.15, 0, 0] }),
     primitive('secretary-chair', 'box', [-6.7, 0.55, -6.85], [0.62, 1.1, 0.6], COLORS.woodDark),
     primitive('orator-table', 'box', [6.7, 0.55, -5.75], [1.9, 0.82, 1.15], COLORS.wood),
+    primitive('orator-desk-top', 'box', [6.7, 1.02, -5.75], [1.7, 0.06, 1], COLORS.woodDark, { rotation: [0.15, 0, 0] }),
     primitive('orator-chair', 'box', [6.7, 0.55, -6.85], [0.62, 1.1, 0.6], COLORS.woodDark),
   ];
 }
@@ -422,9 +428,9 @@ function knottedRope() {
     primitive('rope-south', 'cylinder', [8.68, 6.6, 0], [1, 1, 1], rope, { ...ropeGeometry(22.6), rotation: [Math.PI / 2, 0, 0] }),
     primitive('rope-west-north', 'cylinder', [-5.9, 6.6, 11.02], [1, 1, 1], rope, { ...ropeGeometry(6.6), rotation: [0, 0, Math.PI / 2] }),
     primitive('rope-west-south', 'cylinder', [5.9, 6.6, 11.02], [1, 1, 1], rope, { ...ropeGeometry(6.6), rotation: [0, 0, Math.PI / 2] }),
-    ...knotEight('rope-knot-east', [0, 6.6, -11.02], false),
-    ...knotEight('rope-knot-north', [-8.68, 6.6, 0], true),
-    ...knotEight('rope-knot-south', [8.68, 6.6, 0], true),
+    ...[-5.5, 0, 5.5].flatMap((x, index) => knotEight(`rope-knot-east-${index + 1}`, [x, 6.6, -11.02], false)),
+    ...[-6.5, -2, 2.5, 7].flatMap((z, index) => knotEight(`rope-knot-north-${index + 1}`, [-8.68, 6.6, z], true)),
+    ...[-6.5, -2, 2.5, 7].flatMap((z, index) => knotEight(`rope-knot-south-${index + 1}`, [8.68, 6.6, z], true)),
   ];
   for (const [id, x] of [['north', -2.6], ['south', 2.6]]) {
     items.push(primitive(`rope-tassel-${id}`, 'cylinder', [x, 6.05, 11.02], [1, 1, 1], rope, { geometry: { radiusTop: 0.03, radiusBottom: 0.06, height: 1.2, segments: 8 }, roughness: 0.6 }));
