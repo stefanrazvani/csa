@@ -380,6 +380,75 @@ function wardenStations() {
   ];
 }
 
+
+// Sfeșnicele ritualice: trei lumânări la Maestrul Venerabil, două la
+// Primul Supraveghetor, una la al Doilea Supraveghetor.
+function candelabrum(prefix, x, y, z, candleCount) {
+  const items = [];
+  // Alamă/aur — aceeași finisare ca restul pieselor de cult.
+  const brass = { roughness: 0.36, metalness: 0.55 };
+
+  // Cote verticale locale, măsurate de la fața mesei (y local = 0).
+  const spread = candleCount === 3 ? 0.16 : candleCount === 2 ? 0.12 : 0;
+  const stemTop = candleCount === 3 ? 0.2 : candleCount === 2 ? 0.19 : 0.17;
+  const barY = candleCount === 3 ? 0.185 : 0.165;
+  const candleY0 = candleCount === 3 ? 0.198 : candleCount === 2 ? 0.176 : 0.16;
+  const candleH = candleCount === 3 ? 0.17 : candleCount === 2 ? 0.155 : 0.13;
+
+  // Profil de strung: plintă, tor, gât, fus balustru, nod, tijă.
+  const profile = [
+    [0.094, 0], [0.097, 0.01], [0.08, 0.02], [0.056, 0.028],
+    [0.066, 0.038], [0.048, 0.052], [0.03, 0.066], [0.025, 0.08],
+    [0.037, 0.09], [0.025, 0.102],
+    [0.029, stemTop - 0.06], [0.021, stemTop - 0.028], [0.026, stemTop],
+  ];
+  if (candleCount === 3) {
+    // Cupa centrală (bobeșa) care primește lumânarea din mijloc.
+    profile.push([0.056, stemTop + 0.014], [0.058, stemTop + 0.022],
+      [0.045, stemTop + 0.024], [0.044, stemTop + 0.047]);
+  } else if (candleCount === 2) {
+    // Vârf mic (finial) ridicat peste braț.
+    profile.push([0.034, stemTop + 0.015], [0.02, stemTop + 0.028],
+      [0.012, stemTop + 0.038]);
+  }
+  items.push(primitive(`${prefix}-base`, 'lathe', [x, y, z], [1, 1, 1], COLORS.gold,
+    { geometry: { profile, segments: 24 }, ...brass }));
+
+  if (candleCount > 1) {
+    // Brațul orizontal pe axa X plus galeria inelară care poartă talerele.
+    items.push(primitive(`${prefix}-arm`, 'cylinder', [x, y + barY, z], [1, 1, 1], COLORS.gold,
+      { geometry: { radiusTop: 0.022, radiusBottom: 0.022, height: spread * 2 + 0.02, segments: 14 },
+        rotation: [0, 0, Math.PI / 2], ...brass }));
+    items.push(primitive(`${prefix}-gallery`, 'torus', [x, y + barY + 0.005, z], [1, 1, 1], COLORS.gold,
+      { geometry: { radius: spread, tube: 0.013, segments: 22 },
+        rotation: [Math.PI / 2, 0, 0], ...brass }));
+  } else {
+    // Astragal pe fus și taler de ceară evazat, cu manșon pentru lumânare.
+    items.push(primitive(`${prefix}-astragal`, 'torus', [x, y + 0.104, z], [1, 1, 1], COLORS.gold,
+      { geometry: { radius: 0.034, tube: 0.01, segments: 18 },
+        rotation: [Math.PI / 2, 0, 0], ...brass }));
+    items.push(primitive(`${prefix}-drip-pan`, 'lathe', [x, y + 0.15, z], [1, 1, 1], COLORS.gold,
+      { geometry: { profile: [[0.024, 0], [0.056, 0.014], [0.059, 0.022],
+        [0.046, 0.024], [0.045, 0.05]], segments: 22 }, ...brass }));
+  }
+
+  // Lumânările de fildeș și flăcările, așezate pe braț / în cupă.
+  for (let index = 0; index < candleCount; index += 1) {
+    const offset = candleCount === 1 ? 0
+      : (candleCount === 2 ? (index * 2 - 1) * spread : (index - 1) * spread);
+    items.push(primitive(`${prefix}-candle-${index}`, 'cylinder',
+      [x + offset, y + candleY0 + candleH / 2, z], [1, 1, 1], COLORS.ivory,
+      { geometry: { radiusTop: 0.038, radiusBottom: 0.04, height: candleH, segments: 14 },
+        roughness: 0.75, metalness: 0 }));
+    items.push(primitive(`${prefix}-flame-${index}`, 'cone',
+      [x + offset, y + candleY0 + candleH + 0.11, z], [1, 1, 1], COLORS.flame,
+      { geometry: { radius: 0.075, height: 0.22, segments: 12 },
+        emissive: '#f3b74a', emissiveIntensity: 3, roughness: 0.4, metalness: 0 }));
+  }
+
+  return items;
+}
+
 function officerTables() {
   // Sub estradă: Ospitalierul (Miazănoapte) și Trezorierul (Miazăzi), cu
   // fața unul spre celălalt peste sală — blatul înclinat spre centru,
@@ -494,6 +563,9 @@ function lodgeArchitecture(grade) {
     ...portalColumns(grade),
     ...wardenStations(),
     ...officerTables(),
+    ...candelabrum('vm-candelabrum', 1.02, 1.26, -8.5, 3),
+    ...candelabrum('warden1-candelabrum', -5.85, 1.19, 6.5, 2),
+    ...candelabrum('warden2-candelabrum', 6.55, 1.19, 1.05, 1),
     ...ashlars(),
     ...brotherSeats(),
   ];

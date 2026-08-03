@@ -244,7 +244,7 @@ export function normalizeExperienceManifest(value) {
     gate: gate(source.gate),
     environment: environment(source.environment),
     architecture: Array.isArray(source.architecture)
-      ? source.architecture.slice(0, 224).map(architectureItem).filter(Boolean)
+      ? source.architecture.slice(0, 256).map(architectureItem).filter(Boolean)
       : [],
     interactives,
     learningPath: Array.isArray(source.learningPath)
