@@ -566,7 +566,9 @@ function lodgeArchitecture(grade) {
     ...candelabrum('vm-candelabrum', 1.02, 1.26, -8.5, 3),
     ...candelabrum('warden1-candelabrum', -5.85, 1.19, 6.5, 2),
     ...candelabrum('warden2-candelabrum', 6.55, 1.19, 1.05, 1),
-    ...ashlars(),
+    // În gradul 1, spațiul din fața pupitrelor Ospitalierului și
+    // Trezorierului rămâne liber.
+    ...(grade === 1 ? [] : ashlars()),
     ...brotherSeats(),
   ];
 }
