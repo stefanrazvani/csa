@@ -39,3 +39,16 @@ body.csa-desktop.csa-xp-active .csa-private-nav { display: flex !important; }
   .csa-topbar .form-select { min-width: 0; max-width: 140px; }
   .csa-window-content { padding: 12px; }
 }
+.csa-account-menu { position:relative; margin-left:auto; color:#e8edf2; }
+.csa-account-menu>summary { display:flex; align-items:center; gap:9px; cursor:pointer; padding:4px 8px; border:1px solid #d6b56c55; border-radius:24px; list-style:none; }
+.csa-account-menu>summary::-webkit-details-marker { display:none; }
+.csa-account-avatar { display:grid; place-items:center; width:28px; height:28px; background:#d6b56c22; color:#f1d89b; border-radius:50%; font-size:12px; }
+.csa-account-name { font-size:13px; max-width:230px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.csa-account-dropdown { position:absolute; right:0; top:calc(100% + 10px); width:280px; padding:18px; background:#14202d; border:1px solid #d6b56c55; border-radius:16px; box-shadow:0 16px 50px #0008; }
+.csa-account-dropdown small { display:block; color:#a6b4c0; font-size:12px; overflow-wrap:anywhere; }
+.csa-account-dropdown a,.csa-account-dropdown button { display:block; width:100%; margin-top:14px; padding:12px; text-align:left; color:#f1d89b; background:#0b141f; border:1px solid #d6b56c33; border-radius:10px; }
+.csa-profile .dossiers-definition-list dd { color:#e8edf2; }.csa-profile .dossiers-definition-list dt { color:#a6b4c0; }
+@media(max-width:799px){ .csa-account-name{display:none}.csa-account-dropdown{width:min(280px,calc(100vw - 20px))}.csa-topbar .form-select{max-width:120px} }
+
+.csa-object-actions { display: inline-flex; flex-wrap: wrap; gap: .35rem; margin: .25rem; }
+.csa-object-editor { max-width: 1200px; margin: 0 auto; }

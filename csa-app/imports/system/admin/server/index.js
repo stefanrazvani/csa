@@ -197,7 +197,7 @@ publishAuthorized('admin.tenant', async function adminTenantPublication(requeste
   ];
 });
 
-Meteor.methods({
+export const adminMethods = {
   async 'admin.context'() {
     if (!this.userId) return { authenticated: false };
     const eId = await getActiveEId(this.userId);
@@ -387,7 +387,8 @@ Meteor.methods({
     await auditAdmin(this, userId, eId, 'admin.tenant.groups.setModule', 'group', groupId, { moduleId, permissions: normalized });
     return true;
   },
-});
+};
+Meteor.methods(adminMethods);
 
 Meteor.startup(async () => {
   await Roles.createRoleAsync('tenant_admin', { unlessExists: true });

@@ -131,6 +131,8 @@ Template.csaLayout.helpers({
   isTenantAdmin() { return Template.instance().adminContext.get()?.tenantAdmin === true; },
   appPath(path) { return appPath(path); },
   currentUserEmail() { return Meteor.user()?.emails?.[0]?.address || ''; },
+  userDisplayName() { const u=Meteor.user(); return u?.profile?.name || [u?.setari?.prenume,u?.setari?.nume].filter(Boolean).join(' ') || u?.emails?.[0]?.address || 'Contul meu'; },
+  userInitials() { const u=Meteor.user(); return String(u?.profile?.name || u?.setari?.nume || u?.emails?.[0]?.address || 'ME').split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase(); },
   hasTenants() { return Object.keys(Meteor.user()?.entitati || {}).some((id) => id !== 'all'); },
   tenantOptions() {
     const context = Template.instance().adminContext.get() || {};
@@ -141,6 +143,8 @@ Template.csaLayout.helpers({
 });
 
 Template.csaLayout.events({
+  'click .js-profile-link'(event) { event.currentTarget.closest('details').open=false; },
+  'keydown .csa-account-menu'(event) { if(event.key==='Escape') {event.currentTarget.open=false;event.currentTarget.querySelector('summary').focus();} },
   'click .js-window-focus'(event) { focusWindow(event.currentTarget.dataset.window); },
   'click .js-toggle-menu'() { document.body.classList.toggle('csa-menu-open'); },
   'click .csa-sidebar a'(event) {

@@ -12,7 +12,7 @@ import { attendanceStatus, attendanceTotals, isYes } from '../attendance.js';
 registerDualRoute(FlowRouter, '/prezente', () => renderPage('craftAttendance'));
 registerDualRoute(FlowRouter, '/prezente/:id', ({ id }) => renderPage('craftAttendance', { id }));
 registerDualRoute(FlowRouter, '/confirmari', () => renderPage('craftMyConfirmations'));
-registerDualRoute(FlowRouter, '/confirmari/:id', ({ id }) => renderPage('craftMyConfirmations', { id }));
+registerDualRoute(FlowRouter, '/confirmari/:id', ({ id }) => renderPage('craftResponseWindow', { id }));
 registerDualRoute(FlowRouter, '/confirmare/:token', ({ token }) => renderPage('craftMyConfirmations', { token }));
 registerDualRoute(FlowRouter, '/convocator/:id/tipar', ({ id }) => renderPage('craftConvocatorPrint', { id }));
 
@@ -85,7 +85,7 @@ Template.craftAttendance.events({
   'click .js-export-xlsx'(event, instance) { void action(instance, async () => { downloadReport(await Meteor.callAsync('craft.prezenta.xlsx', instance.eventId.get())); return 'Raportul Excel a fost generat.'; }); },
   'change #attendanceEvent'(event, instance) { instance.eventId.set(event.currentTarget.value); instance.editing.set(''); instance.message.set(''); },
   'input #attendanceSearch'(event, instance) { instance.query.set(event.currentTarget.value.trim().toLocaleLowerCase('ro')); },
-  'click .js-edit-response'(event, instance) { instance.editing.set(event.currentTarget.dataset.id); },
+  'click .js-edit-response'(event, instance) { FlowRouter.go(appPath(`/confirmari/${event.currentTarget.dataset.id}`)); },
   'click .js-prepare'(event, instance) { void action(instance, async () => { const result = await Meteor.callAsync('craft.prezenta.prepare', instance.eventId.get()); return `${result.createdConfirmations} invitații noi. Răspunsurile existente au fost păstrate.`; }); },
   'click .js-send, click .js-resend'(event, instance) {
     const resend = event.currentTarget.classList.contains('js-resend');
@@ -129,3 +129,6 @@ Template.craftConvocatorPrint.helpers({ ...shared,
   sections() { const documentId = Template.instance().id; return [1, 2, 3].map((level) => ({ level, articles: DocumenteText.find({ documentId, level, sys_status: 1 }, { sort: { order: 1 } }).fetch() })).filter((section) => section.articles.length); },
 });
 Template.craftConvocatorPrint.events({ 'click .js-print'() { window.print(); } });
+
+Template.craftResponseWindow.onCreated(function(){this.message=new ReactiveVar('');this.isAdmin=new ReactiveVar(false);this.subscribe('craft.confirmation.record',this.data.id,{onError:error=>this.message.set(error.reason||error.message)});Meteor.callAsync('objects.context','confirmation',this.data.id).then(r=>this.isAdmin.set(r.responseAdmin)).catch(error=>this.message.set(error.reason||error.message));});
+Template.craftResponseWindow.helpers({row:()=>PrezentaConfirmari.findOne(Template.instance().data.id),message:()=>Template.instance().message.get(),isAdmin:()=>Template.instance().isAdmin.get()});

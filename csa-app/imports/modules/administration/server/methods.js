@@ -17,7 +17,7 @@ function audit(context, userId, eId, action, entityType, entityId, metadata = {}
   return writeAuditEvent({ actorId: userId, eId, activeEId: eId, action, entityType, entityId, metadata, context });
 }
 
-Meteor.methods({
+export const administrationMethods = {
   async 'treasury.context'() { const access = await requireAdministrationAccess(this, 'treasury', 'read'); let canWrite = access.superAdmin; if (!canWrite) { try { await requireAdministrationAccess(this, 'treasury', 'write'); canWrite = true; } catch (error) { /* Citirea poate exista fără scriere. */ } } return { canWrite }; },
   async 'hospitality.context'() { const access = await requireAdministrationAccess(this, 'hospitality', 'read'); let canWrite = access.superAdmin; if (!canWrite) { try { await requireAdministrationAccess(this, 'hospitality', 'write'); canWrite = true; } catch (error) { /* Citirea poate exista fără scriere. */ } } return { canWrite }; },
   async 'visitorInvitations.context'() { const access = await requireAdministrationAccess(this, 'secretariat', 'read'); let canWrite = access.superAdmin; if (!canWrite) { try { await requireAdministrationAccess(this, 'secretariat', 'write'); canWrite = true; } catch (error) { /* Citirea poate exista fără scriere. */ } } return { canWrite }; },
@@ -99,6 +99,7 @@ Meteor.methods({
     const email = text(payload.email, 254).toLowerCase(); const originLodge = text(payload.originLodge, 240); if (!email || !originLodge) throw new Meteor.Error('validation-error', 'Emailul și Loja de proveniență sunt obligatorii.');
     const id = await VisitorInvitations.insertAsync({ eId, eventId: text(payload.eventId, 120), email, name: text(payload.name, 200), originLodge, attestedGrade: [1,2,3].includes(Number(payload.attestedGrade)) ? Number(payload.attestedGrade) : 1, status: 'invited', accessExpiresAt: date(payload.accessExpiresAt, 'Expirarea'), sharedDocumentIds: Array.isArray(payload.sharedDocumentIds) ? payload.sharedDocumentIds.slice(0,50).map((value)=>text(value,120)) : [], createdAt: new Date(), createdBy: userId }); await audit(this, userId, eId, 'visitorInvitations.create', 'visitor_invitation', id); return { id };
   },
-});
+};
+Meteor.methods(administrationMethods);
 
 DDPRateLimiter.addRule({ type: 'method', name: /^(treasury|hospitality|visitorInvitations)\./, userId: (value) => Boolean(value) }, 40, 10_000);

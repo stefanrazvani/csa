@@ -22,6 +22,8 @@ const bindings=[
 for(const [template,helper,schema,options] of bindings) registerList(template,helper,schemas[schema],options);
 // Small derived collections use the same controls without a second server subscription.
 for(const [template,helper,columns,label] of [
+ ['treasuryWorkspace','periods',[col('year','An'),col('startsAt','Început','date'),col('endsAt','Sfârșit','date'),col('status','Stare')],'perioade'],
+ ['treasuryWorkspace','accounts',[col('code','Cod'),col('name','Denumire'),col('type','Tip'),col('openingBalanceMinor','Sold inițial (bani)','number')],'conturi'],
  ['studyConcepts','relations',[col('fromConceptId','Concept sursă'),col('type','Relație'),col('toConceptId','Concept destinație'),col('justification','Justificare')],'relații'],
  ['studyReader','debates',[col('title','Titlu'),col('minGrade','Grad','number'),col('updatedAt','Actualizat','date')],'dezbateri'],
  ['studyDebate','messages',[col('createdAt','Data','date'),col('createdBy','Autor'),col('text','Mesaj')],'mesaje'],

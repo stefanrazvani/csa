@@ -19,7 +19,7 @@
 <template name="csaListColumn"><th aria-sort="{{ariaSort}}"><button type="button" class="csa-list-column">{{label}} {{sortIcon}}</button></th></template>
 <template name="csaSimpleTable">
   {{> csaListTools list=list}}
-  <div class="table-responsive"><table class="table table-hover csa-list-table"><thead><tr>{{#each list.columns}}{{> csaListColumn list=../list field=field label=label}}{{/each}}{{#if action}}<th>Acțiuni</th>{{/if}}</tr></thead>
-  <tbody>{{#each tableRows}}<tr>{{#each cells}}<td>{{value}}</td>{{/each}}{{#if action}}<td>{{#if action.href}}<a href="{{action.href}}" class="btn btn-sm btn-outline-primary">{{action.label}}</a>{{else}}<button type="button" class="btn btn-sm btn-outline-primary {{action.className}}" data-id="{{_id}}" data-user-id="{{userId}}">{{action.label}}</button>{{/if}}</td>{{/if}}</tr>{{else}}<tr><td colspan="20">Nu există înregistrări pentru filtrele selectate.</td></tr>{{/each}}</tbody></table></div>
+  <div class="table-responsive"><table class="table table-hover csa-list-table"><thead><tr>{{#each list.columns}}{{> csaListColumn list=../list field=field label=label}}{{/each}}{{#if action}}<th>Acțiuni</th>{{/if}}{{#if objectKind}}<th>Obiect</th>{{/if}}</tr></thead>
+  <tbody>{{#each tableRows}}<tr>{{#each cells}}<td>{{value}}</td>{{/each}}{{#if action}}<td>{{#if action.href}}<a href="{{action.href}}" class="btn btn-sm btn-outline-primary">{{action.label}}</a>{{else}}<button type="button" class="btn btn-sm btn-outline-primary {{action.className}}" data-id="{{_id}}" data-user-id="{{userId}}">{{action.label}}</button>{{/if}}</td>{{/if}}{{#if objectKind}}<td>{{> csaObjectActions kind=objectKind id=_id historyOnly=historyOnly}}</td>{{/if}}</tr>{{else}}<tr><td colspan="20">Nu există înregistrări pentru filtrele selectate.</td></tr>{{/each}}</tbody></table></div>
   {{> csaListPager list=list}}
 </template>

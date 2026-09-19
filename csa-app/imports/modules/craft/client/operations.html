@@ -17,9 +17,9 @@
         <div class="alert alert-light border">Invitați: <strong>{{totals.invited}}</strong> · Participă: <strong>{{totals.confirmed}}</strong> · Absenți: <strong>{{totals.declined}}</strong> · Fără răspuns: <strong>{{totals.pending}}</strong> · Răspuns legacy fără opțiune: <strong>{{totals.answered}}</strong><br>Agapă: <strong>{{totals.agapa}}</strong> · Standard: <strong>{{totals.standard}}</strong> · Vegetarian: <strong>{{totals.vegetarian}}</strong> · Prezenți efectiv: <strong>{{totals.present}}</strong></div>
         {{> csaListTools list=rowsList}}
         <div class="table-responsive"><table class="table align-middle"><thead><tr>{{> csaListColumn list=rowsList field="userSnapshot.nume" label="Membru"}}{{> csaListColumn list=rowsList field="status" label="Răspuns"}}<th>Agapă / meniu</th><th>Absență</th>{{> csaListColumn list=rowsList field="delivery.state" label="Email"}}<th>Prezent efectiv</th><th>Acțiuni</th></tr></thead><tbody>
-          {{#each rows}}<tr><td>{{memberName}}<br><small>{{userSnapshot.email}}</small></td><td>{{responseLabel this}}</td><td>{{mealLabel this}}</td><td>{{motivAbsenta}}<br>{{motivAbsentaAgapa}}</td><td>{{deliveryLabel delivery.state}}<br><small>{{formatDate delivery.sentAt}}</small>{{#if delivery.error}}<br><small>{{delivery.error}}</small>{{/if}}</td><td><input type="checkbox" class="form-check-input js-attended" data-id="{{_id}}" checked="{{attended}}" aria-label="Prezent efectiv"></td><td><button class="btn btn-sm btn-outline-primary js-edit-response" data-id="{{_id}}">Modifică răspunsul</button></td></tr>{{else}}<tr><td colspan="7">Nu există invitații pentru selecția curentă.</td></tr>{{/each}}
+          {{#each rows}}<tr><td>{{memberName}}<br><small>{{userSnapshot.email}}</small></td><td>{{responseLabel this}}</td><td>{{mealLabel this}}</td><td>{{motivAbsenta}}<br>{{motivAbsentaAgapa}}</td><td>{{deliveryLabel delivery.state}}<br><small>{{formatDate delivery.sentAt}}</small>{{#if delivery.error}}<br><small>{{delivery.error}}</small>{{/if}}</td><td><input type="checkbox" class="form-check-input js-attended" data-id="{{_id}}" checked="{{attended}}" aria-label="Prezent efectiv"></td><td><button class="btn btn-sm btn-outline-primary js-edit-response" data-id="{{_id}}">Modifică răspunsul</button>{{> csaObjectActions kind="confirmation" id=_id historyOnly=true}}</td></tr>{{else}}<tr><td colspan="7">Nu există invitații pentru selecția curentă.</td></tr>{{/each}}
         </tbody></table></div>{{> csaListPager list=rowsList}}
-        {{#if editing}}{{> craftResponseForm row=editing admin=true}}{{/if}}
+
       {{/if}}
       {{#if unresolved}}
         <h2 class="h5 mt-4">Prezențe importate fără convocator</h2>
@@ -33,7 +33,7 @@
   <h1 class="h3">Confirmările mele</h1>
   {{#if message}}<div class="alert alert-info" role="status">{{message}}</div>{{/if}}
   {{#if selected}}{{> craftResponseForm row=selected admin=false}}{{/if}}
-  {{> csaSimpleTable list=rowsList action=responseAction}}
+  {{> csaSimpleTable list=rowsList action=responseAction objectKind="confirmation" historyOnly=true}}
 
 </template>
 
@@ -59,3 +59,5 @@
     {{#if document}}<article class="craft-print-document"><h1>{{document.nume}}</h1><h2>{{document.numeLoja}} nr. {{document.nrLoja}} · {{document.orientul}}</h2><p>Convocator nr. {{document.nr}} · Ținuta nr. {{document.numarTinuta}}</p><p>{{formatDate document.dataTinuta}} · Acces: {{document.data_access}}</p><p>{{document.templu}} · {{document.adresaTemplu}}</p><p>Termen confirmare: {{formatDate document.dataConfirmare}}</p><p class="craft-text">{{document.observatii}}</p>{{#each sections}}<section><h2>Grad {{level}}</h2><ol>{{#each articles}}<li class="craft-text">{{continut}}</li>{{/each}}</ol></section>{{/each}}</article>{{else}}<p>Convocator indisponibil.</p>{{/if}}
   {{else}}<p>Se încarcă documentul…</p>{{/if}}
 </template>
+
+<template name="craftResponseWindow"><h1>Răspuns la invitație</h1>{{#if message}}<p role="alert" class="alert alert-info">{{message}}</p>{{/if}}{{#if row}}{{> csaObjectActions kind="confirmation" id=row._id historyOnly=true}}{{> craftResponseForm row=row admin=isAdmin}}{{else}}<p>Se încarcă răspunsul sau nu mai este accesibil.</p>{{/if}}</template>

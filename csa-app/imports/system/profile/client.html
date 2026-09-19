@@ -1,0 +1,8 @@
+<template name="csaProfile">
+  <section class="csa-profile">
+    <header class="dashboard-hero"><p class="eyebrow">Contul meu</p><h1>Profil utilizator</h1><p>Datele personale sunt disponibile pentru consultare. Pentru corecții, contactează Secretariatul.</p></header>
+    {{#if error}}<p class="alert alert-danger mt-3" role="alert">{{error}}</p>{{/if}}
+    <div class="row g-3 mt-2"><div class="col-lg-8"><section class="card p-4"><h2 class="h4">Date personale</h2><dl class="dossiers-definition-list">{{#each rows}}<div><dt>{{label}}</dt><dd>{{value}}</dd></div>{{/each}}</dl></section></div>
+    <div class="col-lg-4"><section class="card p-4"><h2 class="h4">Parola contului</h2><p>Primești un link de resetare la adresa <strong>{{email}}</strong>.</p><button type="button" class="btn btn-primary js-profile-reset" disabled="{{busy}}">Trimite link de resetare</button>{{#if notice}}<p class="mt-3" role="status">{{notice}}</p>{{/if}}</section></div></div>
+  </section>
+</template>

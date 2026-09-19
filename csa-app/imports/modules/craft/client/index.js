@@ -158,23 +158,8 @@ Template.craftConvocatorEditor.events(safeEvents({
     await Meteor.callAsync('craft.convocatoare.update', instance.id, values);
     instance.message.set('Convocator salvat.');
   },
-  async 'submit .articleForm'(event, instance) {
-    event.preventDefault();
-    const values = Object.fromEntries(new FormData(event.currentTarget));
-    values.level = Number(event.currentTarget.dataset.level);
-    values.order = Number(values.order || 0);
-    await Meteor.callAsync('craft.articole.insert', instance.id, values);
-    event.currentTarget.reset();
-  },
-  async 'submit .articleEditForm'(event) {
-    event.preventDefault();
-    const values = Object.fromEntries(new FormData(event.currentTarget));
-    values.order = Number(values.order || 0);
-    await Meteor.callAsync('craft.articole.update', event.currentTarget.dataset.id, values);
-  },
   async 'click .articleRemove'(event) {
-    const form = event.currentTarget.closest('.articleEditForm');
-    if (form && window.confirm('Ștergeți acest articol?')) await Meteor.callAsync('craft.articole.remove', form.dataset.id);
+    if (window.confirm('Ștergeți acest articol?')) await Meteor.callAsync('craft.articole.remove', event.currentTarget.dataset.id);
   },
 }));
 
@@ -202,12 +187,6 @@ Template.craftGradeAdmin.helpers({
   },
 });
 Template.craftGradeAdmin.events({
-  async 'submit #gradeForm'(event) {
-    event.preventDefault();
-    const values = Object.fromEntries(new FormData(event.currentTarget));
-    await Meteor.callAsync('craft.memberships.upsert', values.userId, Number(values.grade));
-    event.currentTarget.reset();
-  },
 });
 
 Template.csaMigrations.onCreated(function created() { this.result = new ReactiveVar(''); this.comparison = new ReactiveVar(null); });
@@ -261,3 +240,5 @@ Template.csaMigrations.events({
     }
   },
 });
+
+Template.craftConvocatorEditor.events({"click .js-new-article"(event,i){FlowRouter.go(appPath(`/obiect/article/nou?documentId=${encodeURIComponent(i.id)}&level=${event.currentTarget.dataset.level}`));}});

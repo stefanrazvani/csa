@@ -12,3 +12,5 @@ import '/imports/system/governance/server/history.js';
 import '/imports/system/governance/server/tracked-collections.js';
 
 import '/imports/ui/lists/server.js';
+import '/imports/system/profile/server.js';
+import '/imports/ui/objects/server.js';

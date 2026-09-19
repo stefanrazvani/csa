@@ -15,4 +15,6 @@ import '/imports/modules/index-client.js';
 bootstrapGateway();
 
 import '/imports/ui/lists/bindings.js';
+import '/imports/system/profile/client.js';
+import '/imports/ui/objects/client.js';
 import '/imports/layout/client/module-theme.css';

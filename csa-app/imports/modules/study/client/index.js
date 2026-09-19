@@ -33,23 +33,6 @@ Template.studyLibrary.helpers({
   statusLabel(status) { return status === 'published' ? 'Publicată' : 'În lucru'; },
 });
 Template.studyLibrary.events({
-  async 'submit #studyCreateWork'(event, instance) {
-    event.preventDefault(); instance.busy.set(true); instance.error.set('');
-    try {
-      const values = Object.fromEntries(new FormData(event.currentTarget));
-      const file = event.currentTarget.elements.sourceFile?.files?.[0];
-      if (!String(values.content || '').trim() && !file) throw new Error('Introduceți text sau selectați un fișier DOCX/PDF.');
-      const result = await Meteor.callAsync('study.works.create', { title: values.title, author: values.author, minGrade: Number(values.minGrade), rightsHolder: values.rightsHolder, license: values.license, source: values.source, storageAllowed: values.storageAllowed === 'on', processingAllowed: values.processingAllowed === 'on' });
-      if (String(values.content || '').trim()) {
-        await Meteor.callAsync('study.works.importDirectText', result.id, { content: values.content });
-      } else {
-        const upload = new FormData(); upload.set('workId', result.id); upload.set('file', file, file.name);
-        const response = await fetch('/portal-api/documents', { method: 'POST', credentials: 'include', headers: { 'X-CSA-Tenant': instance.studyContext.get().eId }, body: upload });
-        const payload = await response.json(); if (!response.ok) throw new Error(payload.error || 'Importul nu a putut fi pornit.');
-      }
-      FlowRouter.go(appPath(`/biblioteca/${result.id}`));
-    } catch (error) { instance.error.set(error?.reason || error?.message); } finally { instance.busy.set(false); }
-  },
   async 'click .js-study-search'(event, instance) {
     const query = instance.$('#studySearch').val();
     try { instance.results.set(await Meteor.callAsync('study.search', query, 30)); } catch (error) { instance.error.set(error?.reason || error?.message); }
@@ -70,10 +53,9 @@ Template.studyReader.helpers({
 Template.studyReader.events({
   async 'click .js-publish-work'(event, instance) { const work = LibraryWorks.findOne(instance.id); if (work?.reviewVersionId) await Meteor.callAsync('study.works.publish', work._id, work.reviewVersionId); },
   async 'click .js-start-debate'(event, instance) {
-    const title = window.prompt('Titlul dezbaterii'); if (!title) return;
     const work = LibraryWorks.findOne(instance.id);
-    const result = await Meteor.callAsync('study.debates.create', { title, targetType: event.currentTarget.dataset.type, targetId: event.currentTarget.dataset.id, quoteSnapshot: event.currentTarget.dataset.text, workId: work?._id, minGrade: work?.minGrade || 1 });
-    FlowRouter.go(appPath(`/dezbatere/${result.id}`));
+    const query=new URLSearchParams({workId:work._id,minGrade:work.minGrade,targetType:event.currentTarget.dataset.type,targetId:event.currentTarget.dataset.id,quoteSnapshot:event.currentTarget.dataset.text});
+    FlowRouter.go(appPath('/obiect/debate/nou')+'?'+query);
   },
 });
 
@@ -83,7 +65,6 @@ Template.studyDebate.helpers({
   libraryPath: () => appPath('/biblioteca'), authorLabel(id) { return id === Meteor.userId() ? 'Tu' : 'Membru'; },
   formatDate(value) { return value ? new Intl.DateTimeFormat('ro-RO', { dateStyle: 'short', timeStyle: 'short' }).format(value) : ''; },
 });
-Template.studyDebate.events({ async 'submit #studyMessageForm'(event, instance) { event.preventDefault(); const values = Object.fromEntries(new FormData(event.currentTarget)); await Meteor.callAsync('study.messages.insert', instance.id, values); event.currentTarget.reset(); } });
 
 Template.studyConcepts.onCreated(function created() { this.subscribe('study.concepts'); setContext(this); });
 Template.studyConcepts.onRendered(function rendered() {
@@ -113,4 +94,3 @@ Template.studyConcepts.helpers({
   concepts: () => StudyConcepts.find({}, { sort: { name: 1 } }), relations: () => ConceptRelations.find({}), canManage: () => Template.instance().studyContext.get().canManageStudy,
   libraryPath: () => appPath('/biblioteca'), conceptName(id) { return StudyConcepts.findOne(id)?.name || id; },
 });
-Template.studyConcepts.events({ async 'submit #studyConceptCreate'(event) { event.preventDefault(); const values = Object.fromEntries(new FormData(event.currentTarget)); await Meteor.callAsync('study.concepts.create', { ...values, minGrade: Number(values.minGrade) }); event.currentTarget.reset(); }, async 'submit #studyConceptLink'(event) { event.preventDefault(); const values = Object.fromEntries(new FormData(event.currentTarget)); await Meteor.callAsync('study.concepts.link', values); event.currentTarget.reset(); } });

@@ -1,0 +1,31 @@
+<template name="csaObjectAdd"><button type="button" class="btn btn-primary js-object-add">{{#if label}}{{label}}{{else}}Adaugă{{/if}}</button></template>
+<template name="csaObjectActions"><span class="csa-object-actions">{{#unless historyOnly}}<button type="button" class="btn btn-sm btn-outline-primary js-object-edit">Deschide / editează</button>{{/unless}}<button type="button" class="btn btn-sm btn-outline-secondary js-object-history">Istoric</button></span></template>
+<template name="csaObjectEditor">
+  <section class="csa-object-editor">
+    <header class="dashboard-hero"><p class="eyebrow">{{modeLabel}}</p><h1>{{title}}</h1><p>{{#if canEdit}}Completează datele și salvează modificările.{{else}}Date disponibile pentru consultare, conform drepturilor și stării obiectului.{{/if}}</p></header>
+    {{#if error}}<p class="alert alert-danger mt-3" role="alert">{{error}}</p>{{/if}}
+    {{#if notice}}<p class="alert alert-success mt-3" role="status">{{notice}}</p>{{/if}}
+    {{#if loading}}<p role="status">Se încarcă obiectul…</p>{{else}}
+    {{#if available}}
+    <div class="d-flex flex-wrap gap-2 my-3">{{#if readerPath}}<a href="{{readerPath}}" class="btn btn-outline-primary">Deschide conținutul</a>{{/if}}{{#if objectId}}<button class="btn btn-outline-secondary js-editor-history" type="button">Istoricul obiectului</button>{{/if}}<button class="btn btn-outline-secondary js-editor-reload" type="button">Reîncarcă</button></div>
+    <form class="csa-object-form card p-4"><div class="row g-3">
+      {{#each fields}}<div class="{{widthClass}}"><label class="form-label w-100">{{label}}
+        {{#if isSelect}}<select class="form-select" name="{{name}}" required="{{required}}" disabled="{{disabled}}"><option value="">Selectează…</option>{{#each options}}<option value="{{value}}" selected="{{selected}}">{{label}}</option>{{/each}}</select>
+        {{else}}{{#if isTextarea}}<textarea class="form-control" name="{{name}}" rows="7" maxlength="{{max}}" disabled="{{disabled}}" required="{{required}}">{{value}}</textarea>
+        {{else}}{{#if isCheckbox}}<input class="form-check-input ms-2" type="checkbox" name="{{name}}" checked="{{checked}}" required="{{required}}" disabled="{{disabled}}">
+        {{else}}<input class="form-control" type="{{type}}" name="{{name}}" value="{{value}}" required="{{required}}" disabled="{{disabled}}" min="{{min}}" minlength="{{minLength}}" maxlength="{{max}}" accept="{{accept}}" autocomplete="{{autocomplete}}">{{/if}}{{/if}}{{/if}}
+      </label></div>{{/each}}
+      <div class="col-12 d-flex gap-2">{{#if canEdit}}<button type="submit" class="btn btn-primary" disabled="{{busy}}">{{#if busy}}Se salvează…{{else}}Salvează{{/if}}</button>{{/if}}<button type="button" class="btn btn-outline-secondary js-editor-close">Închide</button></div>
+    </div></form>
+    {{else}}<p>Obiectul nu mai este disponibil în sesiunea curentă.</p>{{/if}}{{/if}}
+  </section>
+</template>
+<template name="csaObjectHistory">
+  <header class="dashboard-hero"><p class="eyebrow">Trasabilitate</p><h1>Istoric · {{title}}</h1><p>Cine a efectuat operația, când și ce câmpuri s-au modificat.</p></header>
+  {{#if error}}<p role="alert" class="alert alert-danger mt-3">{{error}}</p>{{/if}}
+  <button type="button" class="btn btn-outline-secondary my-3 js-object-history-refresh">Actualizează</button>
+  {{#if loading}}<p role="status">Se încarcă istoricul…</p>{{/if}}
+  <div class="table-responsive"><table class="table table-hover"><thead><tr><th>Moment</th><th>Utilizator</th><th>Operațiune</th><th>Modificări</th></tr></thead><tbody>{{#each rows}}<tr><td>{{historyDate at}}</td><td>{{#if actorLabel}}{{actorLabel}}{{else}}{{actorId}}{{/if}}</td><td>{{action}}<small class="d-block">{{outcome}}</small></td><td>{{#if metadata.changes}}<details><summary>{{metadata.changes.length}} câmpuri</summary><table class="table table-sm"><thead><tr><th>Câmp</th><th>Înainte</th><th>După</th></tr></thead><tbody>{{#each metadata.changes}}<tr><td>{{field}}</td><td>{{before}}</td><td>{{after}}</td></tr>{{/each}}</tbody></table></details>{{else}}Eveniment înregistrat fără comparația câmpurilor.{{/if}}</td></tr>{{else}}<tr><td colspan="4">Nu există evenimente accesibile pentru acest obiect.</td></tr>{{/each}}</tbody></table></div>
+  <nav class="csa-list-pager" aria-label="Paginare istoric obiect"><button type="button" class="btn btn-outline-secondary js-object-history-prev" disabled="{{firstPage}}">Anterior</button><span>Pagina {{pageNumber}}</span><button type="button" class="btn btn-outline-secondary js-object-history-next" disabled="{{lastPage}}">Următor</button></nav>
+  <p class="text-muted small">Valorile sensibile rămân protejate. Evenimentele vechi păstrează informațiile înregistrate la momentul respectiv.</p>
+</template>

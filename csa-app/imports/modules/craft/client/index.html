@@ -11,7 +11,7 @@
   </div>
   {{> csaListTools list=rowsList}}
   <div class="table-responsive"><table class="table table-hover csa-list-table"><thead><tr><th>Selecție</th>{{> csaListColumn list=rowsList field="nr" label="Nr."}}{{> csaListColumn list=rowsList field="nume" label="Denumire"}}{{> csaListColumn list=rowsList field="numeLoja" label="Loja"}}{{> csaListColumn list=rowsList field="status" label="Stare"}}</tr></thead><tbody>
-  {{#each rows}}<tr><td>{{#if canWrite}}<input type="checkbox" class="form-check-input selectConvocator" data-id="{{_id}}" checked="{{selected _id}}" aria-label="Selectează {{nume}}">{{/if}}</td><td>{{nr}}</td><td><a href="{{convocatorPath _id}}">{{nume}}</a></td><td>{{numeLoja}}</td><td>{{status}}</td></tr>{{else}}<tr><td colspan="5">Nu există convocatoare pentru selecția curentă.</td></tr>{{/each}}
+  {{#each rows}}<tr><td>{{#if canWrite}}<input type="checkbox" class="form-check-input selectConvocator" data-id="{{_id}}" checked="{{selected _id}}" aria-label="Selectează {{nume}}">{{/if}}</td><td>{{nr}}</td><td><a href="{{convocatorPath _id}}">{{nume}}</a></td><td>{{numeLoja}}</td><td>{{status}}{{> csaObjectActions kind="convocator" id=_id historyOnly=true}}</td></tr>{{else}}<tr><td colspan="5">Nu există convocatoare pentru selecția curentă.</td></tr>{{/each}}
   </tbody></table></div>{{> csaListPager list=rowsList}}
 
 </template>
@@ -84,12 +84,7 @@
         <div class="card-header">Articole grad {{this}}</div>
         <div class="card-body">
           {{#if canWrite}}
-          <form class="articleForm row g-2" data-level="{{this}}">
-            <div class="col-md-2"><input class="form-control" name="nrArticol" placeholder="Nr. articol"></div>
-            <div class="col-md-2"><input class="form-control" name="order" type="number" min="1" placeholder="Ordine" required></div>
-            <div class="col-md-6"><input class="form-control" name="continut" placeholder="Conținut" required></div>
-            <div class="col-2"><button class="btn btn-outline-primary w-100">Adaugă</button></div>
-          </form>
+          <button type="button" class="btn btn-outline-primary js-new-article" data-level="{{this}}">Adaugă articol</button>
           {{/if}}
           {{> csaListTools list=(articleList this)}}{{> csaListPager list=(articleList this)}}<div class="table-responsive mt-3"><table class="table table-sm align-middle mb-0">
             <thead><tr><th>#</th><th>Nr. articol</th><th>Conținut</th><th>Ordine</th>{{#if canWrite}}<th>Acțiuni</th>{{/if}}</tr></thead>
@@ -97,12 +92,7 @@
               {{#each articlesFor this}}
                 {{#if canWrite}}
                 <tr><td>{{nr}}</td><td colspan="4">
-                  <form class="articleEditForm row g-2 align-items-center" data-id="{{_id}}">
-                    <div class="col-md-2"><input class="form-control form-control-sm" name="nrArticol" value="{{nrArticol}}" aria-label="Număr articol"></div>
-                    <div class="col-md-6"><input class="form-control form-control-sm" name="continut" value="{{continut}}" aria-label="Conținut" required></div>
-                    <div class="col-md-1"><input class="form-control form-control-sm" name="order" type="number" min="1" value="{{order}}" aria-label="Ordine" required></div>
-                    <div class="col-md-3 d-flex gap-2"><button class="btn btn-sm btn-outline-success" type="submit">Salvează</button>{{#if canDelete}}<button class="btn btn-sm btn-outline-danger articleRemove" type="button">Șterge</button>{{/if}}</div>
-                  </form>
+                  <strong>{{nrArticol}}</strong><p class="text-break">{{continut}}</p>{{> csaObjectActions kind="article" id=_id}}{{#if canDelete}}<button class="btn btn-sm btn-outline-danger articleRemove" data-id="{{_id}}" type="button">Șterge</button>{{/if}}
                 </td></tr>
                 {{else}}
                 <tr><td>{{nr}}</td><td>{{nrArticol}}</td><td class="text-break">{{continut}}</td><td>{{order}}</td></tr>
@@ -122,13 +112,9 @@
 <template name="craftGradeAdmin">
   <div class="mb-4"><h1 class="h2 mb-1">Grade de acces</h1><p class="text-muted mb-0">Gradul este stabilit separat pentru fiecare utilizator al tenantului activ.</p></div>
   <div class="card mb-4"><div class="card-header fw-semibold">Alocare grad</div><div class="card-body">
-    <form id="gradeForm" class="row g-3 align-items-end">
-      <div class="col-lg-7"><label class="form-label">Utilizator</label><select class="form-select" name="userId" required><option value="">Selectați utilizatorul</option>{{#each users}}<option value="{{_id}}">{{name}} · {{email}} · grad curent {{currentGrade}}</option>{{/each}}</select></div>
-      <div class="col-lg-2"><label class="form-label">Grad</label><select class="form-select" name="grade"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></div>
-      <div class="col-lg-3"><button class="btn btn-primary w-100">Salvează gradul</button></div>
-    </form>
+    {{> csaObjectAdd kind="gradeAssignment" label="Adaugă / alocă grad"}}
   </div></div>
-  <div class="card"><div class="card-header fw-semibold">Grade configurate</div><div class="table-responsive">{{> csaListTools list=membershipsList}}<table class="table table-hover align-middle mb-0"><thead><tr>{{> csaListColumn list=membershipsList field="name" label="Utilizator"}}{{> csaListColumn list=membershipsList field="email" label="Email"}}{{> csaListColumn list=membershipsList field="grade" label="Grad"}}{{> csaListColumn list=membershipsList field="status" label="Status"}}</tr></thead><tbody>{{#each memberships}}<tr><td>{{name}}</td><td>{{email}}</td><td><span class="badge text-bg-primary">{{grade}}</span></td><td>{{status}}</td></tr>{{else}}<tr><td colspan="4" class="text-muted py-4 text-center">Nu a fost configurat încă niciun grad.</td></tr>{{/each}}</tbody></table>{{> csaListPager list=membershipsList}}</div></div>
+  <div class="card"><div class="card-header fw-semibold">Grade configurate</div><div class="table-responsive">{{> csaListTools list=membershipsList}}<table class="table table-hover align-middle mb-0"><thead><tr>{{> csaListColumn list=membershipsList field="name" label="Utilizator"}}{{> csaListColumn list=membershipsList field="email" label="Email"}}{{> csaListColumn list=membershipsList field="grade" label="Grad"}}{{> csaListColumn list=membershipsList field="status" label="Status"}}</tr></thead><tbody>{{#each memberships}}<tr><td>{{name}}</td><td>{{email}}</td><td><span class="badge text-bg-primary">{{grade}}</span></td><td>{{status}}{{> csaObjectActions kind="gradeAssignment" id=_id}}</td></tr>{{else}}<tr><td colspan="4" class="text-muted py-4 text-center">Nu a fost configurat încă niciun grad.</td></tr>{{/each}}</tbody></table>{{> csaListPager list=membershipsList}}</div></div>
 </template>
 
 <template name="csaMigrations">

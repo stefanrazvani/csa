@@ -11,7 +11,7 @@ import {
   Module,
 } from '/imports/api/collections.js';
 import { renderPage } from '/imports/layout/client';
-import { registerDualRoute } from '/imports/system/gateway/client';
+import { appPath, registerDualRoute } from '/imports/system/gateway/client';
 
 registerDualRoute(FlowRouter, '/administrare-globala', () => renderPage('globalAdmin'));
 registerDualRoute(FlowRouter, '/administrare-tenant', () => renderPage('tenantAdmin'));
@@ -54,30 +54,6 @@ Template.globalAdmin.helpers({
 });
 
 Template.globalAdmin.events({
-  async 'submit #globalTenantCreate'(event, instance) {
-    event.preventDefault();
-    const values = formValues(event.currentTarget);
-    try {
-      const eId = await Meteor.callAsync('admin.global.tenants.create', { name: values.name, cui: values.cui || '' });
-      instance.message.set(`Tenant creat: ${eId}`);
-      event.currentTarget.reset();
-    } catch (error) { instance.message.set(errorMessage(error)); }
-  },
-  async 'submit #globalUserCreate'(event, instance) {
-    event.preventDefault();
-    const values = formValues(event.currentTarget);
-    try {
-      await Meteor.callAsync('admin.global.users.create', {
-        email: values.email,
-        name: values.name,
-        password: values.password,
-        eId: values.eId,
-        tenantAdmin: values.tenantAdmin === 'on',
-      });
-      instance.message.set('Utilizator creat sau asociat tenantului.');
-      event.currentTarget.reset();
-    } catch (error) { instance.message.set(errorMessage(error)); }
-  },
   async 'click .js-global-activate'(event, instance) {
     try {
       await Meteor.callAsync('admin.setActiveTenant', event.currentTarget.dataset.id);
@@ -86,16 +62,15 @@ Template.globalAdmin.events({
   },
 });
 
-Template.tenantAdmin.onCreated(function tenantAdminCreated() {
+function tenantAdminCreated() {
   this.context = new ReactiveVar({ loading: true });
   this.message = new ReactiveVar('');
   Meteor.callAsync('admin.context').then((context) => {
     this.context.set(context);
     if (context.tenantAdmin && context.eId) this.subscribe('admin.tenant', context.eId);
   }).catch((error) => this.message.set(errorMessage(error)));
-});
-
-Template.tenantAdmin.helpers({
+}
+const tenantHelpers = {
   allowed() { return Template.instance().context.get()?.tenantAdmin === true; },
   loading() { return Template.instance().context.get()?.loading === true; },
   message() { return Template.instance().message.get(); },
@@ -118,26 +93,8 @@ Template.tenantAdmin.helpers({
       return { ...group, members, modules: moduleRows };
     });
   },
-});
-
-Template.tenantAdmin.events({
-  async 'submit #tenantDetailsForm'(event, instance) {
-    event.preventDefault();
-    const values = formValues(event.currentTarget);
-    try {
-      await Meteor.callAsync('admin.tenant.update', { name: values.name, cui: values.cui || '' });
-      instance.message.set('Datele tenantului au fost salvate.');
-    } catch (error) { instance.message.set(errorMessage(error)); }
-  },
-  async 'submit #tenantUserCreate'(event, instance) {
-    event.preventDefault();
-    const values = formValues(event.currentTarget);
-    try {
-      await Meteor.callAsync('admin.tenant.users.create', { email: values.email, name: values.name, password: values.password, tenantAdmin: values.tenantAdmin === 'on' });
-      instance.message.set('Utilizatorul a fost creat sau asociat.');
-      event.currentTarget.reset();
-    } catch (error) { instance.message.set(errorMessage(error)); }
-  },
+};
+const tenantEvents = {
   async 'click .js-user-admin'(event, instance) {
     try {
       await Meteor.callAsync('admin.tenant.users.setAdmin', event.currentTarget.dataset.id, event.currentTarget.dataset.enabled === '1');
@@ -148,15 +105,6 @@ Template.tenantAdmin.events({
     try {
       await Meteor.callAsync('admin.tenant.users.setStatus', event.currentTarget.dataset.id, event.currentTarget.dataset.enabled === '1');
       instance.message.set('Statusul utilizatorului a fost actualizat.');
-    } catch (error) { instance.message.set(errorMessage(error)); }
-  },
-  async 'submit #tenantGroupCreate'(event, instance) {
-    event.preventDefault();
-    const values = formValues(event.currentTarget);
-    try {
-      await Meteor.callAsync('admin.tenant.groups.create', values.name);
-      instance.message.set('Grup creat.');
-      event.currentTarget.reset();
     } catch (error) { instance.message.set(errorMessage(error)); }
   },
   async 'click .js-group-remove'(event, instance) {
@@ -189,4 +137,9 @@ Template.tenantAdmin.events({
       instance.message.set('Permisiuni salvate și roluri recalculate.');
     } catch (error) { instance.message.set(errorMessage(error)); }
   },
-});
+};
+
+for(const name of ["tenantAdmin","groupAccessWindow"]){Template[name].onCreated(tenantAdminCreated);Template[name].helpers(tenantHelpers);Template[name].events(tenantEvents);}
+Template.groupAccessWindow.helpers({selectedGroup:id=>id===Template.instance().data.id,usersOptions:tenantHelpers.users});
+Template.tenantAdmin.events({"click .js-group-window"(event){FlowRouter.go(appPath(`/grup/${event.currentTarget.dataset.id}/acces`));}});
+registerDualRoute(FlowRouter,"/grup/:id/acces",data=>renderPage("groupAccessWindow",data));

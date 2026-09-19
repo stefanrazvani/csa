@@ -174,7 +174,7 @@ publishAuthorized('audit.global', async function auditGlobalPublication(limit = 
   return AuditEvents.find({}, { sort: { at: -1 }, limit: safeLimit });
 });
 
-Meteor.methods({
+export const governanceMethods = {
   async 'membership.context'() {
     const access = await requireCompositeAccess(this, {});
     const [membership, grade, definitions, terms, delegations] = await Promise.all([
@@ -463,7 +463,8 @@ Meteor.methods({
     await contextAudit(access, this, 'visitorInvitations.upsert', 'external_visitor', id, { eventId: data.eventId, status });
     return { id };
   },
-});
+};
+Meteor.methods(governanceMethods);
 
 for (const name of [
   'membership.context',

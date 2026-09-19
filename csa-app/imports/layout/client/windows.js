@@ -1,3 +1,4 @@
+import { objectSchemas } from '/imports/ui/objects/schema.js';
 import WinBox from 'winbox/src/js/winbox.js';
 import 'winbox/dist/css/winbox.min.css';
 import { Blaze } from 'meteor/blaze';
@@ -9,6 +10,7 @@ const windows = new Map();
 let active = '';
 let clearing = false;
 const titles = {
+  craftResponseWindow: 'Răspuns la invitație', groupAccessWindow: 'Membri și permisiuni', dossierFormWindow: 'Editor dosar', csaProfile: 'Profilul meu', csaObjectEditor: 'Adăugare / editare', csaObjectHistory: 'Istoric obiect',
   csaHome: 'Tablou de bord', csaTempleExperience: 'Templu', craftConvocatoare: 'Convocatoare',
   craftConvocatorEditor: 'Editor convocator', craftAttendance: 'Prezențe', craftMyConfirmations: 'Confirmările mele',
   craftConvocatorPrint: 'Tipărire convocator', craftGradeAdmin: 'Grade de acces', csaMigrations: 'Migrări',
@@ -52,14 +54,16 @@ export function confirmWindowChanges() {
 }
 export function openModule(template, data, path, onActivate) {
   // O instanță per ecran previne ID-uri duplicate în formularele legacy.
-  const id = template;
+  const id = ['craftResponseWindow','groupAccessWindow'].includes(template) ? `${template}:${data.id}` : template === 'dossierFormWindow' ? `${template}:${data.userId}:${data.kind}` : ['csaObjectEditor','csaObjectHistory'].includes(template) ? `${template}:${data.kind}:${data.id || 'new'}` : template;
   const existing = windows.get(id);
   if (existing && JSON.stringify(existing.data) === JSON.stringify(data)) { focusWindow(id); return; }
   if (existing && existing.box.close() === true) return;
   const mount = document.createElement('section');
   mount.className = 'csa-window-content';
   mount.setAttribute('aria-label', titles[template] || template);
-  const item = { title: titles[template] || template, data, path, dirty: false, view: null, box: null };
+  const title = ['csaObjectEditor','csaObjectHistory'].includes(template) ? `${template==='csaObjectHistory'?'Istoric':data.id?'Consultare / editare':'Adaugă'} · ${objectSchemas[data.kind]?.label || 'Obiect'}` : titles[template] || template;
+  mount.setAttribute('aria-label',title);
+  const item = { title, data, path, dirty: false, view: null, box: null };
   windows.set(id, item);
   const box = new WinBox(item.title, {
     root: document.getElementById('page-content'), mount,
@@ -88,6 +92,8 @@ export function openModule(template, data, path, onActivate) {
   mount.addEventListener('change', event => { if (event.target.closest('form')) item.dirty = true; });
   active = id; publish();
 }
+export function markWindowClean(node) { for(const item of windows.values())if(item.box.dom.contains(node))item.dirty=false; }
+export function closeWindowFor(node) { for(const item of windows.values())if(item.box.dom.contains(node)){item.box.close();return;} }
 window.addEventListener('resize', () => {
   for (const { box } of windows.values()) fitWindow(box);
 });

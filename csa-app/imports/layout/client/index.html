@@ -5,8 +5,7 @@
       <a class="csa-private-brand" href="{{appPath '/dashboard'}}">CSA <span>Nova Reperta</span></a>
       <a class="btn btn-outline-light btn-sm" href="{{appPath '/templu'}}">Templu 3D</a>
       {{#if hasTenants}}<select class="form-select form-select-sm js-active-tenant" aria-label="Tenant activ">{{#each tenantOptions}}<option value="{{id}}" selected="{{selected}}">{{name}}</option>{{/each}}</select>{{/if}}
-      <span class="csa-user-label">{{currentUserEmail}}</span>
-      <button class="btn btn-outline-light btn-sm js-logout">Ieșire</button>
+      <details class="csa-account-menu"><summary aria-label="Meniul utilizatorului"><span class="csa-account-avatar">{{userInitials}}</span><span class="csa-account-name">{{userDisplayName}}</span><span aria-hidden="true">⌄</span></summary><div class="csa-account-dropdown"><strong>{{userDisplayName}}</strong><small>{{currentUserEmail}}</small><a class="js-profile-link" href="{{appPath '/profilul-meu'}}">Profilul meu <small>Date personale și parolă</small></a><button type="button" class="js-logout">Ieșire din cont</button></div></details>
     </header>
     <aside class="csa-sidebar" aria-label="Meniul principal">
       <nav>

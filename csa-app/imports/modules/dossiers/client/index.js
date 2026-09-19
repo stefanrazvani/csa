@@ -1,5 +1,6 @@
 import './index.html';
 import './dossiers.css';
+import { markWindowClean } from '/imports/layout/client/windows.js';
 import { attendanceStatus } from '/imports/modules/craft/attendance.js';
 import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
@@ -93,6 +94,7 @@ function values(form) {
 }
 
 function setMessage(instance, value, timeout = 6000) {
+  if (timeout && /salvat|adăugat|înregistrat/i.test(value)) markWindowClean(instance.firstNode);
   instance.message.set(value);
   if (timeout) window.setTimeout(() => {
     if (instance.message.get() === value) instance.message.set('');
@@ -152,7 +154,7 @@ function exportRegistryCsv(registry) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-Template.dossierWorkspace.onCreated(function dossierWorkspaceCreated() {
+function dossierWorkspaceCreated() {
   this.context = new ReactiveVar(null);
   this.selectedUserId = new ReactiveVar(String(this.data?.userId || ''));
   this.search = new ReactiveVar('');
@@ -175,9 +177,8 @@ Template.dossierWorkspace.onCreated(function dossierWorkspaceCreated() {
     const memberId = this.selectedUserId.get() || context.userId;
     if (memberId) this.subscribe('dossiers.detail', memberId, context.eId);
   });
-});
-
-Template.dossierWorkspace.helpers({
+}
+const dossierHelpers = {
   canManage() { return Boolean(Template.instance().context.get()?.canManage); },
   loading() { return !Template.instance().context.get() || !Template.instance().subscriptionsReady(); },
   message() { return Template.instance().message.get(); },
@@ -313,9 +314,8 @@ Template.dossierWorkspace.helpers({
   },
   sponsorKindLabel(value) { return ({ primary: 'Naș principal', secondary: 'Al doilea naș', historical: 'Mentor / istoric' })[value] || 'Naș'; },
   attendanceStatusLabel(status, finalValue, attendance) { return { confirmed: 'Participă', declined: 'Nu participă', pending: 'În așteptare', answered: 'Răspuns fără opțiune de participare' }[attendanceStatus({ status, confirmareFinala: finalValue, confirmareTinuta: attendance })]; },
-});
-
-Template.dossierWorkspace.events({
+};
+const dossierEvents = {
   'input .js-dossier-search'(event, instance) { instance.search.set(event.currentTarget.value); },
   'click .js-select-member'(event, instance) {
     const userId = event.currentTarget.dataset.userId;
@@ -432,4 +432,9 @@ Template.dossierWorkspace.events({
       event.currentTarget.reset(); setMessage(instance, 'Legătura a fost adăugată.');
     } catch (error) { setMessage(instance, error.reason || error.message); }
   },
-});
+};
+
+for (const name of ["dossierWorkspace","dossierFormWindow"]) { Template[name].onCreated(dossierWorkspaceCreated); Template[name].helpers(dossierHelpers); Template[name].events(dossierEvents); }
+Template.dossierWorkspace.events({"click .js-open-dossier-editor"(event,i){FlowRouter.go(appPath(`/dosare-frati/${i.selectedUserId.get()}/formular/${event.currentTarget.dataset.kind}`));}});
+Template.dossierFormWindow.helpers({editorKind:kind=>Template.instance().data.kind===kind,editorTitle:()=>({personal:"Editează dosarul",note:"Adaugă notă",event:"Adaugă eveniment",document:"Adaugă document",sponsor:"Adaugă naș / mentor"})[Template.instance().data.kind]});
+registerDualRoute(FlowRouter,"/dosare-frati/:userId/formular/:kind",data=>renderPage("dossierFormWindow",data));

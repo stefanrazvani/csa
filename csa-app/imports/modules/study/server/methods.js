@@ -57,7 +57,7 @@ function buildAnchors(nodes) {
   });
 }
 
-Meteor.methods({
+export const studyMethods = {
   async 'study.context'() {
     const base = await studyContext(this, 'read', 1);
     let canManageLibrary = base.superAdmin;
@@ -308,6 +308,7 @@ Meteor.methods({
     const relations = ids.length ? await ConceptRelations.find({ eId, status: 'published', minGrade: { $lte: grade }, fromConceptId: { $in: ids }, toConceptId: { $in: ids } }).fetchAsync() : [];
     return { nodes: concepts, edges: relations };
   },
-});
+};
+Meteor.methods(studyMethods);
 
 DDPRateLimiter.addRule({ type: 'method', name: /^(study\.(search|messages\.insert|debates\.create|annotations\.upsert))$/, userId: (value) => Boolean(value) }, 30, 10_000);

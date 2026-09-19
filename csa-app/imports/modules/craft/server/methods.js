@@ -211,7 +211,7 @@ async function ownToken(context, token) {
   return row;
 }
 
-Meteor.methods({
+export const craftMethods = {
   async 'craft.permissions'() {
     const { userId, eId } = await requireActiveEId(this);
     let grade = 0;
@@ -433,4 +433,5 @@ Meteor.methods({
     });
     return { id };
   },
-});
+};
+Meteor.methods(craftMethods);
