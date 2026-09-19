@@ -13,7 +13,7 @@
     "busboy": "1.6.0",
     "express": "5.2.1",
     "mongodb": "7.5.0",
-    "nodemailer": "9.0.3"
+    "nodemailer": "9.1.1"
   },
   "devDependencies": {
     "ws": "8.21.0"
