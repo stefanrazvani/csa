@@ -7,7 +7,7 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Random } from 'meteor/random';
 import { Tracker } from 'meteor/tracker';
-import { filterRows, normalizeQuery, valueAt, compareRows } from './query.js';
+import { filterRows, normalizeQuery, valueAt } from './query.js';
 const ListRows = new Mongo.Collection('csa_list_rows');
 export function registerList(templateName, helper, columns, options = {}) {
   const template = Template[templateName];
@@ -23,7 +23,10 @@ export function registerList(templateName, helper, columns, options = {}) {
       set(patch) { if ('search' in patch && patch.search === '') clearTimeout(timer); state.set(normalizeQuery({ ...state.get(), page: 0, ...patch }, columns)); },
       search(patch) { clearTimeout(timer); timer = setTimeout(() => list.set(patch), 250); },
       compute() {
-        if (options.remote) { const query=state.get(); return ListRows.find({ scope: currentScope.get() }).fetch().map(row => ({ _id: row.recordId, ...row.record })).sort((a,b) => compareRows(a,b,query)); }
+        // Minimongo uses Mongo's ordering, including nulls and case-sensitive strings.
+        // Locale-sorting a remote page would move its lookahead row into the visible
+        // page and could duplicate/omit records at the next page boundary.
+        if (options.remote) { const query=state.get(); return ListRows.find({ scope: currentScope.get() }, { sort: { [`record.${query.sort}`]: query.direction, recordId: query.direction } }).fetch().map(row => ({ _id: row.recordId, ...row.record })); }
         const source = options.rows ? options.rows(instance) : Blaze._withCurrentView(instance.view, () => original?.call(instance.data || {}));
         return filterRows(source?.fetch ? source.fetch() : source || [], state.get(), columns);
       },
