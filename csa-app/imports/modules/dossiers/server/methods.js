@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { attendanceStatus } from '/imports/modules/craft/attendance.js';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import { check } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
@@ -634,7 +635,7 @@ Meteor.methods({
       OfficeTerms.find({ eId: access.eId, userId: { $in: userIds } }, { sort: { startAt: -1 } }).fetchAsync(),
       MembershipEvents.find({ eId: access.eId, userId: { $in: userIds }, status: 'active' }, { sort: { effectiveAt: -1 } }).fetchAsync(),
       BrotherSponsors.find({ eId: access.eId, userId: { $in: userIds }, status: 'active' }).fetchAsync(),
-      PrezentaConfirmari.find({ eId: access.eId, userId: { $in: userIds }, sys_status: 1 }, { fields: { userId: 1, status: 1, confirmareFinala: 1 } }).fetchAsync(),
+      PrezentaConfirmari.find({ eId: access.eId, userId: { $in: userIds }, sys_status: 1 }, { fields: { userId: 1, status: 1, confirmareFinala: 1, confirmareTinuta: 1 } }).fetchAsync(),
     ]);
     const byId = (rows) => new Map(rows.map((row) => [row.userId || row._id, row]));
     const usersById = new Map(users.map((row) => [row._id, row]));
@@ -695,7 +696,7 @@ Meteor.methods({
         })),
         participation: {
           invitations: attendance.length,
-          confirmed: attendance.filter((row) => row.status === 'confirmed' || Number(row.confirmareFinala) === 1).length,
+          confirmed: attendance.filter((row) => attendanceStatus(row) === 'confirmed').length,
         },
         dataQuality: dossier?.dataQuality?.status || 'missing',
       };

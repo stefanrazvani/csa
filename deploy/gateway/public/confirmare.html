@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="ro"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="referrer" content="no-referrer"><title>Confirmare participare</title><link rel="stylesheet" href="/styles.css"><link rel="stylesheet" href="/confirmare.css"><script src="/confirmare.js" defer></script></head>
+<body><main class="page-shell"><section class="login-card"><h1 id="invitationTitle">Confirmare participare</h1><p id="invitationDates"></p><p id="confirmationMessage" role="status">Se verifică invitația…</p>
+<form id="confirmationForm" hidden>
+<label for="attendance">Particip la ținută</label><select id="attendance" name="confirmareTinuta" required><option value="">Selectați</option><option value="1">Da</option><option value="0">Nu</option></select>
+<label for="meal">Particip la agapă</label><select id="meal" name="confirmareAgapa" required><option value="">Selectați</option><option value="1">Da</option><option value="0">Nu</option></select>
+<label for="menu">Meniu</label><select id="menu" name="menu"><option value="">Fără meniu</option><option value="standard">Standard</option><option value="vegetarian">Vegetarian</option></select>
+<label for="absence">Motiv absență ținută</label><textarea id="absence" name="motivAbsenta" maxlength="1000"></textarea>
+<label for="mealAbsence">Motiv absență agapă</label><textarea id="mealAbsence" name="motivAbsentaAgapa" maxlength="1000"></textarea>
+<button class="primary-button" id="saveResponse">Salvează răspunsul</button></form><p><a href="/">Pagina asociației</a></p></section></main></body></html>

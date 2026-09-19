@@ -1,10 +1,8 @@
 import crypto from 'node:crypto';
 import { Meteor } from 'meteor/meteor';
 import { Random } from 'meteor/random';
-import { Roles } from 'meteor/roles';
 import { check, Match } from 'meteor/check';
 import {
-  CraftCounters,
   CraftMemberships,
   Convocatoare,
   Documente,
@@ -12,8 +10,14 @@ import {
   Prezenta,
   PrezentaConfirmari,
 } from '/imports/api/collections.js';
-import { getCraftGrade, isSuperAdmin, isTenantAdmin, requireActiveEId, requireRole } from '/imports/lib/access/server.js';
+import { getCraftGrade, getReadableCraftGrade, requireActiveEId, requireRole } from '/imports/lib/access/server.js';
 import { recordDegree } from '/imports/system/governance/server/service.js';
+import { nextNumber } from './counters.js';
+import { responseFields, responseDeadline } from '../attendance.js';
+import { Email } from 'meteor/email';
+import { writeAuditEvent } from '/imports/system/governance/server/audit.js';
+import { confirmationAccess } from './member-access.js';
+import { generateConvocatorPdf, sendResponseReceipt } from './reports.js';
 
 const CONVOCATOR_FIELDS = [
   'nume', 'numeLoja', 'nrLoja', 'orientul', 'templu', 'adresaTemplu', 'status',
@@ -52,15 +56,6 @@ function sanitizeConvocator(payload = {}) {
   return data;
 }
 
-async function nextNumber(eId, key) {
-  const result = await CraftCounters.rawCollection().findOneAndUpdate(
-    { _id: `${eId}:${key}` },
-    { $inc: { value: 1 }, $setOnInsert: { eId, key } },
-    { upsert: true, returnDocument: 'after' },
-  );
-  return Number(result?.value || 1);
-}
-
 function sanitizeArticle(payload = {}) {
   const order = Number(payload.order);
   const continut = String(payload.continut || '').trim();
@@ -91,7 +86,7 @@ async function normalizeArticleOrder(eId, documentId, level, priorityId) {
   }
 }
 
-function hashToken(token) {
+export function hashToken(token) {
   return crypto.createHash('sha256').update(String(token)).digest('hex');
 }
 
@@ -115,7 +110,7 @@ function presenceMetadata(convocator) {
   };
 }
 
-async function preparePresenceForConvocator({ eId, convocatorId, userId }) {
+export async function preparePresenceForConvocator({ eId, convocatorId, userId }) {
   const convocator = await Convocatoare.findOneAsync({ _id: convocatorId, eId, sys_status: 1 });
   if (!convocator) throw new Meteor.Error('not-found', 'Convocator inexistent.');
   const now = new Date();
@@ -152,7 +147,6 @@ async function preparePresenceForConvocator({ eId, convocatorId, userId }) {
     CraftMemberships.find({ eId, status: 'active' }, { fields: { userId: 1, grade: 1 } }).fetchAsync(),
   ]);
   const grades = new Map(memberships.map((entry) => [entry.userId, entry.grade]));
-  const deliveryTokens = [];
   let createdConfirmations = 0;
   for (const member of activeUsers) {
     const snapshot = {
@@ -165,9 +159,8 @@ async function preparePresenceForConvocator({ eId, convocatorId, userId }) {
       await PrezentaConfirmari.updateAsync(existing._id, { $set: { idPrezenta: presence._id, ...metadata, userSnapshot: snapshot, updatedAt: now } });
       continue;
     }
-    const token = Random.secret(32);
     try {
-      const confirmationId = await PrezentaConfirmari.insertAsync({
+      await PrezentaConfirmari.insertAsync({
         eId,
         convocatorId,
         idPrezenta: presence._id,
@@ -176,7 +169,6 @@ async function preparePresenceForConvocator({ eId, convocatorId, userId }) {
         gradeAtInvitation: Number(grades.get(member._id) || 0),
         ...metadata,
         userSnapshot: snapshot,
-        publicTokenHash: hashToken(token),
         status: 'pending',
         confirmareFinala: 0,
         confirmareMeniuVegetarian: 0,
@@ -187,26 +179,52 @@ async function preparePresenceForConvocator({ eId, convocatorId, userId }) {
         updatedAt: now,
       });
       createdConfirmations += 1;
-      deliveryTokens.push({ confirmationId, userId: member._id, token });
     } catch (error) {
       if (error?.code !== 11000) throw error;
     }
   }
-  return { presenceId: presence._id, createdConfirmations, deliveryTokens, activeUsers: activeUsers.length };
+  return { presenceId: presence._id, createdConfirmations, activeUsers: activeUsers.length };
+}
+
+export async function saveResponse(context, row, payload, administrative = false) {
+  if (!row) throw new Meteor.Error('not-found', 'Confirmare inexistentă.');
+  const parent = await Convocatoare.findOneAsync({ _id: row.convocatorId, eId: row.eId, sys_status: 1 });
+  if (!parent || ['Anulat', 'Arhivat', 'Finalizat'].includes(parent.status)) throw new Meteor.Error('closed', 'Ținuta nu mai acceptă răspunsuri.');
+  const deadline = responseDeadline(parent);
+  if (!administrative && deadline && deadline <= new Date()) throw new Meteor.Error('deadline', 'Termenul de confirmare a expirat. Contactați Secretarul.');
+  let data;
+  try { data = responseFields(payload); } catch (error) { throw new Meteor.Error('validation-error', error.message); }
+  await PrezentaConfirmari.updateAsync({ _id: row._id, eId: row.eId, sys_status: 1 }, {
+    $set: { ...data, updatedAt: new Date(), updatedBy: context.userId },
+    $push: { log: { type: administrative ? 'admin-response' : 'response', at: new Date(), by: context.userId } },
+  });
+  await writeAuditEvent({ actorId: context.userId, eId: row.eId, action: 'prezenta.response', entityType: 'confirmation', entityId: row._id, metadata: { administrative, status: data.status }, context });
+  const notification = await sendResponseReceipt(row, data);
+  await PrezentaConfirmari.updateAsync(row._id, { $set: { responseNotification: notification } });
+  return { ok: true, notification: notification.state };
+}
+
+async function ownToken(context, token) {
+  const { userId, eId } = await confirmationAccess(context);
+  const row = await PrezentaConfirmari.findOneAsync({ publicTokenHash: hashToken(token), userId, eId, sys_status: 1 });
+  if (!row) throw new Meteor.Error('not-found', 'Invitația nu aparține contului activ sau linkul a fost înlocuit.');
+  return row;
 }
 
 Meteor.methods({
   async 'craft.permissions'() {
     const { userId, eId } = await requireActiveEId(this);
-    const [superAdmin, tenantAdmin, grade] = await Promise.all([
-      isSuperAdmin(userId),
-      isTenantAdmin(userId, eId),
-      getCraftGrade(userId, eId),
+    let grade = 0;
+    try { grade = await getReadableCraftGrade(userId, eId); }
+    catch (error) { if (error.error !== 'craft-grade-required') throw error; }
+    const allowed = async (alias, action) => {
+      try { await requireRole(this, alias, action); return true; }
+      catch (error) { if (['forbidden', 'office-required', 'membership-required', 'insufficient-grade', 'invalid-eid'].includes(error.error)) return false; throw error; }
+    };
+    const [write, remove, admin, presenceAdmin] = await Promise.all([
+      allowed('convocatoare', 'write'), allowed('convocatoare', 'delete'), allowed('convocatoare', 'admin'), allowed('prezenta', 'admin'),
     ]);
-    const write = superAdmin || tenantAdmin || await Roles.userIsInRoleAsync(userId, ['convocatoare_write', 'convocatoare_admin'], { scope: eId });
-    const remove = superAdmin || tenantAdmin || await Roles.userIsInRoleAsync(userId, ['convocatoare_delete', 'convocatoare_admin'], { scope: eId });
-    const admin = superAdmin || tenantAdmin || await Roles.userIsInRoleAsync(userId, ['convocatoare_admin'], { scope: eId });
-    return { grade, read: true, write, delete: remove, admin };
+    return { grade, read: true, write, delete: remove, admin, presenceAdmin };
   },
 
   async 'craft.memberships.upsert'(targetUserId, grade) {
@@ -322,30 +340,83 @@ Meteor.methods({
 
   async 'craft.confirmare.get'(token) {
     check(token, String);
-    const row = await PrezentaConfirmari.findOneAsync(
-      { publicTokenHash: hashToken(token), sys_status: 1 },
-      { fields: { publicTokenHash: 0, userId: 0 } },
-    );
-    if (!row) throw new Meteor.Error('not-found', 'Confirmare inexistentă.');
-    return row;
+    const row = await ownToken(this, token);
+    return { id: row._id };
   },
 
   async 'craft.confirmare.submit'(token, payload) {
     check(token, String);
     check(payload, Object);
-    const allowed = pick(payload, ['confirmareTinuta', 'confirmareAgapa', 'confirmareMeniuVegetarian', 'confirmareMeniuStandard', 'motivAbsenta', 'motivAbsentaAgapa']);
-    for (const key of ['confirmareTinuta', 'confirmareAgapa', 'confirmareMeniuVegetarian', 'confirmareMeniuStandard']) {
-      if (allowed[key] !== undefined) allowed[key] = Boolean(allowed[key]);
-    }
-    for (const key of ['motivAbsenta', 'motivAbsentaAgapa']) {
-      if (allowed[key] !== undefined) allowed[key] = String(allowed[key]).trim().slice(0, 1000);
-    }
-    const updated = await PrezentaConfirmari.updateAsync(
-      { publicTokenHash: hashToken(token), sys_status: 1, confirmareFinala: { $ne: 1 } },
-      { $set: { ...allowed, confirmareFinala: 1, updatedAt: new Date() } },
-    );
-    if (!updated) throw new Meteor.Error('not-found-or-final', 'Confirmarea nu există sau a fost deja finalizată.');
+    return saveResponse(this, await ownToken(this, token), payload);
+  },
+
+  async 'craft.confirmare.mine'(id, payload) {
+    check(id, String); check(payload, Object);
+    const { userId, eId } = await confirmationAccess(this);
+    return saveResponse(this, await PrezentaConfirmari.findOneAsync({ _id: id, userId, eId, sys_status: 1 }), payload);
+  },
+
+  async 'craft.confirmare.admin'(id, payload) {
+    check(id, String); check(payload, Object);
+    const { eId } = await requireRole(this, 'prezenta', 'admin');
+    return saveResponse(this, await PrezentaConfirmari.findOneAsync({ _id: id, eId, sys_status: 1 }), payload, true);
+  },
+
+  async 'craft.prezenta.mark'(id, attended) {
+    check(id, String); check(attended, Boolean);
+    const { eId, userId } = await requireRole(this, 'prezenta', 'admin');
+    const changed = await PrezentaConfirmari.updateAsync({ _id: id, eId, sys_status: 1 }, { $set: { attended, attendanceRecordedAt: new Date(), attendanceRecordedBy: userId } });
+    if (!changed) throw new Meteor.Error('not-found', 'Confirmare inexistentă.');
+    await writeAuditEvent({ actorId: userId, eId, action: 'prezenta.mark', entityType: 'confirmation', entityId: id, metadata: { attended }, context: this });
     return { ok: true };
+  },
+
+  async 'craft.invitations.send'(convocatorId, resend = false) {
+    check(convocatorId, String); check(resend, Boolean);
+    const { userId, eId } = await requireRole(this, 'prezenta', 'admin');
+    if (!process.env.MAIL_URL) throw new Meteor.Error('mail-unavailable', 'Configurați SMTP înainte de trimitere.');
+    const parent = await Convocatoare.findOneAsync({ _id: convocatorId, eId, sys_status: 1 });
+    if (!parent || !responseDeadline(parent) || responseDeadline(parent) <= new Date() || ['Anulat', 'Arhivat', 'Finalizat'].includes(parent.status)) throw new Meteor.Error('closed', 'Configurați o ținută și un termen de confirmare în viitor.');
+    await preparePresenceForConvocator({ eId, convocatorId, userId });
+    const rows = await PrezentaConfirmari.find({ eId, convocatorId, sys_status: 1 }).fetchAsync();
+    const result = { sent: 0, skipped: 0, failed: 0 };
+    const pdfs = new Map();
+    for (const row of rows) {
+      // The claim prevents concurrent clicks from sending the same invitation twice.
+      const selector = { _id: row._id, eId, $or: [{ 'delivery.state': { $ne: 'sending' } }, { 'delivery.claimedAt': { $lt: new Date(Date.now() - 10 * 60_000) } }] };
+      if (!resend) selector['delivery.sentAt'] = { $exists: false };
+      const claim = Random.id();
+      const claimed = await PrezentaConfirmari.updateAsync(selector, { $set: { 'delivery.state': 'sending', 'delivery.claim': claim, 'delivery.claimedAt': new Date() } });
+      if (!claimed) { result.skipped += 1; continue; }
+      const token = Random.secret(32);
+      const currentClaim = await PrezentaConfirmari.findOneAsync({ _id: row._id, 'delivery.claim': claim }, { fields: { publicTokenHash: 1 } });
+      const oldHash = currentClaim?.publicTokenHash;
+      try {
+        const recipient = await Meteor.users.findOneAsync({ _id: row.userId, [`entitati.${eId}`]: { $exists: true }, 'setari.status': '1' }, { fields: { emails: 1 } });
+        const email = recipient?.emails?.[0]?.address;
+        if (!email) throw new Error('Destinatar inactiv sau fără email.');
+        const grade = await getCraftGrade(row.userId, eId);
+        if (!pdfs.has(grade)) pdfs.set(grade, await generateConvocatorPdf(convocatorId, eId, grade));
+        const pdf = pdfs.get(grade);
+        await PrezentaConfirmari.updateAsync({ _id: row._id, 'delivery.claim': claim }, { $set: { publicTokenHash: hashToken(token) } });
+        const root = new URL(process.env.ROOT_URL || Meteor.absoluteUrl());
+        const portal = root.pathname.replace(/\/$/, '') === '/portal';
+        const next = `${portal ? '/portal' : ''}/confirmare/${encodeURIComponent(token)}`;
+        const url = portal ? `${root.origin}/confirmare.html#token=${encodeURIComponent(token)}` : `${root.origin}${next}`;
+        await Email.sendAsync({ to: email, from: process.env.CSA_MAIL_FROM || 'Nova Reperta <no-reply@via-nova.ro>', subject: 'Invitație — confirmarea participării', text: `Aveți o invitație la ținută. Folosiți linkul personal pentru a răspunde; nu îl transmiteți altor persoane:\n\n${url}\n\nTermen: ${responseDeadline(parent).toLocaleString('ro-RO', { timeZone: 'Europe/Bucharest' })}`, attachments: [{ filename: pdf.filename, content: Buffer.from(pdf.content, 'base64'), contentType: pdf.mimeType }] });
+        await PrezentaConfirmari.updateAsync({ _id: row._id, 'delivery.claim': claim }, { $set: { 'delivery.state': 'sent', 'delivery.sentAt': new Date(), 'legacyMetadata.publicTokenPending': false }, $unset: { 'delivery.error': 1 } });
+        result.sent += 1;
+      } catch (error) {
+        const update = { $set: { 'delivery.state': 'failed', 'delivery.error': 'Trimiterea nu a reușit; verificați SMTP și destinatarul.' } };
+        if (oldHash) update.$set.publicTokenHash = oldHash;
+        else update.$unset = { publicTokenHash: 1 };
+        await PrezentaConfirmari.updateAsync({ _id: row._id, 'delivery.claim': claim }, update);
+        result.failed += 1;
+      }
+    }
+    if (result.sent) await Convocatoare.updateAsync({ _id: convocatorId, eId, status: 'Creat' }, { $set: { status: 'Comunicat', updatedAt: new Date() } });
+    await writeAuditEvent({ actorId: userId, eId, action: 'prezenta.invitations.send', entityType: 'convocator', entityId: convocatorId, metadata: { ...result, resend }, context: this });
+    return result;
   },
 
   async 'craft.documents.register'(payload) {

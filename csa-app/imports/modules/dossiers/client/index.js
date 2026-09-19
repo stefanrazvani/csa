@@ -1,5 +1,6 @@
 import './index.html';
 import './dossiers.css';
+import { attendanceStatus } from '/imports/modules/craft/attendance.js';
 import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { Template } from 'meteor/templating';
@@ -21,7 +22,7 @@ import {
 } from '../api/collections.js';
 
 registerDualRoute(FlowRouter, '/dosare-frati', () => renderPage('dossierWorkspace'));
-registerDualRoute(FlowRouter, '/dosare-frati/:userId', () => renderPage('dossierWorkspace'));
+registerDualRoute(FlowRouter, '/dosare-frati/:userId', ({ userId }) => renderPage('dossierWorkspace', { userId }));
 
 const EVENT_LABELS = {
   affiliation: 'Afiliere', transfer_in: 'Transfer primit', transfer_out: 'Transfer plecat',
@@ -153,7 +154,7 @@ function exportRegistryCsv(registry) {
 
 Template.dossierWorkspace.onCreated(function dossierWorkspaceCreated() {
   this.context = new ReactiveVar(null);
-  this.selectedUserId = new ReactiveVar(String(FlowRouter.getParam('userId') || ''));
+  this.selectedUserId = new ReactiveVar(String(this.data?.userId || ''));
   this.search = new ReactiveVar('');
   this.tab = new ReactiveVar('summary');
   this.message = new ReactiveVar('');
@@ -278,8 +279,8 @@ Template.dossierWorkspace.helpers({
     const member = selected(Template.instance());
     const eId = Template.instance().context.get()?.eId;
     const rows = member && eId ? PrezentaConfirmari.find({ eId, userId: member.userId, sys_status: 1 }).fetch() : [];
-    const confirmed = rows.filter((row) => row.status === 'confirmed' || Number(row.confirmareFinala) === 1).length;
-    return { total: rows.length, confirmed, pending: rows.length - confirmed };
+    const confirmed = rows.filter((row) => attendanceStatus(row) === 'confirmed').length;
+    return { total: rows.length, confirmed, pending: rows.filter((row) => attendanceStatus(row) === 'pending').length };
   },
   officeRows() {
     const member = selected(Template.instance());
@@ -311,7 +312,7 @@ Template.dossierWorkspace.helpers({
     return String(value).split(/\s+/).filter(Boolean).slice(0, 2).map((item) => item[0]).join('').toUpperCase();
   },
   sponsorKindLabel(value) { return ({ primary: 'Naș principal', secondary: 'Al doilea naș', historical: 'Mentor / istoric' })[value] || 'Naș'; },
-  attendanceStatusLabel(status, finalValue) { return status === 'confirmed' || Number(finalValue) === 1 ? 'Confirmat' : status === 'declined' ? 'Declinat' : 'În așteptare'; },
+  attendanceStatusLabel(status, finalValue, attendance) { return { confirmed: 'Participă', declined: 'Nu participă', pending: 'În așteptare', answered: 'Răspuns fără opțiune de participare' }[attendanceStatus({ status, confirmareFinala: finalValue, confirmareTinuta: attendance })]; },
 });
 
 Template.dossierWorkspace.events({

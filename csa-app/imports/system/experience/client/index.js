@@ -189,8 +189,11 @@ async function initializeRenderer(instance, generation) {
     if (instance.phase.get() === 'atrium') instance.renderer.showAtrium({ immediate: true });
   } catch (error) {
     if (instance.destroyed || generation !== instance.generation) return;
+    console.warn('[CSA temple] Renderer initialization failed:', error);
     instance.webglFallback.set(true);
-    instance.screenReaderStatus.set('Randarea WebGL nu este disponibilă. Folosește lista accesibilă a reperelor.');
+    instance.screenReaderStatus.set(error?.message === 'webgl-unavailable'
+      ? 'Randarea WebGL nu este disponibilă. Folosește lista accesibilă a reperelor.'
+      : 'Scena 3D nu a putut fi încărcată. Folosește lista accesibilă a reperelor.');
   }
 }
 

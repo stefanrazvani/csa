@@ -293,9 +293,10 @@ Meteor.methods({
     check(enabled, Boolean);
     const target = await Meteor.users.findOneAsync({ _id: targetUserId, [`entitati.${eId}`]: { $exists: true } }, { fields: { _id: 1 } });
     if (!target) throw new Meteor.Error('not-found', 'Utilizatorul nu aparține tenantului.');
+    const previous = await Roles.userIsInRoleAsync(targetUserId, ['tenant_admin'], { scope: eId });
     if (enabled) await Roles.addUsersToRolesAsync(targetUserId, ['tenant_admin'], { scope: eId, ifExists: true });
     else await Roles.removeUsersFromRolesAsync(targetUserId, ['tenant_admin'], { scope: eId });
-    await auditAdmin(this, userId, eId, 'admin.tenant.users.setAdmin', 'user', targetUserId, { enabled });
+    await auditAdmin(this, userId, eId, 'admin.tenant.users.setAdmin', 'user', targetUserId, { enabled, changes: [{ field: 'tenant_admin', before: previous, after: enabled }] });
     return true;
   },
 

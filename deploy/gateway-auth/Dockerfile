@@ -9,7 +9,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --omit=dev --ignore-scripts \
     && npm cache clean --force
 
-COPY server.js access-utils.js clamav-utils.js document-utils.js dossier-utils.js object-store-utils.js ./
+COPY server.js access-utils.js clamav-utils.js document-utils.js dossier-utils.js object-store-utils.js password-utils.js confirmation-routes.js ./
 COPY docker-entrypoint.sh /usr/local/bin/csa-gateway-auth-entrypoint
 RUN chmod 755 /usr/local/bin/csa-gateway-auth-entrypoint
 USER root

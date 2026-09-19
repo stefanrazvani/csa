@@ -6,7 +6,8 @@ import path from 'node:path';
 import { pipeline } from 'node:stream/promises';
 import { Transform } from 'node:stream';
 import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import bcrypt from 'bcryptjs';
+import { hashMeteorPassword, verifyGatewayPassword } from './password-utils.js';
+import { registerConfirmationRoutes } from './confirmation-routes.js';
 import Busboy from 'busboy';
 import express from 'express';
 import { MongoClient } from 'mongodb';
@@ -94,6 +95,8 @@ app.disable('x-powered-by');
 app.use(express.json({ limit: '16kb', strict: true }));
 
 const attempts = new Map();
+
+registerConfirmationRoutes({ app, database, tenantId: TENANT_EID, sameOrigin: requireSameOrigin, rateLimit: (req) => consumeAttempt(rateKey(req, 'invitation')), mailer, from: MAIL_FROM });
 
 function base64url(value) {
   return Buffer.from(value).toString('base64url');
@@ -1025,9 +1028,14 @@ app.post('/auth/login', requireSameOrigin, async (req, res) => {
     { projection: { services: 1, setari: 1 } },
   );
   const hash = user?.services?.password?.bcrypt || DUMMY_HASH;
-  const validPassword = await bcrypt.compare(password, hash).catch(() => false);
+  const passwordCheck = await verifyGatewayPassword(password, hash);
   const active = user && (user.setari?.status == null || String(user.setari.status) === '1');
-  if (!validPassword || !active) return res.status(401).json({ error: 'Email sau parolă incorectă.' });
+  if (!passwordCheck.valid || !active) return res.status(401).json({ error: 'Email sau parolă incorectă.' });
+  if (passwordCheck.needsUpgrade) {
+    const upgradedHash = await hashMeteorPassword(password);
+    const upgraded = await users.updateOne({ _id: user._id, 'services.password.bcrypt': hash }, { $set: { 'services.password.bcrypt': upgradedHash } });
+    if (!upgraded.matchedCount) return res.status(401).json({ error: 'Datele contului s-au schimbat. Reîncercați autentificarea.' });
+  }
 
   const rawToken = crypto.randomBytes(32).toString('base64url');
   const tokenHash = sha256(rawToken);
@@ -1059,7 +1067,7 @@ app.post('/auth/register', requireSameOrigin, async (req, res) => {
   );
   if (duplicate) return res.status(409).json({ error: 'Există deja un cont asociat acestei adrese.' });
   const now = new Date();
-  const bcryptHash = await bcrypt.hash(password, 10);
+  const bcryptHash = await hashMeteorPassword(password);
   try {
     await users.insertOne({
       _id: randomMeteorId(),
@@ -1128,7 +1136,7 @@ app.post('/auth/reset-password', requireSameOrigin, async (req, res) => {
   }, { projection: { _id: 1, 'services.password.reset': 1 } });
   if (!user) return res.status(400).json({ error: 'Linkul este invalid sau a expirat.' });
   const email = user.services.password.reset.email;
-  const bcryptHash = await bcrypt.hash(password, 10);
+  const bcryptHash = await hashMeteorPassword(password);
   const result = await users.updateOne(
     { _id: user._id, 'services.password.reset.token': token, 'emails.address': email },
     {

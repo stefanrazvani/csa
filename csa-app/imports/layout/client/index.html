@@ -1,37 +1,44 @@
 <template name="csaLayout">
   {{#if currentUser}}
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-sm csa-private-nav">
-      <div class="container-fluid">
-        <a class="navbar-brand fw-semibold csa-private-brand" href="{{appPath '/dashboard'}}">
-          <span class="csa-private-brand-mark" aria-hidden="true"><span></span></span>
-          <span>Nova Reperta</span>
-        </a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#csaNavigation"><span class="navbar-toggler-icon"></span></button>
-        <div class="collapse navbar-collapse" id="csaNavigation">
-          <div class="navbar-nav me-auto">
-            <a class="nav-link" href="{{appPath '/templu'}}">Templu</a>
-            <a class="nav-link" href="{{appPath '/biblioteca'}}">Bibliotecă</a>
-            <a class="nav-link" href="{{appPath '/concepte'}}">Concepte</a>
-            <a class="nav-link" href="{{appPath '/convocatoare'}}">Convocatoare</a>
-            <a class="nav-link" href="{{appPath '/dosare-frati'}}">Dosare</a>
-            {{#if isTenantAdmin}}<a class="nav-link" href="{{appPath '/registru'}}">Registru</a>{{/if}}
-            {{#if isTenantAdmin}}<a class="nav-link" href="{{appPath '/administrare-grade'}}">Grade de acces</a>{{/if}}
-            {{#if isTenantAdmin}}<a class="nav-link" href="{{appPath '/administrare-tenant'}}">Administrare Tenant</a>{{/if}}
-            {{#if isSuperAdmin}}<a class="nav-link" href="{{appPath '/administrare-globala'}}">Administrare Globală</a>{{/if}}
-            {{#if isSuperAdmin}}<a class="nav-link" href="{{appPath '/migrari'}}">Migrări</a>{{/if}}
-          </div>
-          {{#if hasTenants}}
-            <select class="form-select form-select-sm me-3 js-active-tenant" aria-label="Tenant activ">
-              {{#each tenantOptions}}<option value="{{id}}" selected="{{selected}}">{{name}}</option>{{/each}}
-            </select>
-          {{/if}}
-          <span class="navbar-text me-3">{{currentUserEmail}}</span>
-          <button class="btn btn-outline-light btn-sm js-logout" type="button">Ieșire</button>
-        </div>
-      </div>
-    </nav>
+    <header class="csa-topbar csa-private-nav">
+      <button class="js-toggle-menu btn btn-outline-light btn-sm" aria-label="Deschide meniul">☰</button>
+      <a class="csa-private-brand" href="{{appPath '/dashboard'}}">CSA <span>Nova Reperta</span></a>
+      <a class="btn btn-outline-light btn-sm" href="{{appPath '/templu'}}">Templu 3D</a>
+      {{#if hasTenants}}<select class="form-select form-select-sm js-active-tenant" aria-label="Tenant activ">{{#each tenantOptions}}<option value="{{id}}" selected="{{selected}}">{{name}}</option>{{/each}}</select>{{/if}}
+      <span class="csa-user-label">{{currentUserEmail}}</span>
+      <button class="btn btn-outline-light btn-sm js-logout">Ieșire</button>
+    </header>
+    <aside class="csa-sidebar" aria-label="Meniul principal">
+      <nav>
+        <h2>Meniul principal</h2>
+        <a href="{{appPath '/dashboard'}}">▦ Tablou de bord</a>
+        <a href="{{appPath '/templu'}}">◇ Templu</a>
+        <details open><summary>Lucrările Lojei</summary>
+          <a href="{{appPath '/convocatoare'}}">Convocatoare</a>
+          <a href="{{appPath '/confirmari'}}">Confirmările mele</a>
+          <a href="{{appPath '/prezente'}}">Prezențe</a>
+        </details>
+        <details open><summary>Studiu și documente</summary>
+          <a href="{{appPath '/biblioteca'}}">Bibliotecă</a>
+          <a href="{{appPath '/concepte'}}">Concepte</a>
+          <a href="{{appPath '/dosare-frati'}}">Dosare frați</a>
+        </details>
+        <details><summary>Administrarea Lojei</summary>
+          <a href="{{appPath '/registru'}}">Matricol și funcții</a>
+          <a href="{{appPath '/metale'}}">Metale · Trezorier</a>
+          <a href="{{appPath '/ospitalier'}}">Ospitalier</a>
+          <a href="{{appPath '/vizitatori'}}">Vizitatori</a>
+          <a href="{{appPath '/istoric'}}">Istoric operațiuni</a>
+          {{#if isTenantAdmin}}<a href="{{appPath '/administrare-grade'}}">Grade de acces</a><a href="{{appPath '/administrare-tenant'}}">Utilizatori și acces</a>{{/if}}
+        </details>
+        {{#if isSuperAdmin}}<details><summary>Platformă</summary><a href="{{appPath '/administrare-globala'}}">Administrare globală</a><a href="{{appPath '/migrari'}}">Migrări</a></details>{{/if}}
+      </nav>
+      <section class="csa-open-windows" aria-label="Ferestre deschise"><h2>Ferestre deschise</h2>
+        {{#each openWindows}}<button class="js-window-focus {{#if active}}active{{/if}}" data-window="{{id}}">{{#if minimized}}▁{{else}}▣{{/if}} {{title}}</button>{{else}}<p>Niciun modul deschis.</p>{{/each}}
+      </section>
+    </aside>
   {{/if}}
-  <main class="{{#if currentUser}}container-fluid py-4 csa-private-main{{else}}csa-auth-main{{/if}}" id="page-content"></main>
+  <main class="{{#if currentUser}}csa-private-main{{else}}csa-auth-main{{/if}}" id="page-content"></main>
 </template>
 
 <template name="csaGatewayLoading">
@@ -181,7 +188,7 @@
                       <div class="dashboard-event">
                         <div><span class="badge text-bg-secondary">{{confirmationStatus status}}</span></div>
                         <div><div class="dashboard-event-title">{{nume}}</div><div class="dashboard-muted">Ținuta {{tinutaNr}}</div></div>
-                        <div>{{formatDate dataTinuta}}</div><div></div>
+                        <div>{{formatDate dataTinuta}}</div><a class="btn btn-sm btn-outline-primary" href="{{homePath '/confirmari/'}}{{_id}}">Răspunde</a>
                       </div>
                     {{/each}}
                   {{else}}

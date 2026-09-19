@@ -9,6 +9,7 @@ import '/imports/system/dashboard/client';
 import '/imports/system/experience/client';
 import '/imports/system/admin/client';
 import '/imports/system/governance/client';
+import '/imports/system/governance/client/history.js';
 import '/imports/modules/index-client.js';
 
 bootstrapGateway();

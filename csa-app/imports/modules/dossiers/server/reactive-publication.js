@@ -31,6 +31,7 @@ export async function publishWithReactiveDossierAccess(context, {
   initialAccess,
   reauthorize,
   buildStreams,
+  authorizationCursors = () => [],
 }) {
   let stopped = false;
   let generation = 0;
@@ -191,6 +192,7 @@ export async function publishWithReactiveDossierAccess(context, {
       OfficeDefinitions.find({ eId }),
       Entitati.find({ _id: eId }),
       Meteor.users.find({ _id: actorId }),
+      ...authorizationCursors(access),
     ];
     const roleAssignments = Meteor.roleAssignment;
     if (roleAssignments?.find) {

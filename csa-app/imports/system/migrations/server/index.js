@@ -1,6 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import { MongoClient } from 'mongodb';
 import { Random } from 'meteor/random';
+import { check } from 'meteor/check';
+import { MongoInternals } from 'meteor/mongo';
+import { fieldDifferences, fingerprint, reconciliationUpdate, RECONCILABLE_FIELDS } from './reconciliation.js';
+import { attendanceStatus } from '/imports/modules/craft/attendance.js';
 import {
   Convocatoare,
   Documente,
@@ -13,6 +17,11 @@ import {
 import { requireSuperAdmin } from '/imports/lib/access/server.js';
 
 const COLLECTIONS = ['convocatoare', 'documente_text', 'prezenta', 'prezenta_confirmari', 'documente'];
+const TARGETS = { convocatoare: Convocatoare, documente_text: DocumenteText, prezenta: Prezenta, prezenta_confirmari: PrezentaConfirmari, documente: Documente, users: Meteor.users };
+
+function tenantSelector(collection, eId) {
+  return collection === 'users' ? { [`entitati.${eId}`]: { $exists: true } } : { eId };
+}
 
 function config() {
   const url = String(process.env.CSA_LEGACY_MONGO_URL || '').trim();
@@ -151,6 +160,59 @@ async function migrate({ dryRun, actor }) {
 }
 
 Meteor.methods({
+  async 'csaMigration.compare'(collection, afterId = '') {
+    await requireSuperAdmin(this);
+    check(collection, String); check(afterId, String);
+    if (!TARGETS[collection]) throw new Meteor.Error('validation-error', 'Colecție nepermisă.');
+    return withLegacy(async (db, eId) => {
+      const selector = { ...tenantSelector(collection, eId), ...(afterId ? { _id: { $gt: afterId } } : {}) };
+      const rows = await db.collection(collection).find(selector).sort({ _id: 1 }).limit(101).toArray();
+      const result = [];
+      for (const source of rows.slice(0, 100)) {
+        const target = await TARGETS[collection].findOneAsync({ _id: source._id, ...tenantSelector(collection, eId) });
+        if (!target) { result.push({ id: source._id, missing: true }); continue; }
+        const differences = fieldDifferences(collection, source, target);
+        if (differences.length) result.push({ id: source._id, sourceHash: fingerprint(source), targetHash: fingerprint(target), differences });
+      }
+      return { collection, rows: result, examined: Math.min(rows.length, 100), next: rows.length > 100 ? rows[99]._id : '', allowedFields: RECONCILABLE_FIELDS[collection] };
+    });
+  },
+
+  async 'csaMigration.reconcile'(payload) {
+    const actor = await requireSuperAdmin(this);
+    check(payload, { collection: String, id: String, sourceHash: String, targetHash: String, fields: [String] });
+    const targetCollection = TARGETS[payload.collection];
+    if (!targetCollection) throw new Meteor.Error('validation-error', 'Colecție nepermisă.');
+    return withLegacy(async (db, eId) => {
+      const selector = { _id: payload.id, ...tenantSelector(payload.collection, eId) };
+      const source = await db.collection(payload.collection).findOne(selector);
+      if (!source || fingerprint(source) !== payload.sourceHash) throw new Meteor.Error('conflict', 'Sursa s-a schimbat. Refaceți comparația.');
+      let update;
+      try { update = reconciliationUpdate(payload.collection, source, payload.fields); }
+      catch (error) { throw new Meteor.Error('validation-error', error.message); }
+      const session = MongoInternals.defaultRemoteCollectionDriver().mongo.client.startSession();
+      try {
+        await session.withTransaction(async () => {
+          const target = await targetCollection.rawCollection().findOne(selector, { session });
+          if (!target || fingerprint(target) !== payload.targetHash) throw new Meteor.Error('conflict', 'Destinația s-a schimbat. Refaceți comparația.');
+          update.$set = { ...(update.$set || {}), 'legacyMetadata.reconciledAt': new Date(), 'legacyMetadata.reconciledBy': actor };
+          if (payload.collection === 'documente_text' && payload.fields.includes('level')) update.$set.accessLevel = Number(source.level || 1);
+          if (payload.collection === 'prezenta_confirmari') {
+            const merged = { ...target };
+            for (const field of payload.fields) { if (source[field] === undefined) delete merged[field]; else merged[field] = source[field]; }
+            update.$set.status = attendanceStatus(merged);
+            if (update.$unset) delete update.$unset.status;
+          }
+          // Store only the selected business fields in the audit, never password hashes or session tokens.
+          const before = fieldDifferences(payload.collection, source, target).filter((item) => payload.fields.includes(item.field));
+          await targetCollection.rawCollection().updateOne(selector, update, { session });
+          await MigrationRuns.rawCollection().insertOne({ _id: Random.id(), type: 'csa-legacy-reconcile', actor, eId, collection: payload.collection, documentId: payload.id, fields: payload.fields, before, sourceHash: payload.sourceHash, targetHash: payload.targetHash, createdAt: new Date() }, { session });
+        });
+      } finally { await session.endSession(); }
+      return { ok: true };
+    });
+  },
+
   async 'csaMigration.audit'() {
     await requireSuperAdmin(this);
     return withLegacy(sourceAudit);
@@ -165,4 +227,3 @@ Meteor.methods({
     return migrate({ dryRun: true, actor });
   },
 });
-

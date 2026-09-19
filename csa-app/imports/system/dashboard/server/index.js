@@ -1,5 +1,6 @@
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import { Meteor } from 'meteor/meteor';
+import { attendanceStatus } from '/imports/modules/craft/attendance.js';
 import {
   Convocatoare,
   CraftMemberships,
@@ -80,7 +81,7 @@ Meteor.methods({
       eventRows(eId, readableGrade),
       PrezentaConfirmari.find(
         { eId, userId, sys_status: 1 },
-        { fields: { convocatorId: 1, dataTinuta: 1, dataConfirmare: 1, status: 1, nume: 1, tinutaNr: 1 }, sort: { dataTinuta: -1 }, limit: 5 },
+        { fields: { convocatorId: 1, dataTinuta: 1, dataConfirmare: 1, status: 1, confirmareFinala: 1, confirmareTinuta: 1, nume: 1, tinutaNr: 1 }, sort: { dataTinuta: -1 }, limit: 5 },
       ).fetchAsync(),
       PrezentaConfirmari.rawCollection().countDocuments({ eId, userId, sys_status: 1 }),
       Documente.rawCollection().countDocuments({ eId, sys_status: 1 }),
@@ -137,7 +138,7 @@ Meteor.methods({
       content: {
         eventMode: events.mode,
         events: events.rows,
-        confirmations,
+        confirmations: confirmations.map((row) => ({ ...row, status: attendanceStatus(row) })),
         totalConfirmations,
         documentsCount,
       },

@@ -8,3 +8,5 @@ import '/imports/system/experience/server';
 import '/imports/modules/index-server.js';
 import '/imports/system/migrations/server';
 import '/imports/system/startup/server';
+import '/imports/system/governance/server/history.js';
+import '/imports/system/governance/server/tracked-collections.js';

@@ -1,0 +1,22 @@
+<template name="csaHistory">
+  <section class="csa-history">
+    <div class="d-flex justify-content-between align-items-start mb-3"><div><h1 class="h4">Istoric operațiuni</h1><p class="text-muted">Cine a modificat, ce s-a schimbat și când, în Loja activă.</p></div><button class="btn btn-outline-primary js-history-refresh">Actualizează</button></div>
+    <form class="js-history-filter row g-2 mb-3">
+      <div class="col-md-3"><label class="form-label">Utilizator<input name="actor" class="form-control" placeholder="Nume, email sau ID"></label></div>
+      <div class="col-md-3"><label class="form-label">Modul<select name="entityType" class="form-select"><option value="">Toate</option><option value="convocatoare">Convocatoare</option><option value="documente_text">Articole</option><option value="prezenta_confirmari">Confirmări / prezențe</option><option value="brother_dossiers">Dosare</option><option value="lodge_memberships">Matricol</option><option value="office_terms">Funcții</option><option value="library_works">Bibliotecă</option><option value="treasury_transactions">Metale</option><option value="hospitality_cases">Ospitalier</option></select></label></div>
+      <div class="col-md-2"><label class="form-label">De la<input name="from" type="date" class="form-control"></label></div>
+      <div class="col-md-2"><label class="form-label">Până la<input name="to" type="date" class="form-control"></label></div>
+      <div class="col-md-2 d-flex align-items-end"><button class="btn btn-primary mb-2" disabled="{{busy}}">Aplică filtrele</button></div>
+      <div class="col-12"><label><input name="includeAccess" type="checkbox"> Include verificările de acces</label></div>
+    </form>
+    {{#if error}}<div class="alert alert-danger" role="alert">{{error}}</div>{{/if}}
+    {{#if busy}}<p role="status">Se încarcă istoricul…</p>{{/if}}
+    <div class="table-responsive"><table class="table table-hover align-middle"><thead><tr><th>Data și ora</th><th>Utilizator</th><th>Operațiune</th><th>Înregistrare</th><th>Modificări</th></tr></thead><tbody>
+      {{#each rows}}<tr><td class="text-nowrap">{{historyDate at}}</td><td>{{actorLabel}}</td><td>{{historyAction action}}<small class="d-block">{{historyOutcome outcome}}</small></td><td>{{historyEntity entityType}}<small class="d-block text-muted">{{entityId}}</small></td><td>
+        {{#if metadata.changes}}<details><summary>{{metadata.changes.length}} câmpuri modificate</summary><table class="table table-sm mt-2"><thead><tr><th>Câmp</th><th>Înainte</th><th>După</th></tr></thead><tbody>{{#each metadata.changes}}<tr><td>{{field}}</td><td class="text-break">{{historyValue before}}</td><td class="text-break">{{historyValue after}}</td></tr>{{/each}}</tbody></table></details>{{else}}<span class="text-muted">{{historyDetails metadata}}</span>{{/if}}
+      </td></tr>{{else}}<tr><td colspan="5">Nu există operațiuni pentru filtrele selectate.</td></tr>{{/each}}
+    </tbody></table></div>
+    <div class="d-flex justify-content-between align-items-center"><button class="btn btn-outline-secondary js-history-prev" disabled="{{previousDisabled}}">Anterior</button><span>Pagina {{pageNumber}}</span><button class="btn btn-outline-secondary js-history-next" disabled="{{nextDisabled}}">Următor</button></div>
+    <p class="small text-muted mt-3">Istoricul detaliat se înregistrează de la activarea acestei funcții. Evenimentele vechi păstrează informațiile disponibile atunci. Valorile protejate se consultă în modulul aferent, conform drepturilor de acces.</p>
+  </section>
+</template>

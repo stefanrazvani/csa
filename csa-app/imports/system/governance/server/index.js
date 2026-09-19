@@ -155,7 +155,7 @@ Meteor.publish('audit.recent', async function auditRecentPublication(limit = 100
   const access = await governanceAdmin(this, 'audit', 'read', requestedEId);
   const safeLimit = Math.min(Math.max(limit, 1), 500);
   await contextAudit(access, this, 'audit.read', 'tenant', access.eId, { publication: true, limit: safeLimit });
-  return AuditEvents.find({ eId: access.eId }, { sort: { at: -1 }, limit: safeLimit });
+  return AuditEvents.find({ eId: access.eId, $or: [{ minGrade: { $exists: false } }, { minGrade: { $lte: access.superAdmin ? 3 : access.grade } }] }, { sort: { at: -1 }, limit: safeLimit });
 });
 
 Meteor.publish('audit.global', async function auditGlobalPublication(limit = 200) {

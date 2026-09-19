@@ -31,8 +31,7 @@ Template.csaHome.helpers({
     return new Intl.DateTimeFormat('ro-RO', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value));
   },
   confirmationStatus(value) {
-    const status = String(value || '').trim();
-    return status || 'Neconfirmat';
+    return { confirmed: 'Participă', declined: 'Nu participă', pending: 'În așteptare', answered: 'Răspuns înregistrat' }[value] || 'În așteptare';
   },
   hasEvents(rows) { return Array.isArray(rows) && rows.length > 0; },
   hasConfirmations(rows) { return Array.isArray(rows) && rows.length > 0; },

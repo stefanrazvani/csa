@@ -1,0 +1,14 @@
+.craft-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.craft-print-document { background: #fff; color: #111; max-width: 210mm; padding: 1.5rem; margin: auto; }
+.craft-print-document h1 { font-size: 1.6rem; text-align: center; }
+.craft-print-document h2 { font-size: 1.15rem; margin-top: 1.5rem; }
+.craft-print-document li { margin-bottom: .6rem; }
+@media print {
+  body:has(.craft-print-document) .navbar,
+  body:has(.craft-print-document) .craft-print-toolbar,
+  body:has(.craft-print-document) .csa-xp-gate { display: none !important; }
+  .craft-print-document { padding: 0; max-width: none; box-shadow: none; }
+  .craft-print-document li { break-inside: avoid; }
+  .craft-print-document h2 { break-after: avoid; }
+  @page { size: A4; margin: 18mm; }
+}

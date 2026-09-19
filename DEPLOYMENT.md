@@ -52,6 +52,29 @@ Se folosește `-F NUL` pentru a evita dependența de configurația SSH globală 
 stației. Cheia SSH nu acordă automat drepturi `sudo`; operațiile privilegiate
 rămân protejate separat.
 
+### Acces sudo prin agent SSH — verificat la 19 septembrie 2026
+
+Hostul Docker are `pam_ssh_agent_auth` configurat pentru cheia
+`docker_192_168_177_68_ed25519`, încărcată în Pageant. Autentificarea sudo
+funcționează cu agent forwarding și terminal alocat; `sudo -n` nu a declanșat
+autentificarea PAM și nu este un test suficient al acestui acces.
+
+```powershell
+& 'C:\Program Files\PuTTY\plink.exe' -batch -agent -A -t `
+  -hostkey 'SHA256:w5xc/uqjA+j1of4qmFxPJ0DxO8yv6EicBy7HiPHYBVo' `
+  urgentit@192.168.177.68 'sudo /usr/bin/id'
+```
+
+Amprenta hostului a fost verificată în `known_hosts`. Compose este disponibil
+ca `/snap/bin/docker-compose`; pluginul `docker compose` nu era instalat
+pentru clientul Docker din PATH. Instanța CSA directă este containerul
+`csa-meteor-1` (SSH 22223), iar portalul este `csa-meteor-portal-1`.
+Aliasul SSH `meteor-key` de pe portul 22222 aparține altei aplicații.
+
+Hotfixul parolelor și verificările executate sunt consemnate în
+`MIGRATION_IMPLEMENTATION.md`; celelalte modificări de migrare nu au fost
+incluse în acel hotfix.
+
 ## Fluxul standard de release
 
 Deploy-ul pornește numai dintr-un commit GitHub identificat exact, nu direct
@@ -193,4 +216,3 @@ La data redactării acestui document, `ops/release.ps1` și wrapperul privilegia
 de pe server nu sunt încă implementate. Comanda nu trebuie prezentată ca
 funcțională până când ambele scripturi, blocarea cu `flock`, regula `sudo`
 limitată și testul de rollback nu sunt versionate și verificate.
-

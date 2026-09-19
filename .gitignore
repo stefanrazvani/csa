@@ -1,6 +1,7 @@
 # Dependențe și builduri locale
 **/node_modules/
 **/.meteor/local/
+**/.meteor/.id
 **/dist/
 **/coverage/
 **/__pycache__/

@@ -1,4 +1,6 @@
 import './index.html';
+import './layout.css';
+import { openModule, closeWindows, confirmWindowChanges, openWindows, focusWindow } from './windows.js';
 import '/imports/system/auth/client/auth.css';
 import { Accounts } from 'meteor/accounts-base';
 import { Blaze } from 'meteor/blaze';
@@ -20,6 +22,8 @@ let layoutView;
 let pageView;
 let requestedTemplate = 'csaHome';
 let requestedData = {};
+let workspaceIdentity = '';
+let mountGeneration = 0;
 const resetToken = new ReactiveVar('');
 let finishResetFlow = null;
 const EXPERIENCE_GATE_STORAGE_PREFIX = 'csa.temple-experience.gate.v1';
@@ -41,14 +45,29 @@ function resetPassword(token, password) {
 }
 
 function mountRequestedPage() {
+  const generation = ++mountGeneration;
   const app = document.getElementById('app');
   if (!app) return;
   if (!layoutView) layoutView = Blaze.render(Template.csaLayout, app);
   Tracker.afterFlush(() => {
+    if (generation !== mountGeneration) return;
     const target = document.getElementById('page-content');
     if (!target) return;
-    if (pageView) Blaze.remove(pageView);
+    if (pageView) { Blaze.remove(pageView); pageView = null; }
     const state = gatewayState.get();
+    const user = Meteor.user();
+    const tenant = Object.entries(user?.entitati || {}).find(([, value]) => Number(value?.activ) === 1)?.[0] || '';
+    const identity = `${Meteor.userId() || ''}:${tenant}`;
+    if (workspaceIdentity !== identity) { closeWindows(); workspaceIdentity = identity; }
+    if (Meteor.userId() && (!gatewayMode || state === 'ready')) {
+      document.body.classList.add('csa-desktop');
+      openModule(requestedTemplate, requestedData, window.location.pathname, (template, data, path) => {
+        requestedTemplate = template; requestedData = data;
+        if (window.location.pathname !== path) window.history.replaceState(null, '', path);
+      });
+      return;
+    }
+    closeWindows(); document.body.classList.remove('csa-desktop');
     const selected = gatewayMode && state === 'loading'
       ? 'csaGatewayLoading'
       : (Meteor.userId() ? requestedTemplate : 'csaLogin');
@@ -72,6 +91,7 @@ Accounts.onResetPasswordLink((token, done) => {
 Meteor.startup(() => {
   Tracker.autorun(() => {
     Meteor.userId();
+    Meteor.user()?.entitati;
     gatewayState.get();
     mountRequestedPage();
   });
@@ -82,14 +102,6 @@ registerDualRoute(FlowRouter, '/dashboard', () => renderPage('csaHome'));
 
 function experienceGateStorageKey() {
   return `${EXPERIENCE_GATE_STORAGE_PREFIX}:${Meteor.userId() || 'anonymous'}`;
-}
-
-function experienceGateWasPassed() {
-  try {
-    return window.sessionStorage.getItem(experienceGateStorageKey()) === 'passed';
-  } catch (error) {
-    return false;
-  }
 }
 
 function clearExperienceGate() {
@@ -108,16 +120,13 @@ Template.csaLayout.onCreated(function layoutCreated() {
       this.adminContext.set({});
       return;
     }
-    const currentPath = window.location.pathname.replace(/\/+$/, '') || '/';
-    if (!experienceGateWasPassed() && !currentPath.endsWith('/templu')) {
-      FlowRouter.go(appPath('/templu'));
-    }
     this.subscribe('admin.self');
     Meteor.callAsync('admin.context').then((context) => this.adminContext.set(context)).catch(() => this.adminContext.set({}));
   });
 });
 
 Template.csaLayout.helpers({
+  openWindows: () => openWindows.get(),
   isSuperAdmin() { return Template.instance().adminContext.get()?.superAdmin === true; },
   isTenantAdmin() { return Template.instance().adminContext.get()?.tenantAdmin === true; },
   appPath(path) { return appPath(path); },
@@ -132,13 +141,23 @@ Template.csaLayout.helpers({
 });
 
 Template.csaLayout.events({
+  'click .js-window-focus'(event) { focusWindow(event.currentTarget.dataset.window); },
+  'click .js-toggle-menu'() { document.body.classList.toggle('csa-menu-open'); },
+  'click .csa-sidebar a'(event) {
+    document.body.classList.remove('csa-menu-open');
+    if (new URL(event.currentTarget.href).pathname === window.location.pathname) { event.preventDefault(); mountRequestedPage(); }
+  },
   async 'change .js-active-tenant'(event, instance) {
+    if (!confirmWindowChanges()) { event.currentTarget.value = instance.adminContext.get()?.eId || ''; return; }
     await Meteor.callAsync('admin.setActiveTenant', event.currentTarget.value);
+    closeWindows();
     const context = await Meteor.callAsync('admin.context');
     instance.adminContext.set(context);
     FlowRouter.go(appPath('/'));
   },
   async 'click .js-logout'() {
+    if (!confirmWindowChanges()) return;
+    closeWindows();
     clearExperienceGate();
     if (gatewayMode) {
       await logoutGateway();

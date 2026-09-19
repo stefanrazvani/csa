@@ -22,6 +22,9 @@ showLogin.addEventListener('click', () => setLoginVisible(true));
 closeLogin.addEventListener('click', () => setLoginVisible(false));
 
 const currentPath = window.location.pathname;
+// Only relative private application paths are accepted; never redirect to an external host.
+const requestedNext = new URLSearchParams(window.location.search).get('next') || '';
+const safeNext = /^\/portal\/(?:confirmare\/[A-Za-z0-9_-]+|confirmari(?:\/[A-Za-z0-9_-]+)?|templu)$/.test(requestedNext) ? requestedNext : '';
 if (currentPath === '/inregistrare') registerPanel.hidden = false;
 else if (currentPath === '/recuperare-parola') forgotPanel.hidden = false;
 else if (currentPath === '/reset-password') resetPanel.hidden = false;
@@ -42,7 +45,7 @@ loginForm.addEventListener('submit', async (event) => {
     });
     const result = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(result.error || 'Autentificarea nu a reușit.');
-    window.location.assign(result.redirect || '/portal/');
+    window.location.assign(safeNext || result.redirect || '/portal/');
   } catch (error) {
     showMessage(error.message || 'Autentificarea nu a reușit.');
     loginButton.disabled = false;

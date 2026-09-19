@@ -1,0 +1,62 @@
+<template name="craftAttendance">
+  <section class="craft-operations">
+    <div class="d-flex flex-wrap gap-2 justify-content-between mb-3"><h1 class="h3">Prezențe și invitații</h1><a class="btn btn-outline-secondary" href="{{craftPath '/convocatoare'}}">Convocatoare</a></div>
+    {{#if message}}<div class="alert alert-info" role="status">{{message}}</div>{{/if}}
+    {{#if allowed}}
+      <label class="form-label" for="attendanceEvent">Ținută</label>
+      <select class="form-select mb-3" id="attendanceEvent"><option value="">Selectați convocatorul</option>{{#each events}}<option value="{{_id}}" {{eventSelected _id}}>#{{nr}} {{nume}}</option>{{/each}}</select>
+      {{#if selectedEvent}}
+        <div class="d-flex flex-wrap gap-2 mb-3">
+          <button class="btn btn-outline-primary js-prepare" disabled="{{busy}}">Sincronizează invitații</button>
+          <button class="btn btn-primary js-send" disabled="{{busy}}">Trimite invitațiile netrimise</button>
+          <button class="btn btn-outline-primary js-resend" disabled="{{busy}}">Retrimite toate invitațiile</button>
+          <button class="btn btn-outline-secondary js-export">Export CSV</button>
+          <button class="btn btn-outline-secondary js-export-xlsx" disabled="{{busy}}">Raport Excel cu totaluri</button>
+        </div>
+        <p class="text-muted">Retrimiterea înlocuiește linkurile anterioare. Răspunsurile deja primite sunt păstrate.</p>
+        <div class="alert alert-light border">Invitați: <strong>{{totals.invited}}</strong> · Participă: <strong>{{totals.confirmed}}</strong> · Absenți: <strong>{{totals.declined}}</strong> · Fără răspuns: <strong>{{totals.pending}}</strong> · Răspuns legacy fără opțiune: <strong>{{totals.answered}}</strong><br>Agapă: <strong>{{totals.agapa}}</strong> · Standard: <strong>{{totals.standard}}</strong> · Vegetarian: <strong>{{totals.vegetarian}}</strong> · Prezenți efectiv: <strong>{{totals.present}}</strong></div>
+        <label class="form-label" for="attendanceSearch">Caută membru</label><input class="form-control mb-3" id="attendanceSearch" type="search" placeholder="Nume sau email">
+        <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Membru</th><th>Răspuns</th><th>Agapă / meniu</th><th>Absență</th><th>Email</th><th>Prezent efectiv</th><th>Acțiuni</th></tr></thead><tbody>
+          {{#each rows}}<tr><td>{{memberName}}<br><small>{{userSnapshot.email}}</small></td><td>{{responseLabel this}}</td><td>{{mealLabel this}}</td><td>{{motivAbsenta}}<br>{{motivAbsentaAgapa}}</td><td>{{deliveryLabel delivery.state}}<br><small>{{formatDate delivery.sentAt}}</small>{{#if delivery.error}}<br><small>{{delivery.error}}</small>{{/if}}</td><td><input type="checkbox" class="form-check-input js-attended" data-id="{{_id}}" checked="{{attended}}" aria-label="Prezent efectiv"></td><td><button class="btn btn-sm btn-outline-primary js-edit-response" data-id="{{_id}}">Modifică răspunsul</button></td></tr>{{else}}<tr><td colspan="7">Nu există invitații pentru selecția curentă.</td></tr>{{/each}}
+        </tbody></table></div>
+        {{#if editing}}{{> craftResponseForm row=editing admin=true}}{{/if}}
+      {{/if}}
+      {{#if unresolved}}
+        <h2 class="h5 mt-4">Prezențe importate fără convocator</h2>
+        {{#each unresolved}}<form class="js-link-presence border rounded p-3 mb-2" data-id="{{_id}}"><p>{{nume}} · {{formatDate dataTinuta}}</p><div class="d-flex gap-2"><select name="convocatorId" class="form-select" required><option value="">Asociază unui convocator fără prezență</option>{{#each availableEvents}}<option value="{{_id}}">#{{nr}} {{nume}}</option>{{/each}}</select><button class="btn btn-outline-primary">Asociază</button></div></form>{{/each}}
+      {{/if}}
+    {{else}}<p class="text-muted">{{accessMessage}}</p>{{/if}}
+  </section>
+</template>
+
+<template name="craftMyConfirmations">
+  <h1 class="h3">Confirmările mele</h1>
+  {{#if message}}<div class="alert alert-info" role="status">{{message}}</div>{{/if}}
+  {{#if selected}}{{> craftResponseForm row=selected admin=false}}{{/if}}
+  {{#if Template.subscriptionsReady}}
+    <div class="list-group mt-3">{{#each rows}}<a href="{{responsePath _id}}" class="list-group-item list-group-item-action"><strong>{{nume}}</strong><br>{{formatDate dataTinuta}} · {{responseLabel this}}</a>{{else}}<p class="text-muted">Nu aveți invitații în tenantul activ.</p>{{/each}}</div>
+  {{else}}<p>Se încarcă invitațiile…</p>{{/if}}
+</template>
+
+<template name="craftResponseForm">
+  <section class="card my-3"><div class="card-header"><h2 class="h5 mb-0">{{row.nume}}</h2></div><div class="card-body">
+    <p>Ținută: {{formatDate row.dataTinuta}} · Termen răspuns: {{formatDate row.dataConfirmare}}</p>
+    {{#if admin}}<p class="text-muted">Corecție administrativă; modificarea este înregistrată în jurnal.</p>{{else}}<p class="text-muted">Puteți corecta răspunsul până la termenul de confirmare.</p>{{/if}}
+    {{#if message}}<div class="alert alert-info" role="status">{{message}}</div>{{/if}}
+    <form class="js-response-form row g-3">
+      <div class="col-sm-6"><label class="form-label">Particip la ținută</label><select name="confirmareTinuta" class="form-select" required><option value="">Selectați</option><option value="1" {{selectedFlag row.confirmareTinuta true}}>Da</option><option value="0" {{selectedFlag row.confirmareTinuta false}}>Nu</option></select></div>
+      <div class="col-sm-6"><label class="form-label">Particip la agapă</label><select name="confirmareAgapa" class="form-select" required><option value="">Selectați</option><option value="1" {{selectedFlag row.confirmareAgapa true}}>Da</option><option value="0" {{selectedFlag row.confirmareAgapa false}}>Nu</option></select></div>
+      <div class="col-sm-6"><label class="form-label">Meniu pentru agapă</label><select name="menu" class="form-select"><option value="">Fără meniu</option><option value="standard" {{menuSelected row 'standard'}}>Standard</option><option value="vegetarian" {{menuSelected row 'vegetarian'}}>Vegetarian</option></select></div>
+      <div class="col-sm-6"><label class="form-label">Motiv absență ținută</label><textarea class="form-control" name="motivAbsenta" maxlength="1000">{{row.motivAbsenta}}</textarea></div>
+      <div class="col-12"><label class="form-label">Motiv absență agapă</label><textarea class="form-control" name="motivAbsentaAgapa" maxlength="1000">{{row.motivAbsentaAgapa}}</textarea></div>
+      <div class="col-12"><button class="btn btn-success" disabled="{{busy}}">Salvează răspunsul</button></div>
+    </form>
+  </div></section>
+</template>
+
+<template name="craftConvocatorPrint">
+  <div class="craft-print-toolbar mb-3"><button class="btn btn-primary js-print">Tipărește / Salvează PDF</button> <a class="btn btn-outline-secondary" href="{{backPath}}">Înapoi</a><p class="text-muted mt-2">PDF-ul include numai articolele accesibile gradului dumneavoastră.</p></div>
+  {{#if Template.subscriptionsReady}}
+    {{#if document}}<article class="craft-print-document"><h1>{{document.nume}}</h1><h2>{{document.numeLoja}} nr. {{document.nrLoja}} · {{document.orientul}}</h2><p>Convocator nr. {{document.nr}} · Ținuta nr. {{document.numarTinuta}}</p><p>{{formatDate document.dataTinuta}} · Acces: {{document.data_access}}</p><p>{{document.templu}} · {{document.adresaTemplu}}</p><p>Termen confirmare: {{formatDate document.dataConfirmare}}</p><p class="craft-text">{{document.observatii}}</p>{{#each sections}}<section><h2>Grad {{level}}</h2><ol>{{#each articles}}<li class="craft-text">{{continut}}</li>{{/each}}</ol></section>{{/each}}</article>{{else}}<p>Convocator indisponibil.</p>{{/if}}
+  {{else}}<p>Se încarcă documentul…</p>{{/if}}
+</template>

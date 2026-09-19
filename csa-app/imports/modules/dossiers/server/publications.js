@@ -145,7 +145,7 @@ function detailStreams(access) {
     )),
     stream(PrezentaConfirmari, PrezentaConfirmari.find(
       { eId, userId: memberId, sys_status: 1 },
-      { fields: { eId: 1, userId: 1, convocatorId: 1, dataTinuta: 1, status: 1, nume: 1, tinutaNr: 1, confirmareFinala: 1 }, sort: { dataTinuta: -1 }, limit: 100 },
+      { fields: { eId: 1, userId: 1, convocatorId: 1, dataTinuta: 1, status: 1, nume: 1, tinutaNr: 1, confirmareFinala: 1, confirmareTinuta: 1 }, sort: { dataTinuta: -1 }, limit: 100 },
     )),
     stream(Meteor.users, Meteor.users.find(
       { _id: memberId },

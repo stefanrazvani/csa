@@ -1,5 +1,6 @@
 import { AuditEvents } from '/imports/api/collections.js';
 import { Random } from 'meteor/random';
+import { Meteor } from 'meteor/meteor';
 
 const SENSITIVE_KEYS = /password|secret|token|authorization|cookie|privatepath/i;
 
@@ -38,8 +39,10 @@ export async function writeAuditEvent({
   const safeAction = String(action || '').trim().slice(0, 160);
   if (!safeAction) throw new Error('Audit action is required.');
   const headers = context?.connection?.httpHeaders || {};
+  const actor = actorId && actorId !== 'system' ? await Meteor.users.findOneAsync(String(actorId), { fields: { profile: 1, emails: 1 } }) : null;
   return AuditEvents.insertAsync({
     actorId: String(actorId || 'system').slice(0, 120),
+    actorLabel: String(actor?.profile?.name || actor?.profile?.nume || actor?.emails?.[0]?.address || actorId || 'Sistem').slice(0, 200),
     eId: String(eId || '').slice(0, 120),
     activeEId: String(activeEId || '').slice(0, 120),
     action: safeAction,
