@@ -210,7 +210,7 @@ Template.csaLogin.events({
     const values = Object.fromEntries(new FormData(event.currentTarget));
     try {
       await loginWithPassword(values.email.trim(), values.password);
-      FlowRouter.go(appPath('/templu'));
+      FlowRouter.go(appPath('/dashboard'));
     } catch (error) {
       instance.error.set(error?.reason || 'Autentificarea a eșuat.');
     } finally {
