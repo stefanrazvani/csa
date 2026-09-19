@@ -1,11 +1,12 @@
 # Platformă CSA – stare implementare
 
-Release activ, 20 septembrie 2026: `cc469a3`. Dashboard 2D implicit, navigație
-laterală, ferestre WinBox pentru module și buton separat pentru templu.
-Istoric operațiuni cu actor și modificări, plus funcțiile de paritate craft.
-Corecțiile parolelor/CSP și geometria gradului 1 sunt păstrate. 10/10 containere
-healthy; autentificarea și interfața au fost verificate live.
-Detalii: `deploy/releases/2026-09-20-desktop.md`.
+Release activ, 20 septembrie 2026: `39e1b2e`, tag `release-20260920-profile-editors`.
+Meniu de cont cu profil readonly și resetare prin email; ferestre separate pentru
+adăugare/editare și istoric pe obiect. Dashboardul 2D, tema comună, listele cu
+paginare/filtrare/sortare și templul separat sunt păstrate. Funcțiile PDF/DOCX,
+autentificarea și geometria gradului 1 au trecut verificările de regresie.
+10/10 containere healthy, 147/147 fișiere sursă identice cu arhiva publicată.
+Detalii: `deploy/releases/2026-09-20-profile-editors.md`; standard: `MODULE_OBJECTS.md`.
 Publicarea inițială: 13 iulie 2026.
 
 Actualizare operațională, 19 septembrie 2026: containerele CSA Meteor găsite
@@ -74,12 +75,12 @@ nu include OCR; documentele fără text suficient devin `unsupported_scan`.
 - teste locale: 70 fișiere JavaScript validate sintactic, 14/14 teste gateway, schema import 9/9, contractul de securitate dossiers și catalogul editorial;
 - datele migrate au rămas la 25 convocatoare, 559 articole, 24 prezențe și 462 confirmări;
 - backup logic complet valid: `post-platform-20260713`.
-- validare release curent: 20/20 teste unitare și 106/106 fișiere sursă identice cu commitul publicat;
-- backup logic înainte de release: `pre-release-20260718-022123-8445e883cfe9`;
+- validare curentă: 44 teste unitare, 13 verificări obiecte/profil, 21 craft și 11 liste; 147 fișiere sursă identice;
+- backup logic înainte de release: `pre-release-editors-20260920`;
 - backup cod/gateway cu SHA-256: `pre-3d-dossiers-20260713T162926Z`;
-- release activ: `csa-app-release-20260718-022123-8445e883cfe9`, SHA-256 `1bbb115e380fe487564f72fd43f142b1eb068bad070f922a9388214eaee9fb0a`;
-- sursă release: commit GitHub `8445e883cfe97e36b68bdf517875136e36234ccc`, tag `release-20260718-022123`;
-- conținut release: Secretarul și Oratorul pe estradă orientați spre pupitrele de jos, Ospitalierul și Trezorierul sub estradă față în față peste sală, balustrada retrasă din dreptul scărilor laterale, spada Expertului la primul scaun al Coloanei de Miazănoapte; anterior: Altarul Jurămintelor lipit de estrada Maestrului Venerabil cu axul central liber (trepte laterale), blaturi înclinate care arată orientarea pupitrelor, Maestrul de Ceremonii și Acoperitorul aduși în interiorul Templului, funia cu mai multe noduri-opt; anterior: Secretarul și Oratorul cu fața spre Occident, Ospitalierul și Trezorierul față în față cu blaturi înclinate, Primul Supraveghetor spre colțul de Miazănoapte al intrării, Maestrul de Ceremonii în stânga Coloanei Boaz și Acoperitorul cu spada verticală în dreapta Coloanei Jachin, pavajul cu colonetele, firul cu plumb și Tabloul Lojii mutate în mijlocul Templului, camera adusă în față cu rotire aproape completă spre coloane și markerele-piramidă fără reprezentare eliminate din scenă;
+- release activ: `csa-app-release-39e1b2e.tar.gz`, SHA-256 `b6707f582df6b2a40d8f228c56170e8acdfc03a24957545ccd5ba28b25d148f7`;
+- sursă release: commit GitHub `39e1b2e`, tag `release-20260920-profile-editors`;
+- istoric geometric (iulie 2026): Secretarul și Oratorul pe estradă orientați spre pupitrele de jos, Ospitalierul și Trezorierul sub estradă față în față peste sală, balustrada retrasă din dreptul scărilor laterale, spada Expertului la primul scaun al Coloanei de Miazănoapte; anterior: Altarul Jurămintelor lipit de estrada Maestrului Venerabil cu axul central liber (trepte laterale), blaturi înclinate care arată orientarea pupitrelor, Maestrul de Ceremonii și Acoperitorul aduși în interiorul Templului, funia cu mai multe noduri-opt; anterior: Secretarul și Oratorul cu fața spre Occident, Ospitalierul și Trezorierul față în față cu blaturi înclinate, Primul Supraveghetor spre colțul de Miazănoapte al intrării, Maestrul de Ceremonii în stânga Coloanei Boaz și Acoperitorul cu spada verticală în dreapta Coloanei Jachin, pavajul cu colonetele, firul cu plumb și Tabloul Lojii mutate în mijlocul Templului, camera adusă în față cu rotire aproape completă spre coloane și markerele-piramidă fără reprezentare eliminate din scenă;
 - incident anterior (16 iulie): backend-ul `urgentit-apps` de pe portul `3008` (alt stack, pe același host) nu a răspuns câteva ore și a blocat canalul de comenzi Sentinel; fără impact asupra aplicației CSA;
 - după release: 10/10 containere `healthy`, `200` pentru `/templu` pe `18600` și pentru gateway pe `18610`, redirect la login pentru `/portal/` anonim, fără erori runtime în ultimele loguri.
 
