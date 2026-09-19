@@ -1,11 +1,12 @@
 # Platformă CSA – stare implementare
 
-Release activ al templului, 19 septembrie 2026: `fd0f4f8`, cu build tar 7.5.22
-din `9806366`. Pietrele din fața pupitrelor Ospitalierului și Trezorierului au
-fost eliminate pentru gradul 1. Verificare DDP live trecută, 10/10 containere
-healthy. Detalii: `deploy/releases/2026-09-19-temple.md`.
-
-Data publicării: 13 iulie 2026.
+Release activ, 20 septembrie 2026: `cc469a3`. Dashboard 2D implicit, navigație
+laterală, ferestre WinBox pentru module și buton separat pentru templu.
+Istoric operațiuni cu actor și modificări, plus funcțiile de paritate craft.
+Corecțiile parolelor/CSP și geometria gradului 1 sunt păstrate. 10/10 containere
+healthy; autentificarea și interfața au fost verificate live.
+Detalii: `deploy/releases/2026-09-20-desktop.md`.
+Publicarea inițială: 13 iulie 2026.
 
 Actualizare operațională, 19 septembrie 2026: containerele CSA Meteor găsite
 oprite au fost repornite/recreate cu volumele păstrate. `gateway-auth` a primit
@@ -15,9 +16,7 @@ Pagina albă după login a fost remediată prin compatibilizarea CSP cu bootstra
 stilurile și modulele dinamice Meteor. Interfața este verificată în Chrome în modul
 simplificat; raportul GPU al VM-ului Windows indică WebGL dezactivat și lipsa
 accelerării hardware. Randarea 3D pe un client cu WebGL rămâne de verificat.
-Detalii, imagine și backup: `MIGRATION_IMPLEMENTATION.md`. Funcțiile noi de
-paritate descrise acolo sunt încă în directorul local de lucru, nu în release-ul
-Meteor instalat pe server.
+Detalii, imagine și backup: `MIGRATION_IMPLEMENTATION.md`. Funcțiile de paritate sunt incluse în release-ul din 20 septembrie.
 
 ## Adrese active
 

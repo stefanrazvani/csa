@@ -1,6 +1,6 @@
 # CSA: paritate Meteor 2.16 și remedierea autentificării
 
-Data: 19 septembrie 2026. Bază: `0bd4d74543c5fd5a66c66ac61c8d409db58088f1`. Modificările migrării sunt în directorul de lucru și nu sunt încă publicate ca release complet.
+Actualizat: 20 septembrie 2026. Implementările descrise sunt publicate în release-ul `cc469a3`; detalii în `deploy/releases/2026-09-20-desktop.md`.
 
 ## Sursa comparată
 
@@ -50,7 +50,7 @@ Browserul a confirmat eroarea `__meteor_runtime_config__ is not defined`: politi
 
 Testul live de autentificare verifică acum și concordanța nonce-ului HTML cu CSP, compatibilitatea stilurilor/modulelor și menținerea politicii stricte pe pagina publică. Contul temporar este eliminat la final.
 
-Templul și reperele se afișează în Chrome în modul simplificat. Raportul furnizat de utilizator `about-gpu-2026-09-19T20-21-01-646Z.txt` indică Microsoft Basic Render Driver, ANGLE D3D11 WARP, lipsa accelerării hardware și WebGL dezactivat. Utilizatorul confirmă că browserul rulează într-un VM Windows Hyper-V. Acest raport explică indisponibilitatea randării 3D în mediul testat; nu stabilește când s-a schimbat configurația grafică. Nu au fost modificate setările de securitate ale browserului sau ale hypervizorului. Codul local distinge acum mesajul pentru lipsa WebGL de o eroare de încărcare și înregistrează cauza în consola browserului.
+Templul și reperele se afișează în Chrome în modul simplificat. Raportul furnizat de utilizator `about-gpu-2026-09-19T20-21-01-646Z.txt` indică Microsoft Basic Render Driver, ANGLE D3D11 WARP, lipsa accelerării hardware și WebGL dezactivat. Utilizatorul confirmă că browserul rulează într-un VM Windows Hyper-V. Acest raport explică indisponibilitatea randării 3D în mediul testat; nu stabilește când s-a schimbat configurația grafică. Nu au fost modificate setările de securitate ale browserului sau ale hypervizorului. Codul publicat distinge acum mesajul pentru lipsa WebGL de o eroare de încărcare și înregistrează cauza în consola browserului.
 
 ## Adrese pentru verificare
 
@@ -63,6 +63,6 @@ Templul folosește Three.js/WebGL și oferă listă accesibilă dacă WebGL lips
 
 ## Verificare și limite
 
-Au trecut 35 de teste automate și 17 verificări de integrare DDP/Mongo. Testele automate acoperă formatul parolelor, validarea răspunsurilor, tokenurile publice, izolarea tenantului, conturi inactive, termene, câmpurile reconcilierii și testele existente ale dosarelor/documentelor. Integrarea locală verifică permisiuni, răspunsuri, termene, duplicare tranzacțională, contoare concurente, exporturi PDF/XLSX, retragerea reactivă a documentelor devenite inaccesibile și prezență efectivă. PDF-urile de probă au fost extrase și randate: gradul 1 nu include text de gradul 3.
+Au trecut 37 de teste automate și 21 verificări de integrare DDP/Mongo. Testele automate acoperă formatul parolelor, validarea răspunsurilor, tokenurile publice, izolarea tenantului, conturi inactive, termene, câmpurile reconcilierii și testele existente ale dosarelor/documentelor. Integrarea locală verifică permisiuni, răspunsuri, termene, duplicare tranzacțională, contoare concurente, exporturi PDF/XLSX, retragerea reactivă a documentelor devenite inaccesibile și prezență efectivă. PDF-urile de probă au fost extrase și randate: gradul 1 nu include text de gradul 3.
 
-Nu au fost trimise emailuri reale. Livrarea SMTP către destinatarii reali, reconcilierea cu baza legacy și importul fișierelor binare nu au fost executate. Publicarea completă a modificărilor migrării trebuie să urmeze procedura de release; serverul .68 conține deocamdată corecțiile autentificării/CSP și versiunea Meteor repornită.
+Nu au fost trimise emailuri reale. Livrarea SMTP către destinatarii reali, reconcilierea cu baza legacy și importul fișierelor binare nu au fost executate. Implementarea este publicată pe serverul .68, inclusiv desktopul 2D, ferestrele modulelor și istoricul operațiunilor. Publicarea nu execută automat reconcilierea sau importul fișierelor.

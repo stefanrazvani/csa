@@ -29,3 +29,5 @@ Operațiile existente care folosesc tranzacții `rawCollection()` (duplicare/șt
 37 teste automate și 21 verificări locale DDP/Mongo: paritate craft, PDF/XLSX, autorizare, revocare documente, istoric cu actor și diferențe, refuz pentru membru obișnuit, separarea Lojei și două scrieri concurente. În browser au fost verificate dashboardul, ferestrele multiple, păstrarea filtrului în Convocatoare și pagina de istoric. Nu au fost trimise emailuri reale.
 
 Funcțiile PDF/DOCX existente rămân păstrate. Detaliile publicării efective se consemnează separat în `deploy/releases/` după verificarea pe server.
+
+Publicat pe 192.168.177.68 în release-ul `cc469a3`. Verificare live și rollback: `deploy/releases/2026-09-20-desktop.md`.
