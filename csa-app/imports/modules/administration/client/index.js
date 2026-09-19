@@ -33,13 +33,16 @@ Template.treasuryWorkspace.events({
   async 'click .js-post-transaction'(event,instance){try{await Meteor.callAsync('treasury.transactions.post',event.currentTarget.dataset.id)}catch(error){instance.message.set(error.reason||error.message)}},
 });
 
-Template.hospitalityWorkspace.onCreated(function created(){this.context=new ReactiveVar({canWrite:false});this.message=new ReactiveVar('');Meteor.callAsync('hospitality.context').then((context)=>{this.context.set(context);this.subscribe(context.canWrite?'hospitality.workspace':'hospitality.events')}).catch((error)=>this.message.set(error.reason||error.message))});
+Template.hospitalityWorkspace.onCreated(function created(){this.context=new ReactiveVar({canWrite:false});this.message=new ReactiveVar('');Meteor.callAsync('hospitality.context').then((context)=>{this.context.set(context);}).catch((error)=>this.message.set(error.reason||error.message))});
 Template.hospitalityWorkspace.helpers({canWrite:()=>Template.instance().context.get().canWrite,message:()=>Template.instance().message.get(),events:()=>HospitalityEvents.find({},{sort:{startsAt:1}}),cases:()=>HospitalityCases.find({},{sort:{updatedAt:-1}}),formatDateTime:dateTime});
 Template.hospitalityWorkspace.events({
   async 'submit #hospitalityEventForm'(event,instance){event.preventDefault();try{const v=formValues(event.currentTarget);await Meteor.callAsync('hospitality.events.create',{...v,minGrade:Number(v.minGrade),startsAt:parseRoDate(v.startsAt,true),endsAt:v.endsAt?parseRoDate(v.endsAt,true):parseRoDate(v.startsAt,true)});event.currentTarget.reset()}catch(error){instance.message.set(error.reason||error.message)}},
   async 'submit #hospitalityCaseForm'(event,instance){event.preventDefault();try{await Meteor.callAsync('hospitality.cases.create',formValues(event.currentTarget));event.currentTarget.reset()}catch(error){instance.message.set(error.reason||error.message)}},
 });
 
-Template.visitorWorkspace.onCreated(function created(){this.message=new ReactiveVar('');this.context=new ReactiveVar({canWrite:false});Meteor.callAsync('visitorInvitations.context').then((context)=>{this.context.set(context);this.subscribe('visitorInvitations.workspace')}).catch((error)=>this.message.set(error.reason||error.message))});
+Template.visitorWorkspace.onCreated(function created(){this.message=new ReactiveVar('');this.context=new ReactiveVar({canWrite:false});Meteor.callAsync('visitorInvitations.context').then((context)=>{this.context.set(context);}).catch((error)=>this.message.set(error.reason||error.message))});
 Template.visitorWorkspace.helpers({message:()=>Template.instance().message.get(),canWrite:()=>Template.instance().context.get().canWrite,invitations:()=>VisitorInvitations.find({},{sort:{createdAt:-1}}),formatDateTime:dateTime});
 Template.visitorWorkspace.events({async 'submit #visitorInvitationForm'(event,instance){event.preventDefault();try{const v=formValues(event.currentTarget);await Meteor.callAsync('visitorInvitations.create',{...v,attestedGrade:Number(v.attestedGrade),accessExpiresAt:parseRoDate(v.accessExpiresAt,true)});event.currentTarget.reset()}catch(error){instance.message.set(error.reason||error.message)}}});
+
+Template.treasuryWorkspace.onCreated(function(){ this.totals=new ReactiveVar({income:0,expense:0,balance:0}); });
+Template.treasuryWorkspace.helpers({ totalIncome:()=>Template.instance().totals.get().income,totalExpense:()=>Template.instance().totals.get().expense,postedBalance:()=>Template.instance().totals.get().balance });

@@ -15,10 +15,10 @@
         </div>
         <p class="text-muted">Retrimiterea înlocuiește linkurile anterioare. Răspunsurile deja primite sunt păstrate.</p>
         <div class="alert alert-light border">Invitați: <strong>{{totals.invited}}</strong> · Participă: <strong>{{totals.confirmed}}</strong> · Absenți: <strong>{{totals.declined}}</strong> · Fără răspuns: <strong>{{totals.pending}}</strong> · Răspuns legacy fără opțiune: <strong>{{totals.answered}}</strong><br>Agapă: <strong>{{totals.agapa}}</strong> · Standard: <strong>{{totals.standard}}</strong> · Vegetarian: <strong>{{totals.vegetarian}}</strong> · Prezenți efectiv: <strong>{{totals.present}}</strong></div>
-        <label class="form-label" for="attendanceSearch">Caută membru</label><input class="form-control mb-3" id="attendanceSearch" type="search" placeholder="Nume sau email">
-        <div class="table-responsive"><table class="table align-middle"><thead><tr><th>Membru</th><th>Răspuns</th><th>Agapă / meniu</th><th>Absență</th><th>Email</th><th>Prezent efectiv</th><th>Acțiuni</th></tr></thead><tbody>
+        {{> csaListTools list=rowsList}}
+        <div class="table-responsive"><table class="table align-middle"><thead><tr>{{> csaListColumn list=rowsList field="userSnapshot.nume" label="Membru"}}{{> csaListColumn list=rowsList field="status" label="Răspuns"}}<th>Agapă / meniu</th><th>Absență</th>{{> csaListColumn list=rowsList field="delivery.state" label="Email"}}<th>Prezent efectiv</th><th>Acțiuni</th></tr></thead><tbody>
           {{#each rows}}<tr><td>{{memberName}}<br><small>{{userSnapshot.email}}</small></td><td>{{responseLabel this}}</td><td>{{mealLabel this}}</td><td>{{motivAbsenta}}<br>{{motivAbsentaAgapa}}</td><td>{{deliveryLabel delivery.state}}<br><small>{{formatDate delivery.sentAt}}</small>{{#if delivery.error}}<br><small>{{delivery.error}}</small>{{/if}}</td><td><input type="checkbox" class="form-check-input js-attended" data-id="{{_id}}" checked="{{attended}}" aria-label="Prezent efectiv"></td><td><button class="btn btn-sm btn-outline-primary js-edit-response" data-id="{{_id}}">Modifică răspunsul</button></td></tr>{{else}}<tr><td colspan="7">Nu există invitații pentru selecția curentă.</td></tr>{{/each}}
-        </tbody></table></div>
+        </tbody></table></div>{{> csaListPager list=rowsList}}
         {{#if editing}}{{> craftResponseForm row=editing admin=true}}{{/if}}
       {{/if}}
       {{#if unresolved}}
@@ -33,9 +33,8 @@
   <h1 class="h3">Confirmările mele</h1>
   {{#if message}}<div class="alert alert-info" role="status">{{message}}</div>{{/if}}
   {{#if selected}}{{> craftResponseForm row=selected admin=false}}{{/if}}
-  {{#if Template.subscriptionsReady}}
-    <div class="list-group mt-3">{{#each rows}}<a href="{{responsePath _id}}" class="list-group-item list-group-item-action"><strong>{{nume}}</strong><br>{{formatDate dataTinuta}} · {{responseLabel this}}</a>{{else}}<p class="text-muted">Nu aveți invitații în tenantul activ.</p>{{/each}}</div>
-  {{else}}<p>Se încarcă invitațiile…</p>{{/if}}
+  {{> csaSimpleTable list=rowsList action=responseAction}}
+
 </template>
 
 <template name="craftResponseForm">

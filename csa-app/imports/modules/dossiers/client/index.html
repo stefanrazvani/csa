@@ -14,7 +14,7 @@
     {{#if message}}<div class="dossiers-alert" role="status">{{message}}</div>{{/if}}
 
     {{#if registry}}
-      <section class="dossiers-registry" aria-labelledby="registry-title">
+      <section class="dossiers-registry" aria-labelledby="registry-title">{{> csaListPager list=registryRowsList}}{{> csaListTools list=registryRowsList}}
         <div class="dossiers-section-heading">
           <div><p class="dossiers-eyebrow">Proiecție la momentul curent</p><h2 id="registry-title">Registru matricol generat</h2></div>
           <div class="dossiers-registry-actions"><button class="dossiers-button dossiers-button-secondary js-export-registry" type="button">Exportă CSV</button><button class="dossiers-icon-button js-close-registry" type="button" aria-label="Închide registrul">×</button></div>
@@ -36,21 +36,11 @@
     <div class="dossiers-workspace {{#unless canManage}}dossiers-workspace-self{{/unless}}">
       {{#if canManage}}
         <aside class="dossiers-directory" aria-label="Frații din Loja activă">
-          <label class="dossiers-search">
-            <span>Caută după nume sau matricol</span>
-            <input type="search" class="js-dossier-search" placeholder="Începe să scrii…" value="{{searchQuery}}">
-          </label>
-          <div class="dossiers-member-list">
-            {{#each memberRows}}
-              <button class="dossiers-member-card js-select-member {{selectedClass userId}}" type="button" data-user-id="{{userId}}">
-                <span class="dossiers-member-symbol" aria-hidden="true">{{initials displayName}}</span>
-                <span><strong>{{displayName}}</strong><small>{{matriculationNoLabel matriculationNo}} · Grad {{gradeLabel grade}}</small></span>
-                <i aria-hidden="true">›</i>
-              </button>
-            {{else}}
-              <p class="dossiers-empty">Nu există rezultate pentru această căutare.</p>
-            {{/each}}
-          </div>
+          {{> csaListTools list=memberRowsList}}
+          <div class="table-responsive"><table class="table table-hover dossiers-roster-table"><thead><tr>{{> csaListColumn list=memberRowsList field="displayName" label="Frate"}}{{> csaListColumn list=memberRowsList field="grade" label="Grad"}}</tr></thead><tbody>
+            {{#each memberRows}}<tr class="{{selectedClass userId}}"><td><button type="button" class="dossiers-roster-member js-select-member" data-user-id="{{userId}}"><span class="dossiers-member-symbol">{{initials displayName}}</span><span><strong>{{displayName}}</strong><small>{{matriculationNoLabel matriculationNo}} · {{membershipStatusLabel status}}</small></span></button></td><td>{{gradeLabel grade}}</td></tr>{{else}}<tr><td colspan="2">Nu există dosare pentru filtrele selectate.</td></tr>{{/each}}
+          </tbody></table></div>
+          {{> csaListPager list=memberRowsList}}
         </aside>
       {{/if}}
 
@@ -115,7 +105,7 @@
               {{/if}}
 
               {{#if hasNotes}}
-                <section class="dossiers-panel dossiers-notes-panel"><p class="dossiers-eyebrow">Însemnări</p><h3>Note în dosar</h3>{{#each notes}}<article><div><strong>{{titleOrDefault title}}</strong><span>{{visibilityLabel visibility}}</span></div><p>{{body}}</p><time>{{formatDate createdAt}}</time></article>{{/each}}</section>
+                <section class="dossiers-panel dossiers-notes-panel">{{> csaListPager list=notesList}}{{> csaListTools list=notesList}}<p class="dossiers-eyebrow">Însemnări</p><h3>Note în dosar</h3>{{#each notes}}<article><div><strong>{{titleOrDefault title}}</strong><span>{{visibilityLabel visibility}}</span></div><p>{{body}}</p><time>{{formatDate createdAt}}</time></article>{{/each}}</section>
               {{/if}}
               {{#if canManage}}
                 <details class="dossiers-editor dossiers-editor-compact"><summary>Adaugă o notă</summary><form class="js-dossier-note-form dossiers-form"><div class="dossiers-form-grid"><label>Titlu<input name="title"></label><label>Vizibilitate<select name="visibility"><option value="secretariat">Numai Secretariat</option><option value="member">Vizibilă Fratelui</option></select></label><label class="dossiers-span-2">Conținut<textarea name="body" rows="4" required></textarea></label></div><button class="dossiers-button" type="submit">Adaugă nota</button></form></details>
@@ -123,7 +113,7 @@
             {{/if}}
 
             {{#if activeTab 'timeline'}}
-              <section class="dossiers-panel">
+              <section class="dossiers-panel">{{> csaListPager list=timelineRowsList}}{{> csaListTools list=timelineRowsList}}
                 <div class="dossiers-section-heading"><div><p class="dossiers-eyebrow">Parcurs</p><h3>Cronologia dosarului</h3></div></div>
                 <ol class="dossiers-timeline">
                   {{#each timelineRows}}
@@ -137,7 +127,7 @@
             {{/if}}
 
             {{#if activeTab 'documents'}}
-              <section class="dossiers-panel">
+              <section class="dossiers-panel">{{> csaListPager list=documentsList}}{{> csaListTools list=documentsList}}
                 <div class="dossiers-section-heading"><div><p class="dossiers-eyebrow">Documente</p><h3>Arhiva dosarului</h3></div><span class="dossiers-lock">◆</span></div>
                 <div class="dossiers-document-grid">
                   {{#each documents}}
@@ -152,10 +142,10 @@
 
             {{#if activeTab 'participation'}}
               <div class="dossiers-panel-grid">
-                <section class="dossiers-panel"><p class="dossiers-eyebrow">Participare</p><h3>Prezențe și confirmări</h3><div class="dossiers-stat-grid"><article><strong>{{participationStats.total}}</strong><span>Invitații</span></article><article><strong>{{participationStats.confirmed}}</strong><span>Confirmate</span></article><article><strong>{{participationStats.pending}}</strong><span>În așteptare</span></article></div><div class="dossiers-participation-list">{{#each participationRows}}<article><div><strong>{{titleOrDefault nume}}</strong><span>Ținuta {{valueOrDash tinutaNr}}</span></div><time>{{formatDate dataTinuta}}</time><em>{{attendanceStatusLabel status confirmareFinala confirmareTinuta}}</em></article>{{else}}<p class="dossiers-empty">Nu există participări înregistrate.</p>{{/each}}</div></section>
-                <section class="dossiers-panel"><p class="dossiers-eyebrow">Mandate</p><h3>Funcții deținute</h3><div class="dossiers-office-list">{{#each officeRows}}<article><span class="dossiers-member-symbol">{{officeInitial officeCode}}</span><div><strong>{{officeLabel officeCode}}</strong><p>{{valueOrDash masonicYear}} · {{formatDate startAt}} – {{formatDate endAt}}</p></div><em>{{membershipStatusLabel status}}</em></article>{{else}}<p class="dossiers-empty">Nu există funcții înregistrate.</p>{{/each}}</div></section>
+                <section class="dossiers-panel">{{> csaListPager list=participationRowsList}}{{> csaListTools list=participationRowsList}}<p class="dossiers-eyebrow">Participare</p><h3>Prezențe și confirmări</h3><div class="dossiers-stat-grid"><article><strong>{{participationStats.total}}</strong><span>Invitații</span></article><article><strong>{{participationStats.confirmed}}</strong><span>Confirmate</span></article><article><strong>{{participationStats.pending}}</strong><span>În așteptare</span></article></div><div class="dossiers-participation-list">{{#each participationRows}}<article><div><strong>{{titleOrDefault nume}}</strong><span>Ținuta {{valueOrDash tinutaNr}}</span></div><time>{{formatDate dataTinuta}}</time><em>{{attendanceStatusLabel status confirmareFinala confirmareTinuta}}</em></article>{{else}}<p class="dossiers-empty">Nu există participări înregistrate.</p>{{/each}}</div></section>
+                <section class="dossiers-panel">{{> csaListPager list=officeRowsList}}{{> csaListTools list=officeRowsList}}<p class="dossiers-eyebrow">Mandate</p><h3>Funcții deținute</h3><div class="dossiers-office-list">{{#each officeRows}}<article><span class="dossiers-member-symbol">{{officeInitial officeCode}}</span><div><strong>{{officeLabel officeCode}}</strong><p>{{valueOrDash masonicYear}} · {{formatDate startAt}} – {{formatDate endAt}}</p></div><em>{{membershipStatusLabel status}}</em></article>{{else}}<p class="dossiers-empty">Nu există funcții înregistrate.</p>{{/each}}</div></section>
               </div>
-              <section class="dossiers-panel"><p class="dossiers-eyebrow">Legături</p><h3>Nași și mentori consemnați</h3><div class="dossiers-sponsor-grid">{{#each sponsors}}<article><span class="dossiers-member-symbol">{{sponsorInitials this}}</span><div><strong>{{sponsorName this}}</strong><p>{{sponsorKindLabel kind}}{{#if fromAt}} · {{formatDate fromAt}}{{/if}}</p></div></article>{{else}}<p class="dossiers-empty">Nu există nași sau mentori consemnați.</p>{{/each}}</div></section>
+              <section class="dossiers-panel">{{> csaListPager list=sponsorsList}}{{> csaListTools list=sponsorsList}}<p class="dossiers-eyebrow">Legături</p><h3>Nași și mentori consemnați</h3><div class="dossiers-sponsor-grid">{{#each sponsors}}<article><span class="dossiers-member-symbol">{{sponsorInitials this}}</span><div><strong>{{sponsorName this}}</strong><p>{{sponsorKindLabel kind}}{{#if fromAt}} · {{formatDate fromAt}}{{/if}}</p></div></article>{{else}}<p class="dossiers-empty">Nu există nași sau mentori consemnați.</p>{{/each}}</div></section>
               {{#if canManage}}
                 <details class="dossiers-editor"><summary>Adaugă un naș sau mentor istoric</summary><form class="js-dossier-sponsor-form dossiers-form"><div class="dossiers-form-grid"><label>Nume istoric<input name="externalName" required></label><label>Tip<select name="kind"><option value="primary">Naș principal</option><option value="secondary">Al doilea naș</option><option value="historical">Mentor / consemnare istorică</option></select></label><label>Data<input type="date" name="fromAt"></label><label>Vizibilitate<select name="visibility"><option value="member">Vizibil Fratelui</option><option value="secretariat">Numai Secretariat</option></select></label><label class="dossiers-span-2">Notă<textarea name="note" rows="3"></textarea></label></div><button class="dossiers-button" type="submit">Adaugă legătura</button></form></details>
               {{/if}}

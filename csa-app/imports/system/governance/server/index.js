@@ -1,3 +1,4 @@
+import { publishAuthorized } from '/imports/ui/lists/authorized-publication.js';
 import { check, Match } from 'meteor/check';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import { Meteor } from 'meteor/meteor';
@@ -75,7 +76,7 @@ async function governanceAdmin(context, alias, action = 'admin', requestedEId = 
   });
 }
 
-Meteor.publish('membership.current', async function membershipCurrentPublication() {
+publishAuthorized('membership.current', async function membershipCurrentPublication() {
   if (!this.userId) return this.ready();
   const { userId, eId } = await requireCompositeAccess(this, {});
   return [
@@ -84,7 +85,7 @@ Meteor.publish('membership.current', async function membershipCurrentPublication
   ];
 });
 
-Meteor.publish('membership.admin', async function membershipAdminPublication(requestedEId = '') {
+publishAuthorized('membership.admin', async function membershipAdminPublication(requestedEId = '') {
   check(requestedEId, String);
   const access = await governanceAdmin(this, 'membership', 'read', requestedEId);
   await contextAudit(access, this, 'membership.read', 'tenant', access.eId, { publication: true });
@@ -97,7 +98,7 @@ Meteor.publish('membership.admin', async function membershipAdminPublication(req
   ];
 });
 
-Meteor.publish('degreeEvents.admin', async function degreeEventsAdminPublication(userId = '', requestedEId = '') {
+publishAuthorized('degreeEvents.admin', async function degreeEventsAdminPublication(userId = '', requestedEId = '') {
   check(userId, String);
   check(requestedEId, String);
   const access = await governanceAdmin(this, 'degreeEvents', 'read', requestedEId);
@@ -107,7 +108,7 @@ Meteor.publish('degreeEvents.admin', async function degreeEventsAdminPublication
   return DegreeEvents.find(selector, { sort: { effectiveAt: -1, createdAt: -1 } });
 });
 
-Meteor.publish('officeTerms.current', async function officeTermsCurrentPublication() {
+publishAuthorized('officeTerms.current', async function officeTermsCurrentPublication() {
   if (!this.userId) return this.ready();
   const access = await requireCompositeAccess(this, {});
   const now = new Date();
@@ -131,7 +132,7 @@ Meteor.publish('officeTerms.current', async function officeTermsCurrentPublicati
   ];
 });
 
-Meteor.publish('officeTerms.admin', async function officeTermsAdminPublication(requestedEId = '') {
+publishAuthorized('officeTerms.admin', async function officeTermsAdminPublication(requestedEId = '') {
   check(requestedEId, String);
   const access = await governanceAdmin(this, 'officeTerms', 'read', requestedEId);
   await contextAudit(access, this, 'officeTerms.read', 'tenant', access.eId, { publication: true });
@@ -142,14 +143,14 @@ Meteor.publish('officeTerms.admin', async function officeTermsAdminPublication(r
   ];
 });
 
-Meteor.publish('visitorInvitations.admin', async function visitorInvitationsAdminPublication(requestedEId = '') {
+publishAuthorized('visitorInvitations.admin', async function visitorInvitationsAdminPublication(requestedEId = '') {
   check(requestedEId, String);
   const access = await governanceAdmin(this, 'visitorInvitations', 'read', requestedEId);
   await contextAudit(access, this, 'visitorInvitations.read', 'tenant', access.eId, { publication: true });
   return ExternalVisitors.find({ eId: access.eId }, { sort: { visitAt: -1, createdAt: -1 } });
 });
 
-Meteor.publish('audit.recent', async function auditRecentPublication(limit = 100, requestedEId = '') {
+publishAuthorized('audit.recent', async function auditRecentPublication(limit = 100, requestedEId = '') {
   check(limit, Match.Integer);
   check(requestedEId, String);
   const access = await governanceAdmin(this, 'audit', 'read', requestedEId);
@@ -158,7 +159,7 @@ Meteor.publish('audit.recent', async function auditRecentPublication(limit = 100
   return AuditEvents.find({ eId: access.eId, $or: [{ minGrade: { $exists: false } }, { minGrade: { $lte: access.superAdmin ? 3 : access.grade } }] }, { sort: { at: -1 }, limit: safeLimit });
 });
 
-Meteor.publish('audit.global', async function auditGlobalPublication(limit = 200) {
+publishAuthorized('audit.global', async function auditGlobalPublication(limit = 200) {
   check(limit, Match.Integer);
   const actorId = await requireSuperAdmin(this);
   const safeLimit = Math.min(Math.max(limit, 1), 1000);

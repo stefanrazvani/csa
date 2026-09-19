@@ -6,7 +6,7 @@
     </header>
     {{#if error}}<div class="alert alert-danger">{{error}}</div>{{/if}}
     <section class="study-toolbar">
-      <label class="visually-hidden" for="studySearch">Caută în bibliotecă</label>
+      <label class="visually-hidden" for="studySearch">Caută în conținutul textelor</label>
       <input id="studySearch" class="form-control" placeholder="Caută în texte…">
       <button class="btn btn-primary js-study-search">Caută</button>
     </section>
@@ -31,11 +31,7 @@
         </form>
       </details>
     {{/if}}
-    <section class="study-shelves" aria-label="Catalog">
-      {{#each works}}
-        <a class="study-book" href="{{workPath _id}}"><span class="study-book-grade">Grad {{minGrade}}</span><span class="study-book-spine"></span><strong>{{title}}</strong><span>{{author}}</span><small>{{statusLabel status}}</small></a>
-      {{else}}<div class="study-empty">Biblioteca așteaptă prima lucrare.</div>{{/each}}
-    </section>
+    {{> csaSimpleTable list=worksList action=workAction}}
   </div>
 </template>
 
@@ -53,7 +49,7 @@
             </article>
           {{else}}<div class="study-empty">Versiunea publicată nu conține încă text.</div>{{/each}}
         </main>
-        <aside class="study-side"><h2>Dezbateri</h2>{{#each debates}}<a href="{{debatePath _id}}"><strong>{{title}}</strong><small>Grad {{minGrade}}</small></a>{{else}}<p class="text-muted">Nu există dezbateri.</p>{{/each}}</aside>
+        <aside class="study-side">{{> csaListPager list=debatesList}}{{> csaListTools list=debatesList}}<h2>Dezbateri</h2>{{#each debates}}<a href="{{debatePath _id}}"><strong>{{title}}</strong><small>Grad {{minGrade}}</small></a>{{else}}<p class="text-muted">Nu există dezbateri.</p>{{/each}}</aside>
       </div>
     {{else}}<div class="study-loading">Se deschide lucrarea…</div>{{/if}}
   </div>
@@ -63,7 +59,7 @@
   <div class="study-debate-page">
     {{#if debate}}
       <header><a href="{{libraryPath}}" class="study-back">← Bibliotecă</a><span class="study-kicker">Dezbatere · grad {{debate.minGrade}}</span><h1>{{debate.title}}</h1>{{#if debate.quoteSnapshot}}<blockquote>{{debate.quoteSnapshot}}</blockquote>{{/if}}</header>
-      <section class="study-messages" aria-live="polite">{{#each messages}}<article><div class="study-message-meta">{{authorLabel createdBy}} · {{formatDate createdAt}}</div>{{#if quote}}<blockquote>{{quote}}</blockquote>{{/if}}<p>{{text}}</p></article>{{else}}<p class="text-muted">Deschide dialogul prin primul mesaj.</p>{{/each}}</section>
+      <section class="study-messages" aria-live="polite">{{> csaListPager list=messagesList}}{{> csaListTools list=messagesList}}{{#each messages}}<article><div class="study-message-meta">{{authorLabel createdBy}} · {{formatDate createdAt}}</div>{{#if quote}}<blockquote>{{quote}}</blockquote>{{/if}}<p>{{text}}</p></article>{{else}}<p class="text-muted">Deschide dialogul prin primul mesaj.</p>{{/each}}</section>
       <form id="studyMessageForm" class="study-message-form"><textarea class="form-control" name="text" rows="3" placeholder="Scrie o contribuție…" required></textarea><button class="btn btn-primary">Trimite</button></form>
     {{else}}<div class="study-loading">Se încarcă dezbaterea…</div>{{/if}}
   </div>
@@ -71,9 +67,9 @@
 
 <template name="studyConcepts">
   <div class="study-page"><header class="study-hero"><div><span class="study-kicker">Planșa ideilor</span><h1>Harta conceptelor</h1><p>Relații create și validate de oameni, legate de sursele lor.</p></div><a class="btn btn-outline-light" href="{{libraryPath}}">Bibliotecă</a></header>
-    {{#if canManage}}<section class="study-panel"><form id="studyConceptCreate" class="row g-2"><div class="col-md-3"><input class="form-control" name="name" placeholder="Concept" required></div><div class="col-md-5"><input class="form-control" name="description" placeholder="Descriere"></div><div class="col-md-2"><select class="form-select" name="minGrade"><option value="1">Grad 1</option><option value="2">Grad 2</option><option value="3">Grad 3</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100">Adaugă</button></div></form><hr><form id="studyConceptLink" class="row g-2"><div class="col-md-3"><select class="form-select" name="fromConceptId" required><option value="">Concept sursă</option>{{#each concepts}}<option value="{{_id}}">{{name}}</option>{{/each}}</select></div><div class="col-md-2"><select class="form-select" name="type"><option value="asociat">asociat</option><option value="dezvolta">dezvoltă</option><option value="contrasteaza">contrastează</option><option value="exemplifica">exemplifică</option><option value="referinta">referință</option></select></div><div class="col-md-3"><select class="form-select" name="toConceptId" required><option value="">Concept destinație</option>{{#each concepts}}<option value="{{_id}}">{{name}}</option>{{/each}}</select></div><div class="col-md-3"><input class="form-control" name="justification" placeholder="Justificare"></div><div class="col-md-1"><button class="btn btn-primary w-100">Leagă</button></div></form></section>{{/if}}
+    {{#if canManage}}<section class="study-panel"><form id="studyConceptCreate" class="row g-2"><div class="col-md-3"><input class="form-control" name="name" placeholder="Concept" required></div><div class="col-md-5"><input class="form-control" name="description" placeholder="Descriere"></div><div class="col-md-2"><select class="form-select" name="minGrade"><option value="1">Grad 1</option><option value="2">Grad 2</option><option value="3">Grad 3</option></select></div><div class="col-md-2"><button class="btn btn-primary w-100">Adaugă</button></div></form><hr><form id="studyConceptLink" class="row g-2"><div class="col-md-3"><select class="form-select" name="fromConceptId" required><option value="">Concept sursă</option>{{#each conceptsOptions}}<option value="{{_id}}">{{name}}</option>{{/each}}</select></div><div class="col-md-2"><select class="form-select" name="type"><option value="asociat">asociat</option><option value="dezvolta">dezvoltă</option><option value="contrasteaza">contrastează</option><option value="exemplifica">exemplifică</option><option value="referinta">referință</option></select></div><div class="col-md-3"><select class="form-select" name="toConceptId" required><option value="">Concept destinație</option>{{#each conceptsOptions}}<option value="{{_id}}">{{name}}</option>{{/each}}</select></div><div class="col-md-3"><input class="form-control" name="justification" placeholder="Justificare"></div><div class="col-md-1"><button class="btn btn-primary w-100">Leagă</button></div></form></section>{{/if}}
     <section class="study-panel"><div id="studyConceptGraph" class="study-concept-graph" role="img" aria-label="Graf interactiv al conceptelor"></div></section>
-    <section class="concept-map concept-map-fallback">{{#each concepts}}<article class="concept-node concept-grade-{{minGrade}}"><span>Grad {{minGrade}}</span><h2>{{name}}</h2><p>{{description}}</p></article>{{else}}<div class="study-empty">Nu există concepte publicate.</div>{{/each}}</section>
-    <section class="study-panel"><h2>Relații</h2>{{#each relations}}<div class="concept-relation"><strong>{{conceptName fromConceptId}}</strong><span>{{type}}</span><strong>{{conceptName toConceptId}}</strong><p>{{justification}}</p></div>{{else}}<p class="text-muted">Nu există relații.</p>{{/each}}</section>
+    {{> csaSimpleTable list=conceptsList}}
+    <section class="study-panel">{{> csaListPager list=relationsList}}{{> csaListTools list=relationsList}}<h2>Relații</h2>{{#each relations}}<div class="concept-relation"><strong>{{conceptName fromConceptId}}</strong><span>{{type}}</span><strong>{{conceptName toConceptId}}</strong><p>{{justification}}</p></div>{{else}}<p class="text-muted">Nu există relații.</p>{{/each}}</section>
   </div>
 </template>

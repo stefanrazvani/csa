@@ -56,8 +56,9 @@ Template.craftAttendance.onCreated(function () {
   this.subscribe('craft.convocatoare');
   Meteor.callAsync('craft.permissions').then((permissions) => {
     this.allowed.set(permissions.presenceAdmin);
+    this.autorun(() => { if (this.allowed.get()) this.subscribe('craft.attendance.workspace', this.eventId.get(), { onError: error => this.message.set(error.reason || error.message) }); });
     this.accessMessage.set('Este necesară permisiunea de prezențe și un mandat activ de Secretar/Venerabil.');
-    if (permissions.presenceAdmin) this.subscribe('craft.attendance.workspace', { onError: (error) => this.message.set(error.reason || error.message) });
+
   }).catch((error) => this.accessMessage.set(error.reason || error.message));
 });
 
@@ -100,7 +101,7 @@ Template.craftAttendance.events({
 
 Template.craftMyConfirmations.onCreated(function () {
   this.message = new ReactiveVar(''); this.selectedId = new ReactiveVar(this.data?.id || '');
-  this.subscribe('craft.confirmari.mine', { onError: (error) => this.message.set(error.reason || error.message) });
+  this.autorun(() => { const id=this.selectedId.get(); if(id) this.subscribe('craft.confirmari.mine', id, { onError: error=>this.message.set(error.reason||error.message) }); });
   if (this.data?.token) Meteor.callAsync('craft.confirmare.get', this.data.token).then((result) => this.selectedId.set(result.id)).catch((error) => this.message.set(error.reason || error.message));
 });
 Template.craftMyConfirmations.helpers({ ...shared,

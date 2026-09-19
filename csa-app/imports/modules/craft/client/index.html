@@ -4,31 +4,16 @@
     {{#if canWrite}}<button class="btn btn-primary" id="newConvocator">Convocator nou</button>{{/if}}
   </div>
   {{#if message}}<div class="alert alert-info" role="status">{{message}}</div>{{/if}}
-  <div class="row g-2 mb-3"><div class="col-md-8"><input id="convocatorSearch" class="form-control" type="search" aria-label="Caută convocator" placeholder="Caută nume, număr, lojă"></div><div class="col-md-4"><select id="convocatorStatus" class="form-select" aria-label="Filtrează status"><option value="">Toate stările</option><option>Creat</option><option>Comunicat</option><option>Finalizat</option><option>Anulat</option><option>Arhivat</option></select></div></div>
   <div class="d-flex gap-2 mb-3">{{#if presenceAdmin}}<a class="btn btn-outline-primary" href="{{attendancePath}}">Prezențe</a>{{/if}}<button class="btn btn-outline-secondary" id="exportConvocatoare">Export CSV</button></div>
   <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
-    <label for="convocatorSort">Ordine</label><select id="convocatorSort" class="form-select w-auto"><option value="newest">Data descrescător</option><option value="oldest">Data crescător</option><option value="name">Nume</option><option value="number">Număr descrescător</option></select>
     {{#if canWrite}}<button class="btn btn-outline-secondary" id="selectConvocatorPage">Selectează pagina</button>{{/if}}
     {{#if selectedCount}}<span>{{selectedCount}} selectate</span><button class="btn btn-outline-primary" id="duplicateSelectedConvocatoare">Duplică selecția</button><button class="btn btn-outline-secondary" id="archiveSelectedConvocatoare">Arhivează selecția</button><button class="btn btn-link" id="clearConvocatorSelection">Deselectează</button>{{/if}}
   </div>
-  {{#if Template.subscriptionsReady}}
-    <div class="list-group">
-      {{#each rows}}
-        <div class="list-group-item d-flex align-items-center gap-3">
-          {{#if canWrite}}<input type="checkbox" class="form-check-input selectConvocator" data-id="{{_id}}" checked="{{selected _id}}" aria-label="Selectează {{nume}}">{{/if}}
-          <a class="flex-grow-1 text-decoration-none" href="{{convocatorPath _id}}">
-          <strong>#{{nr}} {{nume}}</strong>
-          <span class="float-end">{{status}}</span>
-          </a>
-        </div>
-      {{else}}
-        <div class="alert alert-info">Nu există convocatoare.</div>
-      {{/each}}
-    </div>
-    <div class="d-flex align-items-center gap-3 mt-3"><button class="btn btn-outline-secondary" id="previousConvocatoare" disabled="{{previousDisabled}}">Înapoi</button><span>Pagina {{pageNumber}} din {{pageCount}}</span><button class="btn btn-outline-secondary" id="nextConvocatoare" disabled="{{nextDisabled}}">Înainte</button></div>
-  {{else}}
-    <div class="spinner-border"></div>
-  {{/if}}
+  {{> csaListTools list=rowsList}}
+  <div class="table-responsive"><table class="table table-hover csa-list-table"><thead><tr><th>Selecție</th>{{> csaListColumn list=rowsList field="nr" label="Nr."}}{{> csaListColumn list=rowsList field="nume" label="Denumire"}}{{> csaListColumn list=rowsList field="numeLoja" label="Loja"}}{{> csaListColumn list=rowsList field="status" label="Stare"}}</tr></thead><tbody>
+  {{#each rows}}<tr><td>{{#if canWrite}}<input type="checkbox" class="form-check-input selectConvocator" data-id="{{_id}}" checked="{{selected _id}}" aria-label="Selectează {{nume}}">{{/if}}</td><td>{{nr}}</td><td><a href="{{convocatorPath _id}}">{{nume}}</a></td><td>{{numeLoja}}</td><td>{{status}}</td></tr>{{else}}<tr><td colspan="5">Nu există convocatoare pentru selecția curentă.</td></tr>{{/each}}
+  </tbody></table></div>{{> csaListPager list=rowsList}}
+
 </template>
 
 <template name="craftConvocatorEditor">
@@ -106,7 +91,7 @@
             <div class="col-2"><button class="btn btn-outline-primary w-100">Adaugă</button></div>
           </form>
           {{/if}}
-          <div class="table-responsive mt-3"><table class="table table-sm align-middle mb-0">
+          {{> csaListTools list=(articleList this)}}{{> csaListPager list=(articleList this)}}<div class="table-responsive mt-3"><table class="table table-sm align-middle mb-0">
             <thead><tr><th>#</th><th>Nr. articol</th><th>Conținut</th><th>Ordine</th>{{#if canWrite}}<th>Acțiuni</th>{{/if}}</tr></thead>
             <tbody>
               {{#each articlesFor this}}
@@ -143,7 +128,7 @@
       <div class="col-lg-3"><button class="btn btn-primary w-100">Salvează gradul</button></div>
     </form>
   </div></div>
-  <div class="card"><div class="card-header fw-semibold">Grade configurate</div><div class="table-responsive"><table class="table table-hover align-middle mb-0"><thead><tr><th>Utilizator</th><th>Email</th><th>Grad</th><th>Status</th></tr></thead><tbody>{{#each memberships}}<tr><td>{{name}}</td><td>{{email}}</td><td><span class="badge text-bg-primary">{{grade}}</span></td><td>{{status}}</td></tr>{{else}}<tr><td colspan="4" class="text-muted py-4 text-center">Nu a fost configurat încă niciun grad.</td></tr>{{/each}}</tbody></table></div></div>
+  <div class="card"><div class="card-header fw-semibold">Grade configurate</div><div class="table-responsive">{{> csaListTools list=membershipsList}}<table class="table table-hover align-middle mb-0"><thead><tr>{{> csaListColumn list=membershipsList field="name" label="Utilizator"}}{{> csaListColumn list=membershipsList field="email" label="Email"}}{{> csaListColumn list=membershipsList field="grade" label="Grad"}}{{> csaListColumn list=membershipsList field="status" label="Status"}}</tr></thead><tbody>{{#each memberships}}<tr><td>{{name}}</td><td>{{email}}</td><td><span class="badge text-bg-primary">{{grade}}</span></td><td>{{status}}</td></tr>{{else}}<tr><td colspan="4" class="text-muted py-4 text-center">Nu a fost configurat încă niciun grad.</td></tr>{{/each}}</tbody></table>{{> csaListPager list=membershipsList}}</div></div>
 </template>
 
 <template name="csaMigrations">
@@ -152,7 +137,7 @@
     <p>Comparația nu modifică documentele. Selectați doar câmpurile care trebuie preluate din sursă. Modificările concurente opresc aplicarea.</p>
     <form id="migrationCompare" class="d-flex gap-2"><select class="form-select" name="collection"><option value="convocatoare">Convocatoare</option><option value="documente_text">Articole</option><option value="prezenta">Prezențe</option><option value="prezenta_confirmari">Confirmări</option><option value="documente">Documente</option><option value="users">Profiluri utilizatori</option></select><button class="btn btn-outline-primary">Compară primele 100</button></form>
     {{#if comparison}}<p class="mt-3">{{comparison.examined}} înregistrări examinate în această pagină.</p>
-      {{#each comparison.rows}}
+      {{> csaListTools list=comparisonRowsList}}{{> csaListPager list=comparisonRowsList}}{{#each comparisonRows}}
         <form class="migrationReconcile border rounded p-3 mt-2" data-id="{{id}}"><strong>{{id}}</strong>
           {{#if missing}}<p>Lipsește din destinație. Folosiți importul inițial pentru inserare.</p>{{else}}
             {{#each differences}}<label class="d-block mt-2"><input type="checkbox" name="fields" value="{{field}}"> <strong>{{field}}</strong> · sursă: <code>{{formatValue source}}</code> · destinație: <code>{{formatValue target}}</code></label>{{/each}}

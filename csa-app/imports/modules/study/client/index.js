@@ -22,7 +22,7 @@ function setContext(instance) {
   Meteor.callAsync('study.context').then((value) => instance.studyContext.set(value)).catch(() => {});
 }
 
-Template.studyLibrary.onCreated(function created() { this.subscribe('study.catalog'); setContext(this); this.results = new ReactiveVar([]); this.error = new ReactiveVar(''); this.busy = new ReactiveVar(false); });
+Template.studyLibrary.onCreated(function created() { setContext(this); this.results = new ReactiveVar([]); this.error = new ReactiveVar(''); this.busy = new ReactiveVar(false); });
 Template.studyLibrary.helpers({
   works: () => LibraryWorks.find({}, { sort: { title: 1 } }),
   canManage: () => Template.instance().studyContext.get().canManage,

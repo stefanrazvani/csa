@@ -13,6 +13,8 @@ import { writeAuditEvent } from '/imports/system/governance/server/audit.js';
 
 export async function requireUser(context) {
   if (!context?.userId) throw new Meteor.Error('not-authorized', 'Autentificare necesară.');
+  const account = await Meteor.users.findOneAsync(context.userId, { fields: { 'setari.status': 1 } });
+  if (!account || (account.setari?.status != null && String(account.setari.status) !== '1')) throw new Meteor.Error('not-authorized', 'Contul nu este activ.');
   return context.userId;
 }
 
@@ -209,10 +211,10 @@ async function hasActiveOfficePermission(userId, eId, alias, action, at = new Da
 
 async function activeMembership(userId, eId) {
   const membership = await LodgeMemberships.findOneAsync(
-    { userId, eId, status: 'active' },
+    { userId, eId },
     { fields: { currentGrade: 1, matriculationNo: 1, status: 1 } },
   );
-  if (membership) return { ...membership, legacy: false };
+  if (membership) return membership.status === 'active' ? { ...membership, legacy: false } : null;
   const legacy = await CraftMemberships.findOneAsync(
     { userId, eId, status: 'active' },
     { fields: { grade: 1, status: 1 } },

@@ -6,19 +6,11 @@ import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
 import { renderPage } from '/imports/layout/client';
 import { registerDualRoute } from '/imports/system/gateway/client';
 registerDualRoute(FlowRouter, '/istoric', () => renderPage('csaHistory'));
-async function load(instance) {
-  const request = ++instance.request;
-  instance.busy.set(true); instance.error.set(''); instance.rows.set([]);
-  try {
-    const result = await Meteor.callAsync('audit.history', { ...instance.filters, page: instance.page.get() });
-    if (request === instance.request && !instance.destroyed) { instance.rows.set(result.rows); instance.more.set(result.hasMore); }
-  } catch (error) { if (request === instance.request && !instance.destroyed) instance.error.set(error.reason || error.message); }
-  finally { if (request === instance.request && !instance.destroyed) instance.busy.set(false); }
-}
+function load(instance) { instance.lists?.rows?.set({ page: 0 }); }
 Template.csaHistory.onCreated(function () {
   this.rows = new ReactiveVar([]); this.page = new ReactiveVar(0); this.more = new ReactiveVar(false);
   this.error = new ReactiveVar(''); this.busy = new ReactiveVar(false); this.filters = {}; this.request = 0;
-  load(this);
+
 });
 Template.csaHistory.onDestroyed(function () { this.destroyed = true; this.request += 1; });
 Template.csaHistory.helpers({

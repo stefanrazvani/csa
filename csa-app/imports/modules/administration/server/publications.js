@@ -1,3 +1,4 @@
+import { publishAuthorized } from '/imports/ui/lists/authorized-publication.js';
 import { Meteor } from 'meteor/meteor';
 import { getCraftGrade } from '/imports/lib/access/server.js';
 import {
@@ -6,18 +7,18 @@ import {
 } from '../api/collections.js';
 import { requireAdministrationAccess } from './access.js';
 
-Meteor.publish('treasury.workspace', async function treasuryWorkspacePublication() {
+publishAuthorized('treasury.workspace', async function treasuryWorkspacePublication() {
   try {
     const { eId } = await requireAdministrationAccess(this, 'treasury', 'read');
     return [
       TreasuryPeriods.find({ eId }, { sort: { startsAt: -1 } }), TreasuryAccounts.find({ eId, status: 'active' }, { sort: { code: 1 } }),
       TreasuryBudgets.find({ eId }, { sort: { createdAt: -1 } }), TreasuryBudgetLines.find({ eId }),
-      TreasuryTransactions.find({ eId }, { sort: { occurredAt: -1 }, limit: 1000 }),
+
     ];
   } catch (error) { return this.ready(); }
 });
 
-Meteor.publish('hospitality.events', async function hospitalityEventsPublication() {
+publishAuthorized('hospitality.events', async function hospitalityEventsPublication() {
   try {
     const { userId, eId } = await requireAdministrationAccess(this, 'hospitality', 'read');
     const grade = await getCraftGrade(userId, eId);
@@ -25,16 +26,18 @@ Meteor.publish('hospitality.events', async function hospitalityEventsPublication
   } catch (error) { return this.ready(); }
 });
 
-Meteor.publish('hospitality.workspace', async function hospitalityWorkspacePublication() {
+publishAuthorized('hospitality.workspace', async function hospitalityWorkspacePublication() {
   try {
     const { eId } = await requireAdministrationAccess(this, 'hospitality', 'write');
     return [HospitalityEvents.find({ eId }, { sort: { startsAt: -1 } }), HospitalityCases.find({ eId }, { sort: { updatedAt: -1 } })];
   } catch (error) { return this.ready(); }
 });
 
-Meteor.publish('visitorInvitations.workspace', async function visitorInvitationsPublication() {
+publishAuthorized('visitorInvitations.workspace', async function visitorInvitationsPublication() {
   try {
     const { eId } = await requireAdministrationAccess(this, 'secretariat', 'read');
     return VisitorInvitations.find({ eId }, { sort: { createdAt: -1 } });
   } catch (error) { return this.ready(); }
 });
+
+Meteor.methods({ async 'treasury.listTotals'() { const {eId}=await requireAdministrationAccess(this,'treasury','read'); const rows=await TreasuryTransactions.rawCollection().aggregate([{$match:{eId,status:'posted'}},{$group:{_id:'$direction',total:{$sum:'$amountMinor'}}}]).toArray(); const income=rows.find(r=>r._id==='income')?.total||0; const expense=rows.find(r=>r._id==='expense')?.total||0; return {income,expense,balance:income-expense}; } });

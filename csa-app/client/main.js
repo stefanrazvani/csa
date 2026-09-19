@@ -13,3 +13,6 @@ import '/imports/system/governance/client/history.js';
 import '/imports/modules/index-client.js';
 
 bootstrapGateway();
+
+import '/imports/ui/lists/bindings.js';
+import '/imports/layout/client/module-theme.css';

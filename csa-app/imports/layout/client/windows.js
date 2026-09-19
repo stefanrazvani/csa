@@ -21,6 +21,20 @@ function publish() {
   openWindows.set([...windows].map(([id, item]) => ({ id, title: item.title, active: id === active, minimized: Boolean(item.box?.min) })));
 }
 function margins() { return { top: 58, left: window.innerWidth < 800 ? 0 : 240, right: 0, bottom: 0 }; }
+function fitWindow(box) {
+  const bounds = margins();
+  Object.assign(box, bounds);
+  box.maxwidth = Math.max(150, window.innerWidth - bounds.left);
+  box.maxheight = Math.max(box.header, window.innerHeight - bounds.top);
+  if (box.full || box.min) return;
+  if (box.max) {
+    // WinBox.maximize() is a no-op on an already maximized window.
+    box.resize(box.maxwidth, box.maxheight, true).move(bounds.left, bounds.top, true);
+  } else {
+    box.resize(Math.min(box.width, box.maxwidth), Math.min(box.height, box.maxheight));
+    box.move(Math.max(bounds.left, Math.min(box.x, window.innerWidth - box.width)), Math.max(bounds.top, Math.min(box.y, window.innerHeight - box.height)));
+  }
+}
 export function focusWindow(id) {
   const item = windows.get(id);
   if (!item) return false;
@@ -52,7 +66,7 @@ export function openModule(template, data, path, onActivate) {
     width: '78%', height: '82%', x: 'center', y: 'center', max: true,
     ...margins(), background: '#183849', class: ['csa-module-window'],
     onfocus() { active = id; onActivate?.(template, data, path); publish(); },
-    onminimize() { publish(); }, onrestore() { publish(); }, onmaximize() { publish(); },
+    onminimize() { publish(); }, onrestore() { fitWindow(this); publish(); }, onmaximize() { publish(); },
     onclose(force) {
       if (!force && !clearing && item.dirty && !window.confirm('Formularul a fost modificat. Închideți fereastra?')) return true;
       windows.delete(id);
@@ -75,10 +89,7 @@ export function openModule(template, data, path, onActivate) {
   active = id; publish();
 }
 window.addEventListener('resize', () => {
-  for (const { box } of windows.values()) {
-    Object.assign(box, margins());
-    if (box.max) box.maximize();
-  }
+  for (const { box } of windows.values()) fitWindow(box);
 });
 window.addEventListener('beforeunload', event => {
   if ([...windows.values()].some(item => item.dirty)) { event.preventDefault(); event.returnValue = ''; }

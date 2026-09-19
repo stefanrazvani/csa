@@ -10,3 +10,5 @@ import '/imports/system/migrations/server';
 import '/imports/system/startup/server';
 import '/imports/system/governance/server/history.js';
 import '/imports/system/governance/server/tracked-collections.js';
+
+import '/imports/ui/lists/server.js';

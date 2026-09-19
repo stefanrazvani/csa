@@ -1,0 +1,25 @@
+<template name="csaListTools">
+  {{#with list}}<section class="csa-list-tools" aria-label="Căutare și filtre {{label}}">
+    <label>Caută în {{label}}<input class="form-control csa-list-search" type="search" value="{{state.search}}" placeholder="Caută…" maxlength="120"></label>
+    <label>Filtrează coloana<select class="form-select csa-list-filter-field"><option value="">Alege coloana</option>{{#each columns}}<option value="{{field}}" selected="{{selectedFilter field}}">{{label}}</option>{{/each}}</select></label>
+    <label>Valoare filtru<input class="form-control csa-list-filter" value="{{state.filter}}" placeholder="Valoare…" maxlength="120"></label>
+    <label>Sortează<select class="form-select csa-list-sort">{{#each columns}}<option value="{{field}}" selected="{{selectedSort field}}">{{label}}</option>{{/each}}</select></label>
+    <button type="button" class="btn btn-outline-secondary csa-list-direction" aria-label="Inversează sortarea">{{directionLabel}}</button>
+    <button type="button" class="btn btn-outline-secondary csa-list-reset">Resetează</button>
+    {{#if error}}<p class="text-danger" role="alert">{{error}}</p>{{/if}}
+    {{#if loading}}<span role="status">Se încarcă…</span>{{/if}}
+  </section>{{/with}}
+</template>
+<template name="csaListPager">{{#with list}}<nav class="csa-list-pager" aria-label="Paginare {{label}}">
+  <label>Rânduri<select class="form-select csa-list-size">{{#each sizes}}<option value="{{this}}" selected="{{selectedSize this}}">{{this}}</option>{{/each}}</select></label>
+  <button type="button" class="btn btn-outline-secondary csa-list-prev" disabled="{{firstPage}}">Anterior</button>
+  <span>Pagina {{pageNumber}} · {{visibleCount}} înregistrări{{#unless remote}} din {{total}}{{/unless}}</span>
+  <button type="button" class="btn btn-outline-secondary csa-list-next" disabled="{{lastPage}}">Următor</button>
+</nav>{{/with}}</template>
+<template name="csaListColumn"><th aria-sort="{{ariaSort}}"><button type="button" class="csa-list-column">{{label}} {{sortIcon}}</button></th></template>
+<template name="csaSimpleTable">
+  {{> csaListTools list=list}}
+  <div class="table-responsive"><table class="table table-hover csa-list-table"><thead><tr>{{#each list.columns}}{{> csaListColumn list=../list field=field label=label}}{{/each}}{{#if action}}<th>Acțiuni</th>{{/if}}</tr></thead>
+  <tbody>{{#each tableRows}}<tr>{{#each cells}}<td>{{value}}</td>{{/each}}{{#if action}}<td>{{#if action.href}}<a href="{{action.href}}" class="btn btn-sm btn-outline-primary">{{action.label}}</a>{{else}}<button type="button" class="btn btn-sm btn-outline-primary {{action.className}}" data-id="{{_id}}" data-user-id="{{userId}}">{{action.label}}</button>{{/if}}</td>{{/if}}</tr>{{else}}<tr><td colspan="20">Nu există înregistrări pentru filtrele selectate.</td></tr>{{/each}}</tbody></table></div>
+  {{> csaListPager list=list}}
+</template>

@@ -103,11 +103,11 @@ Template.tenantAdmin.helpers({
     const eId = Template.instance().context.get()?.eId;
     return eId ? Entitati.findOne(eId) : null;
   },
-  users() { return Meteor.users.find({}, { sort: { 'emails.0.address': 1 } }).fetch().map(decorateUser); },
+  users() { return Meteor.users.find({ [`entitati.${Template.instance().context.get()?.eId}`]: { $exists: true } }, { sort: { 'emails.0.address': 1 } }).fetch().map(decorateUser); },
   groups() {
-    const usersById = new Map(Meteor.users.find({}).fetch().map((user) => [user._id, decorateUser(user)]));
-    const modules = Module.find({}, { sort: { nume: 1 } }).fetch();
-    return Groups.find({}, { sort: { nume: 1 } }).fetch().map((group) => {
+    const usersById = new Map(Meteor.users.find({ [`entitati.${Template.instance().context.get()?.eId}`]: { $exists: true } }).fetch().map((user) => [user._id, decorateUser(user)]));
+    const modules = Module.find({ eId: Template.instance().context.get()?.eId }, { sort: { nume: 1 } }).fetch();
+    return Groups.find({ eId: Template.instance().context.get()?.eId }, { sort: { nume: 1 } }).fetch().map((group) => {
       const members = GroupMembers.find({ groupId: group._id }).fetch()
         .map((row) => usersById.get(row.userId))
         .filter(Boolean);

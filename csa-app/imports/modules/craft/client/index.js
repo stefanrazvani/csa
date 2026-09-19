@@ -31,13 +31,7 @@ function safeEvents(events) {
   }]));
 }
 
-function filteredConvocatoare(instance) {
-  const query = instance.query.get(); const status = instance.status.get();
-  const sort = { newest: { dataTinuta: -1, nr: -1 }, oldest: { dataTinuta: 1, nr: 1 }, name: { nume: 1 }, number: { nr: -1 } }[instance.sort.get()];
-  return Convocatoare.find({ sys_status: 1, ...(status ? { status } : {}) }, { sort }).fetch().filter((row) => `${row.nr} ${row.nume || ''} ${row.numeLoja || ''}`.toLocaleLowerCase('ro').includes(query));
-}
-
-function pageRows(instance) { return filteredConvocatoare(instance).slice(instance.page.get() * 20, (instance.page.get() + 1) * 20); }
+function pageRows(instance) { return instance.lists?.rows?.rows() || []; }
 
 function asDate(value) {
   if (!value) return null;
@@ -64,13 +58,9 @@ function accessTimeValue(document) {
   return date ? new Intl.DateTimeFormat('ro-RO', { hour: '2-digit', minute: '2-digit', hour12: false }).format(date) : '';
 }
 
-Template.craftConvocatoare.onCreated(function created() { this.query = new ReactiveVar(''); this.status = new ReactiveVar(''); this.sort = new ReactiveVar('newest'); this.page = new ReactiveVar(0); this.selected = new ReactiveVar([]); this.subscribe('craft.convocatoare'); loadPermissions(this); });
+Template.craftConvocatoare.onCreated(function created() { this.selected = new ReactiveVar([]); loadPermissions(this); });
 Template.craftConvocatoare.helpers({
   rows: () => pageRows(Template.instance()),
-  pageNumber: () => Template.instance().page.get() + 1,
-  pageCount: () => Math.max(1, Math.ceil(filteredConvocatoare(Template.instance()).length / 20)),
-  previousDisabled: () => Template.instance().page.get() === 0,
-  nextDisabled: () => (Template.instance().page.get() + 1) * 20 >= filteredConvocatoare(Template.instance()).length,
   selectedCount: () => Template.instance().selected.get().length,
   selected: (id) => Template.instance().selected.get().includes(id),
   message: () => Template.instance().message.get(),
@@ -80,11 +70,6 @@ Template.craftConvocatoare.helpers({
   canWrite() { return Template.instance().permissions.get().write; },
 });
 Template.craftConvocatoare.events(safeEvents({
-  'input #convocatorSearch'(event, instance) { instance.query.set(event.currentTarget.value.trim().toLocaleLowerCase('ro')); instance.page.set(0); },
-  'change #convocatorStatus'(event, instance) { instance.status.set(event.currentTarget.value); instance.page.set(0); },
-  'change #convocatorSort'(event, instance) { instance.sort.set(event.currentTarget.value); instance.page.set(0); },
-  'click #previousConvocatoare'(event, instance) { instance.page.set(Math.max(0, instance.page.get() - 1)); },
-  'click #nextConvocatoare'(event, instance) { if ((instance.page.get() + 1) * 20 < filteredConvocatoare(instance).length) instance.page.set(instance.page.get() + 1); },
   'change .selectConvocator'(event, instance) { const id = event.currentTarget.dataset.id; instance.selected.set(event.currentTarget.checked ? [...new Set([...instance.selected.get(), id])] : instance.selected.get().filter((value) => value !== id)); },
   'click #selectConvocatorPage'(event, instance) { instance.selected.set([...new Set([...instance.selected.get(), ...pageRows(instance).map((row) => row._id)])]); },
   'click #clearConvocatorSelection'(event, instance) { instance.selected.set([]); },
@@ -102,7 +87,7 @@ Template.craftConvocatoare.events(safeEvents({
       instance.message.set(`${completed} convocatoare ${duplicate ? 'duplicate' : 'arhivate'}.`);
     } catch (error) { instance.message.set(`${completed} operații finalizate. Restul au rămas selectate. ${error.reason || error.message}`); }
   },
-  'click #exportConvocatoare'(event, instance) { downloadCsv('convocatoare.csv', [['Nr', 'Nume', 'Loja', 'Data', 'Status'], ...filteredConvocatoare(instance).map((row) => [row.nr, row.nume, row.numeLoja, formatDateTime(row.dataTinuta), row.status])]); },
+  async 'click #exportConvocatoare'(event, instance) { const exported = await Meteor.callAsync('csa.list.export', 'convocatoare', instance.lists.rows.state()); downloadCsv('convocatoare.csv', [['Nr', 'Nume', 'Loja', 'Data', 'Status'], ...exported.map((row) => [row.nr, row.nume, row.numeLoja, formatDateTime(row.dataTinuta), row.status])]); },
   async 'click #newConvocator'() {
     const result = await Meteor.callAsync('craft.convocatoare.insert', { nume: 'Convocator nou' });
     FlowRouter.go(appPath(`/convocator/${result.id}`));

@@ -1,3 +1,4 @@
+import { publishAuthorized } from '/imports/ui/lists/authorized-publication.js';
 import { Accounts } from 'meteor/accounts-base';
 import { check, Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
@@ -167,7 +168,7 @@ Meteor.publish('admin.self', async function adminSelfPublication() {
   ];
 });
 
-Meteor.publish('admin.global', async function adminGlobalPublication() {
+publishAuthorized('admin.global', async function adminGlobalPublication() {
   if (!this.userId || !await isSuperAdmin(this.userId)) return this.ready();
   await auditAdmin(this, this.userId, '*', 'admin.global.read', 'platform', '', { publication: true });
   return [
@@ -177,7 +178,7 @@ Meteor.publish('admin.global', async function adminGlobalPublication() {
   ];
 });
 
-Meteor.publish('admin.tenant', async function adminTenantPublication(requestedEId = '') {
+publishAuthorized('admin.tenant', async function adminTenantPublication(requestedEId = '') {
   if (!this.userId) return this.ready();
   const { eId } = await requireTenantAdmin(this, requestedEId);
   if (await isSuperAdmin(this.userId)) {
