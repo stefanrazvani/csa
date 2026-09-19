@@ -30,8 +30,8 @@ chmod u+w "$SERVER_DIR/package.json"
 cd "$SERVER_DIR"
 
 npm install --omit=dev
-npm pkg set overrides.tar=7.5.16
-npm install --omit=dev --save-exact tar@7.5.16 underscore@1.13.8
+npm pkg set overrides.tar=7.5.22
+npm install --omit=dev --save-exact tar@7.5.22 underscore@1.13.8
 # Buildurile se opresc pentru vulnerabilități high/critical. Nivelurile mai
 # mici sunt raportate separat, fără a bloca promovarea unui bundle verificat.
 npm audit --omit=dev --audit-level=high
