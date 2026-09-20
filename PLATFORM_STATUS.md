@@ -1,6 +1,10 @@
 # Platformă CSA – stare implementare
 
-Release activ, 21 septembrie 2026: `e4d0752`, tag `release-20260921-profile-camera`.
+Release activ, 21 septembrie 2026: `9a5264d`, tag `release-20260921-discovery-toggle`.
+Lista „Descoperă templul” este ascunsă implicit; butonul de afișare/ascundere
+este disponibil pe desktop și mobil, alături de închidere cu × sau Escape.
+Selecția directă din 3D este păstrată. UI live verificat inclusiv la 390×844.
+Detalii: `deploy/releases/2026-09-21-discovery-toggle.md`.
 Camera revine la perspectiva apropiată inițială, deplasată doar puțin la stânga;
 sferele se văd prin întoarcerea camerei. Privirea verticală permite centrarea
 sferelor și a locurilor S1, MC și Acoperitor. Meniul de profil afișează prenumele
