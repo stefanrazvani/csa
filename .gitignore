@@ -34,3 +34,6 @@ tmp/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Referințe private furnizate local pentru proiectare
+/documente/

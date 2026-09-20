@@ -1,3 +1,5 @@
+import { ZODIAC_SIGNS } from '../zodiac.js';
+
 // Scenele templului sunt construite după „Planșa nr. 1" din documentele-sursă:
 // Orientul supraînălțat la -Z, Occidentul cu intrarea la +Z, Miazănoaptea la -X
 // și Miazăzi la +X. Fiecare grad primește aceeași sală, cu diferențele planșei
@@ -342,6 +344,14 @@ function ionicPillar(id, x, z) {
         { geometry: { radius: 0.08, innerRadius: 0.009, tube: 0.009, turns: 1.65 }, rotation: [0, sign < 0 ? Math.PI : 0, 0], roughness: 0.65 }));
     }
   }
+  for (const [side, direction] of [['front', 1], ['back', -1]]) {
+    items.push(primitive(`${id}-capital-band-${side}`, 'box', [x, 1.635, z + direction * 0.15], [0.32, 0.022, 0.02], stone));
+    items.push(primitive(`${id}-neck-beads-${side}`, 'box', [x, 1.485, z + direction * 0.108], [0.18, 0.02, 0.018], shade));
+  }
+  for (const [side, sign] of [['left', -1], ['right', 1]]) {
+    items.push(primitive(`${id}-bolster-collar-${side}`, 'torus', [x + sign * 0.17, 1.59, z], [1, 1, 1], shade,
+      { geometry: { radius: 0.087, tube: 0.01, segments: 32 } }));
+  }
   // Ove sculptate, vizibile sub perna capitelului.
   for (let index = -2; index <= 2; index += 1) {
     items.push(primitive(`${id}-egg-${index + 2}`, 'sphere', [x + index * 0.05, 1.535, z + 0.14], [0.22, 0.34, 0.15], stone, { geometry: { size: 0.08, segments: 16 } }));
@@ -358,23 +368,30 @@ function corinthianPillar(id, x, z) {
   const items = [
     primitive(`${id}-base`, 'box', [x, 0.08, z], [0.4, 0.16, 0.4], '#242e38'),
     primitive(`${id}-base-torus`, 'torus', [x, 0.2, z], [1, 1, 1], stone, { geometry: { radius: 0.11, tube: 0.03, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }),
-    primitive(`${id}-shaft`, 'cylinder', [x, 0.76, z], [1, 1, 1], stone, { geometry: { radiusTop: 0.08, radiusBottom: 0.1, height: 1.2, segments: 14 } }),
+    primitive(`${id}-shaft`, 'flutedColumn', [x, 0.82, z], [1, 1, 1], stone, { geometry: { radiusTop: 0.08, radiusBottom: 0.1, height: 1.12, flutes: 20, segments: 96 } }),
+    primitive(`${id}-base-upper`, 'lathe', [x, 0.22, z], [1, 1, 1], stone, { geometry: { profile: [[0.12, 0], [0.13, 0.014], [0.115, 0.03], [0.1, 0.045]], segments: 32 } }),
     // Kalathos: clopotul cu evazare concavă, strunjit dintr-un profil.
     primitive(`${id}-bell`, 'lathe', [x, 1.38, z], [1, 1, 1], stone, { geometry: { profile: [[0.085, 0], [0.088, 0.09], [0.096, 0.17], [0.112, 0.24], [0.138, 0.3], [0.16, 0.34]], segments: 22 } }),
   ];
-  // Rândul inferior: șase frunze de acant lobate, ușor răsfrânte în afară.
-  for (let index = 0; index < 6; index += 1) {
-    const angle = (index / 6) * Math.PI * 2;
+  // Rândul inferior: opt frunze de acant lobate, ușor răsfrânte în afară.
+  for (let index = 0; index < 8; index += 1) {
+    const angle = (index / 8) * Math.PI * 2;
     items.push(primitive(`${id}-leaf-low-${index + 1}`, 'leaf',
       [x + Math.cos(angle) * 0.095, 1.4, z + Math.sin(angle) * 0.095], [1, 1, 1], stoneShade,
       { geometry: { width: 0.1, height: 0.22, depth: 0.016, tilt: 0.3 }, rotation: [0, Math.PI / 2 - angle, 0], roughness: 0.85 }));
   }
-  // Rândul superior: patru frunze mai înalte, pe diagonale, mai răsfrânte.
-  for (let index = 0; index < 4; index += 1) {
-    const angle = Math.PI / 4 + (index / 4) * Math.PI * 2;
+  // Rândul superior: opt frunze mai înalte, pe diagonale, mai răsfrânte.
+  for (let index = 0; index < 8; index += 1) {
+    const angle = Math.PI / 8 + (index / 8) * Math.PI * 2;
     items.push(primitive(`${id}-leaf-up-${index + 1}`, 'leaf',
       [x + Math.cos(angle) * 0.105, 1.42, z + Math.sin(angle) * 0.105], [1, 1, 1], stoneShade,
       { geometry: { width: 0.11, height: 0.28, depth: 0.016, tilt: 0.45 }, rotation: [0, Math.PI / 2 - angle, 0], roughness: 0.85 }));
+  }
+  for (let index = 0; index < 8; index += 1) {
+    const angle = Math.PI / 8 + index * Math.PI / 4;
+    items.push(primitive(`${id}-leaf-vein-${index}`, 'leaf',
+      [x + Math.cos(angle) * 0.12, 1.43, z + Math.sin(angle) * 0.12], [1, 1, 1], stone,
+      { geometry: { width: 0.025, height: 0.24, depth: 0.012, tilt: 0.45 }, rotation: [0, Math.PI / 2 - angle, 0], roughness: 0.85 }));
   }
   // Volutele de colț (caulicoli): suluri spiralate sub colțurile abacei.
   for (let index = 0; index < 4; index += 1) {
@@ -383,11 +400,51 @@ function corinthianPillar(id, x, z) {
       [x + Math.cos(angle) * 0.15, 1.66, z + Math.sin(angle) * 0.15], [1, 1, 1], stone,
       { geometry: { radius: 0.05, innerRadius: 0.012, tube: 0.014, turns: 1.9 }, rotation: [0, Math.PI / 2 - angle, 0] }));
   }
-  // Abaca evazată: două plăci subțiri suprapuse, rotite la 45°, cu rozetă.
+  // Abaca evazată: două muluri subțiri suprapuse, cu rozetă florală.
   items.push(primitive(`${id}-abacus`, 'box', [x, 1.75, z], [0.36, 0.04, 0.36], '#cfc4a4'));
-  items.push(primitive(`${id}-abacus-star`, 'box', [x, 1.752, z], [0.33, 0.036, 0.33], '#cfc4a4', { rotation: [0, Math.PI / 4, 0] }));
+  items.push(primitive(`${id}-abacus-crown`, 'box', [x, 1.78, z], [0.39, 0.025, 0.39], stone));
   items.push(primitive(`${id}-fleuron`, 'cylinder', [x, 1.72, z + 0.175], [1, 1, 1], stoneShade, { geometry: { radiusTop: 0.045, radiusBottom: 0.045, height: 0.035, segments: 14 }, rotation: [Math.PI / 2, 0, 0], roughness: 0.8 }));
+  for (let petal = 0; petal < 5; petal += 1) {
+    const angle = petal * Math.PI * 2 / 5;
+    items.push(primitive(`${id}-flower-petal-${petal}`, 'sphere', [x + Math.cos(angle) * 0.025, 1.72 + Math.sin(angle) * 0.025, z + 0.2], [0.24, 0.24, 0.1], stone, { geometry: { size: 0.08, segments: 16 } }));
+  }
   return items;
+}
+
+// Lumânare comună tuturor sfeșnicelor: ceară, margine topită, fitil și
+// flacără strunjită în picătură cu miez luminos, fără conul geometric vechi.
+function candle(prefix, x, y, z, height = 0.2, radius = 0.04, suffix = '') {
+  const flameHeight = 0.16;
+  const flameProfile = Array.from({ length: 20 }, (_, index) => {
+    const t = index / 19;
+    return [Math.max(0.01, 0.3 * Math.pow(Math.sin(Math.PI * t), 0.8) * (1 - 0.55 * t)), t];
+  });
+  return [
+    primitive(`${prefix}-candle${suffix}`, 'lathe', [x, y, z], [radius, height, radius], '#e9ddbb',
+      { geometry: { profile: [[0.93, 0], [1, 0.04], [1, 0.9], [0.96, 0.99], [0.7, 1], [0.48, 0.93], [0.01, 0.92]], segments: 32 }, roughness: 0.65, metalness: 0 }),
+    primitive(`${prefix}-wax-drop${suffix}`, 'sphere', [x + radius * 0.85, y + height * 0.82, z + radius * 0.3], [0.13, 0.45, 0.13], '#f2e6ca', { geometry: { size: 0.08, segments: 16 }, metalness: 0 }),
+    primitive(`${prefix}-wick${suffix}`, 'cylinder', [x, y + height + 0.016, z], [0.17, 1, 0.17], '#34241b', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 0.05, segments: 10 }, roughness: 1, metalness: 0 }),
+    primitive(`${prefix}-flame${suffix}`, 'lathe', [x, y + height + 0.018, z], [0.12, flameHeight, 0.12], '#ffac43',
+      { geometry: { profile: flameProfile, segments: 32 }, emissive: '#ff8e26', emissiveIntensity: 1.5, roughness: 0.6, metalness: 0 }),
+    primitive(`${prefix}-flame-core${suffix}`, 'lathe', [x, y + height + 0.025, z + 0.013], [0.052, flameHeight * 0.63, 0.052], '#fff0bd',
+      { geometry: { profile: flameProfile, segments: 24 }, emissive: '#ffeac0', emissiveIntensity: 2, roughness: 0.6, metalness: 0 }),
+  ];
+}
+
+function zodiacBand() {
+  return ZODIAC_SIGNS.flatMap(sign => {
+    const north = sign.side === 'north';
+    const x = north ? -8.6 : 8.6;
+    const z = north ? -8 + sign.index * 3.2 : 8 - sign.index * 3.2;
+    const yaw = north ? Math.PI / 2 : -Math.PI / 2;
+    return [
+      primitive(`zodiac-support-${sign.id}`, 'cylinder', [x, 2.78, z], [1, 1, 1], '#263a48', { geometry: { radiusTop: 0.16, radiusBottom: 0.2, height: 5.2, segments: 20 }, roughness: 0.8 }),
+      primitive(`zodiac-base-${sign.id}`, 'box', [x, 0.13, z], [0.48, 0.26, 0.48], '#334753'),
+      primitive(`zodiac-capital-${sign.id}`, 'box', [x, 5.46, z], [0.48, 0.16, 0.48], '#ac9464'),
+      primitive(`zodiac-${sign.id}`, 'plane', [north ? -8.37 : 8.37, 6.02, z], [1, 1, 1], '#ffffff',
+        { geometry: { width: 1, height: 1 }, rotation: [0, yaw, 0], map: `zodiac-${sign.id}`, emissive: '#d8c69e', emissiveIntensity: 0.65, roughness: 0.9, metalness: 0 }),
+    ];
+  });
 }
 
 function threePillars() {
@@ -399,8 +456,7 @@ function threePillars() {
   ];
   return spots.flatMap(([id, x, z, builder]) => ([
     ...builder(id, x, z),
-    primitive(`${id}-candle`, 'cylinder', [x, 1.82, z], [1, 1, 1], '#e9dfc4', { geometry: { radiusTop: 0.04, radiusBottom: 0.04, height: 0.22, segments: 10 } }),
-    primitive(`${id}-flame`, 'cone', [x, 2.04, z], [1, 1, 1], COLORS.flame, { geometry: { radius: 0.08, height: 0.24, segments: 10 }, emissive: '#f3b74a', emissiveIntensity: 3.2 }),
+    ...candle(id, x, builder === corinthianPillar ? 1.79 : 1.71, z, 0.22),
   ]));
 }
 
@@ -522,14 +578,7 @@ function candelabrum(prefix, x, y, z, candleCount, yaw = 0) {
   for (let index = 0; index < candleCount; index += 1) {
     const offset = candleCount === 1 ? 0
       : (candleCount === 2 ? (index * 2 - 1) * spread : (index - 1) * spread);
-    items.push(primitive(`${prefix}-candle-${index}`, 'cylinder',
-      [x + offset, y + candleY0 + candleH / 2, z], [1, 1, 1], COLORS.ivory,
-      { geometry: { radiusTop: 0.038, radiusBottom: 0.04, height: candleH, segments: 14 },
-        roughness: 0.75, metalness: 0 }));
-    items.push(primitive(`${prefix}-flame-${index}`, 'cone',
-      [x + offset, y + candleY0 + candleH + 0.11, z], [1, 1, 1], COLORS.flame,
-      { geometry: { radius: 0.075, height: 0.22, segments: 12 },
-        emissive: '#f3b74a', emissiveIntensity: 3, roughness: 0.4, metalness: 0 }));
+    items.push(...candle(prefix, x + offset, y + candleY0, z, candleH, 0.04, `-${index}`));
   }
 
   if (!yaw) return items;
@@ -640,6 +689,7 @@ function lodgeArchitecture(grade) {
   return [
     ...wallsAndEntrance(),
     ...starryVault(),
+    ...zodiacBand(),
     ...knottedRope(),
     ...orientPlatform(),
     ...venerableStation(),

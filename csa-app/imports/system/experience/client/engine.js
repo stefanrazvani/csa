@@ -1,3 +1,5 @@
+import { ZODIAC_MAPS, drawZodiac } from '../zodiac.js';
+
 const QUALITY = Object.freeze({
   low: { pixelRatio: 1, particleFactor: 0.34, targetFps: 30 },
   balanced: { pixelRatio: 1.35, particleFactor: 0.68, targetFps: 45 },
@@ -55,6 +57,8 @@ export function makeGeometry(THREE, definition = {}) {
   const type = definition.type || 'octahedron';
   const segments = Math.round(bounded(definition.segments, 24, 4, 96));
   switch (type) {
+    case 'plane':
+      return new THREE.PlaneGeometry(bounded(definition.width, 1, 0.02, 20), bounded(definition.height, 1, 0.04, 20));
     case 'box':
       return new THREE.BoxGeometry(
         bounded(definition.width, 1, 0.04, 20),
@@ -209,7 +213,7 @@ export function makeGeometry(THREE, definition = {}) {
   }
 }
 
-const PROCEDURAL_TEXTURES = new Set(['terrestrial', 'celestial', 'board-apprentice', 'board-fellowcraft', 'board-master']);
+const PROCEDURAL_TEXTURES = new Set([...ZODIAC_MAPS, 'terrestrial', 'celestial', 'board-apprentice', 'board-fellowcraft', 'board-master']);
 
 // Tabloul Lojii: desen stilizat pe pergament — chenar, pavaj, coloanele B/J,
 // trepte, Soare/Lună/Delta și motivele gradului. Determinist, fără text.
@@ -385,6 +389,14 @@ function drawTracingBoard(context, width, height, kind) {
 // Texturi procedurale: sferele coloanelor (echirectangulare) și Tabloul
 // Lojii pe grade. Deterministe (fără Math.random), desenate pe canvas.
 function globeTexture(THREE, kind) {
+  if (ZODIAC_MAPS.has(kind)) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512; canvas.height = 512;
+    drawZodiac(canvas.getContext('2d'), 512, 512, kind.slice(7));
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    return texture;
+  }
   if (kind.indexOf('board-') === 0) {
     const canvas = document.createElement('canvas');
     canvas.width = 256;

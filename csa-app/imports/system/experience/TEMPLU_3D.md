@@ -453,3 +453,20 @@ pe ambele fețe ale capitelului.
 Sfeșnicul Primului Supraveghetor este rotit cu +45° în jurul axei verticale
 a bazei: pozițiile lumânărilor/flăcărilor și orientarea brațului se rotesc
 împreună; galeria orizontală rămâne orizontală. Celelalte sfeșnice sunt păstrate.
+
+### Zodiac, colonete și lumânări — referințele locale
+
+Documentele active de consultare se află în `C:/Proiecte/MigrareCSA/documente`.
+Ritualul Ucenicului 2012, pp. 119–120, cere șase semne la Miazănoapte
+(Berbec–Fecioară) și șase la Miazăzi (Balanță–Pești), în dreptul celor
+12 coloane laterale. Ritualurile Calfei p. 61 și Maestrului p. 69 păstrează
+structura comună. `zodiac.js` fixează aceste două grupe și desenează medalioane
+cu simbol și denumire. Ordinea longitudinală aleasă în aplicație formează un
+circuit continuu; sensul de parcurgere nu este stabilit de textul citat.
+Stelele existente sunt decorative; nu reprezintă hărți astronomice ale constelațiilor.
+
+Coloneta ionică are muluri și coliere pe sulurile capitelului. Coloneta
+corintică are fus cu 20 de caneluri, două coroane de câte opt frunze de
+acant, nervuri și rozetă florală. Helperul `candle` păstrează nouă lumânări
+(3 pe stâlpi + 3/2/1 pe mese), cu ceară profilată, picătură, fitil și flacără
+netedă cu miez luminos. Rotația sfeșnicului Primului Supraveghetor se păstrează.

@@ -93,3 +93,31 @@ test('plumb remains thin after normalization and warden candles rotate with thei
     assert.equal(items.filter(item => item.id.startsWith('pillar-wisdom-se-volute-') && item.geometry.type === 'spiral').length, 4);
   }
 });
+
+test('zodiac follows the supplied ritual sides and panels face the room in every grade', () => {
+  const north = ['aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo'];
+  const south = ['libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'];
+  for (const grade of [1, 2, 3]) {
+    const scene = normalizeExperienceManifest(getScenePreset(grade));
+    const signs = scene.architecture.filter(item => item.geometry.type === 'plane' && item.material.map.startsWith('zodiac-'));
+    assert.equal(signs.length, 12);
+    for (const [ids, side] of [[north, -1], [south, 1]]) for (const id of ids) {
+      const panel = signs.find(item => item.id === `zodiac-${id}`);
+      assert.ok(panel.position[0] * side > 8);
+      assert.ok(panel.position[1] > 5.5 && panel.position[1] < 6.6);
+      const normal = new THREE.Vector3(0, 0, 1).applyEuler(new THREE.Euler(...panel.rotation));
+      assert.ok(normal.x * side < -0.99, 'glyph must face the aisle');
+      assert.equal(scene.architecture.find(item => item.id === `zodiac-support-${id}`).position[2], panel.position[2]);
+    }
+    const candles = scene.architecture.filter(item => /-candle(?:-\d+)?$/.test(item.id));
+    assert.equal(candles.length, 9, '3 pillar candles and 3/2/1 on desks');
+    const flames = scene.architecture.filter(item => /-flame(?:-\d+)?$/.test(item.id));
+    assert.equal(flames.length, 9);
+    assert.ok(candles.every(item => item.geometry.type === 'lathe'));
+    assert.ok(flames.every(item => item.geometry.type === 'lathe' && item.geometry.profile.length >= 16));
+    assert.equal(scene.architecture.filter(item => /-wick(?:-\d+)?$/.test(item.id)).length, 9);
+    assert.equal(scene.architecture.filter(item => /pillar-beauty-sw-leaf-(low|up)-/.test(item.id)).length, 16);
+  }
+  const unknown = normalizeExperienceManifest({ architecture: [{ geometry: { type: 'plane' }, material: { map: 'zodiac-untrusted' } }] });
+  assert.equal(unknown.architecture[0].material.map, '');
+});
