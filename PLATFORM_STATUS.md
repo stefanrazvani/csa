@@ -1,12 +1,14 @@
 # Platformă CSA – stare implementare
 
-Release activ, 20 septembrie 2026: `39e1b2e`, tag `release-20260920-profile-editors`.
-Meniu de cont cu profil readonly și resetare prin email; ferestre separate pentru
-adăugare/editare și istoric pe obiect. Dashboardul 2D, tema comună, listele cu
-paginare/filtrare/sortare și templul separat sunt păstrate. Funcțiile PDF/DOCX,
-autentificarea și geometria gradului 1 au trecut verificările de regresie.
+Release activ, 20 septembrie 2026: `ebf3465`, tag `release-20260920-temple-g23`.
+Templu: pietrele decorative din fața Ospitalierului/Trezorierului sunt eliminate
+și la gradele 2/3; nodul și octaedrul pentru Concepte/Bibliotecă din gradul 2
+rămân numai în navigator, fără geometrie sau halo.
+Manifestele live pentru toate gradele, autentificarea și accesul au fost verificate.
 10/10 containere healthy, 147/147 fișiere sursă identice cu arhiva publicată.
-Detalii: `deploy/releases/2026-09-20-profile-editors.md`; standard: `MODULE_OBJECTS.md`.
+Detalii: `deploy/releases/2026-09-20-temple-g23.md`.
+Profilul, editoarele și istoricul pe obiect din release-ul `39e1b2e` sunt păstrate;
+standard: `MODULE_OBJECTS.md`; detalii: `deploy/releases/2026-09-20-profile-editors.md`.
 Publicarea inițială: 13 iulie 2026.
 
 Actualizare operațională, 19 septembrie 2026: containerele CSA Meteor găsite
