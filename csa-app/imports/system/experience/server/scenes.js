@@ -278,15 +278,30 @@ function orientSeating() {
 }
 
 function altarOfLights(grade) {
-  return [
-    primitive('altar-plinth', 'box', [0, 0.09, -6.95], [1, 0.18, 1], '#20282f'),
-    primitive('altar-shaft', 'cylinder', [0, 0.62, -6.95], [1, 1, 1], '#c7bb9d', { geometry: { radiusTop: 0.36, radiusBottom: 0.46, height: 0.9, segments: 20 } }),
+  // Orient (-Z) is raised; the reading surface faces the entrance (+Z).
+  // Rotate the entire reading assembly together, retaining each degree's layering.
+  const pitch = 25 * Math.PI / 180;
+  const cos = Math.cos(pitch), sin = Math.sin(pitch);
+  const readingAssembly = [
     primitive('altar-top', 'box', [0, 1.11, -6.95], [0.95, 0.08, 0.8], '#d6cbab'),
     // Volumul Legii Sacre deschis, cu echerul și compasul suprapuse.
     primitive('vsl-page-north', 'box', [-0.2, 1.2, -6.95], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, 0.18] }),
     primitive('vsl-page-south', 'box', [0.2, 1.2, -6.95], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, -0.18] }),
     ...squareTool(primitive, 'vsl-square', 0, 1.29, -6.74, .35),
     ...compassTool(primitive, 'vsl-compass', 0, 1.29, -7.09, .4, grade),
+  ];
+  return [
+    primitive('altar-plinth', 'box', [0, 0.09, -6.95], [1, 0.18, 1], '#20282f'),
+    primitive('altar-shaft', 'cylinder', [0, 0.62, -6.95], [1, 1, 1], '#c7bb9d', { geometry: { radiusTop: 0.36, radiusBottom: 0.46, height: 0.9, segments: 20 } }),
+    primitive('altar-tilt-support', 'cylinder', [0, 1.15, -6.95], [1, 1, 1], '#998766', { geometry: { radiusTop: 0.075, radiusBottom: 0.1, height: 0.16, segments: 20 }, metalness: 0.35 }),
+    ...readingAssembly.map(part => {
+      const dy = part.position[1] - 1.11, dz = part.position[2] + 6.95;
+      return {
+        ...part,
+        position: [part.position[0], 1.27 + dy * cos - dz * sin, -6.95 + dy * sin + dz * cos],
+        rotation: [part.rotation[0] + pitch, part.rotation[1], part.rotation[2]],
+      };
+    }),
   ];
 }
 

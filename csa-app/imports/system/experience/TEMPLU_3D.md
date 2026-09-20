@@ -533,3 +533,11 @@ Spadele folosesc lame teșite, canelură centrală, gardă și mâner cu inele.
 Echerul și Compasul au brațe separate și suprapunere în funcție de grad.
 Planșele procedurale completează reperele lipsă, fără recuzită ceremonială
 mare adăugată în camera navigabilă.
+
+### Extensia 9 — altar înclinat spre intrare
+
+Blatul, cartea, Echerul și Compasul sunt rotite ca un ansamblu rigid cu 25°
+în jurul axei X, cu fața de lectură spre Occident (+Z). Centrul blatului este
+la y=1.27, cu un suport scurt deasupra coloanei altarului. Pozițiile relative
+și suprapunerea brațelor pe grad sunt păstrate. Sunt 688/712/712 piese;
+numărul fișelor rămâne 56/64/64. Manifest: `2026.09.20-9`.
