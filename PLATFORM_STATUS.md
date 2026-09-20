@@ -1,6 +1,11 @@
 # Platformă CSA – stare implementare
 
-Release activ, 20 septembrie 2026: `9f31f7d`, tag `release-20260920-temple-altar`.
+Release activ, 20 septembrie 2026: `6c7cf7c`, tag `release-20260920-menu-toggle`.
+Meniul lateral se ascunde/redeschide și pe desktop; ferestrele se încadrează
+automat în spațiul disponibil. Verificat în portal la 1280 px și 390 px,
+inclusiv păstrarea textului introdus și navigarea mobilă. Detalii:
+`deploy/releases/2026-09-20-menu-toggle.md`.
+Templul păstrează versiunea din `9f31f7d` (manifest `2026.09.20-9`).
 Templu: elementele arhitecturale sunt selectabile direct sau din lista cu căutare;
 56/64/64 fișe la Ucenic/Calfă/Maestru, cu descrieri, surse și texte de studiu distincte pe grad.
 Pupitrele și scaunele funcțiilor, spadele, bastonul MC și băncile laterale deschid fișele asociate.
