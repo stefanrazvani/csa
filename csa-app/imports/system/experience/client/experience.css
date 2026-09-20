@@ -660,7 +660,7 @@ body.csa-xp-active .csa-private-nav { display: none !important; }
 .csa-xp.is-fallback .csa-xp-plan-star { display: none; }
 .csa-xp.is-fallback.is-grade-2 .csa-xp-plan-star {
   display: block;
-  top: 27%;
+  top: 43%;
   left: 50%;
   width: 52px;
   height: 52px;

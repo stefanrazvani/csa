@@ -494,3 +494,25 @@ Gradele, profilul și sursele superioare nu sunt serializate pentru Ucenic.
 Schimbarea gradului reîncarcă manifestul și închide detaliile vechi.
 Geometria uneltelor de pe altar rămâne schematică; fișa explică configurația
 rituală a gradului, fără a pretinde că modelul simplificat este o planșă exactă.
+
+### Funcții, coloane de participanți și Steaua Calfei
+
+Extensie: 51/54/53 fișe fizice la gradele 1/2/3. Cele 10 funcții au fișe
+educative prin pupitre/scaune, accesibile participanților gradului fără a
+acorda drepturi administrative. Spadele Expertului/Acoperitorului și bastonul
+MC au fișe separate. Primul scaun din rândul de Miazănoapte, lângă spada
+Expertului, deschide funcția Expertului; restul rândurilor și băncile laterale
+deschid fișa coloanei de participanți.
+
+În gradul I, Miazănoapte este etichetată coloana Ucenicilor și Miazăzi coloana
+Calfelor (Ritual Ucenic, p. 125). În gradul II nu sunt indicați Ucenici prezenți;
+în gradul III ambele laturi sunt prezentate pentru Maeștri. `study-notes.js`
+furnizează un text pedagogic specific fiecărui element și fiecărui grad,
+distinct de descrierea factuală și de sursa rituală. Nu există un paragraf
+unic de studiu reutilizat pentru toate simbolurile.
+
+Steaua gradului II este la [0, 1.85, -5.65], pe suport independent, spre centrul
+sălii față de altarul aflat la z=-6.95. Amplasarea este cerința explicită a
+utilizatorului; fișa distinge aceasta de formularea sursei (Calfa, p. 61).
+Fallback-ul reflectă mutarea. Blaturile Secretarului, Oratorului, Ospitalierului
+și Trezorierului sunt orizontale, în contact cu corpul pupitrului, ca S1/S2.

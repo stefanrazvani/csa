@@ -32,3 +32,10 @@ Fișele interactive de descoperire folosesc descrierea arhitecturii din Ritualul
 Ucenicului pp. 119–122 și diferențele de grad din Calfa p. 61 / Maestrul p. 69.
 Întrebările de reflecție și pașii de studiu sunt propuneri pedagogice ale
 aplicației, nu citate și nici interpretări rituale atribuite documentelor.
+
+Extensia funcțiilor și a băncilor consultă și Ritualul Ucenicului pp. 123–125:
+însemne, amplasarea ofițerilor, Ucenici la Miazănoapte, Calfe la Miazăzi,
+regula primului rând și libertatea de așezare a Maeștrilor. Participarea pe
+scene este precizată în Calfa p. 61 și Maestrul p. 69. Mutarea Stelei în fața
+altarului este cerută explicit de utilizator și este descrisă ca adaptare
+în fișă; nu este atribuită ca atare formulării ritualului.

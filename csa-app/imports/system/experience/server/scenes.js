@@ -251,9 +251,11 @@ function orientLuminaries(grade) {
     ...orientSun(),
   ];
   if (grade === 2) {
-    // Steaua flamboyantă cu litera G apare numai în Loja Calfelor.
-    items.push(primitive('flaming-star', 'star', [0, 3.35, -7.2], [1, 1, 1], '#ffd061', { geometry: { points: 5, radius: 0.8, innerRadius: 0.34, depth: 0.12 }, emissive: '#ffbe3d', emissiveIntensity: 2.1, metalness: 0.2, roughness: 0.3 }));
-    items.push(primitive('flaming-star-heart', 'sphere', [0, 3.35, -7.08], [1, 1, 1], '#fff3cf', { geometry: { size: 0.16, segments: 20 }, emissive: '#ffe9b0', emissiveIntensity: 2.6 }));
+    // Steaua Calfei, independentă pe suport, în fața altarului, conform cerinței Lojei.
+    items.push(primitive('flaming-star', 'star', [0, 1.85, -5.65], [1, 1, 1], '#ffd061', { geometry: { points: 5, radius: 0.65, innerRadius: 0.28, depth: 0.12 }, emissive: '#ffbe3d', emissiveIntensity: 2.1, metalness: 0.2, roughness: 0.3 }));
+    items.push(primitive('flaming-star-heart', 'sphere', [0, 1.85, -5.53], [1, 1, 1], '#fff3cf', { geometry: { size: 0.16, segments: 20 }, emissive: '#ffe9b0', emissiveIntensity: 2.6 }));
+    items.push(primitive('flaming-star-base', 'cylinder', [0, 0.05, -5.65], [1, 1, 1], '#3a3325', { geometry: { radiusTop: 0.23, radiusBottom: 0.28, height: 0.1, segments: 24 }, metalness: 0.5 }));
+    items.push(primitive('flaming-star-support', 'cylinder', [0, 0.975, -5.65], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.025, radiusBottom: 0.03, height: 1.75, segments: 12 }, metalness: 0.6 }));
   }
   return items;
 }
@@ -264,12 +266,12 @@ function orientSeating() {
     ...seating('orient-bench-south', 3.7, 0.72, -10.4, 0, { width: 3.4 }),
     ...seating('orient-seat-adjunct', -1.75, 0.72, -9.55),
     // Pe estradă: Secretarul (Miazănoapte) și Oratorul (Miazăzi), cu blatul
-    // înclinat spre pupitrele de jos (spre Occident) și scaunele spre Orient.
+    // simplu, orizontal, ca la Supraveghetori, și scaunele spre Orient.
     primitive('secretary-desk', 'box', [-6.5, 1.14, -9.55], [1.5, 0.84, 1], COLORS.wood),
-    primitive('secretary-desk-top', 'box', [-6.5, 1.62, -9.55], [1.4, 0.07, 0.95], COLORS.woodDark, { rotation: [0.18, 0, 0] }),
+    primitive('secretary-desk-top', 'box', [-6.5, 1.605, -9.55], [1.65, 0.09, 1.15], COLORS.woodDark),
     ...seating('secretary-chair', -6.5, 0.72, -10.35),
     primitive('orator-desk', 'box', [6.5, 1.14, -9.55], [1.5, 0.84, 1], COLORS.wood),
-    primitive('orator-desk-top', 'box', [6.5, 1.62, -9.55], [1.4, 0.07, 0.95], COLORS.woodDark, { rotation: [0.18, 0, 0] }),
+    primitive('orator-desk-top', 'box', [6.5, 1.605, -9.55], [1.65, 0.09, 1.15], COLORS.woodDark),
     ...seating('orator-chair', 6.5, 0.72, -10.35),
   ];
 }
@@ -599,15 +601,15 @@ function candelabrum(prefix, x, y, z, candleCount, yaw = 0) {
 
 function officerTables() {
   // Sub estradă: Ospitalierul (Miazănoapte) și Trezorierul (Miazăzi), cu
-  // fața unul spre celălalt peste sală — blatul înclinat spre centru,
+  // fața unul spre celălalt peste sală — blat orizontal pe corpul pupitrului,
   // scaunele spre ziduri. Lângă Ospitalier, spre intrare, stă spada
   // Expertului, la primul scaun al Coloanei de Miazănoapte.
   return [
     primitive('hospitalier-table', 'box', [-6.7, 0.55, -5.75], [1, 0.82, 1.6], COLORS.wood),
-    primitive('hospitalier-desk-top', 'box', [-6.7, 1.02, -5.75], [0.95, 0.06, 1.45], COLORS.woodDark, { rotation: [0, 0, -0.15] }),
+    primitive('hospitalier-desk-top', 'box', [-6.7, 1.005, -5.75], [1.15, 0.09, 1.75], COLORS.woodDark),
     ...seating('hospitalier-chair', -7.55, 0, -5.75, Math.PI / 2),
     primitive('treasurer-table', 'box', [6.7, 0.55, -5.75], [1, 0.82, 1.6], COLORS.wood),
-    primitive('treasurer-desk-top', 'box', [6.7, 1.02, -5.75], [0.95, 0.06, 1.45], COLORS.woodDark, { rotation: [0, 0, 0.15] }),
+    primitive('treasurer-desk-top', 'box', [6.7, 1.005, -5.75], [1.15, 0.09, 1.75], COLORS.woodDark),
     ...seating('treasurer-chair', 7.55, 0, -5.75, -Math.PI / 2),
     primitive('expert-sword-blade', 'box', [-6.15, 0.95, -4.45], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
     primitive('expert-sword-guard', 'box', [-6.15, 1.58, -4.45], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),

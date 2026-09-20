@@ -96,3 +96,60 @@ test('unresolved bindings are inert and normalization keeps only bounded plain t
   assert.equal(normalized.interactives[0].education.sections.length,5);
   assert.equal(normalized.interactives[0].education.sections[0].body.length,800);
 });
+
+
+test('officer desks, seats, swords and staff resolve to educational cards, without operational access', () => {
+  const targets = {
+    'vm-table-top':'office-venerable', 'vm-throne-seat-back':'office-venerable',
+    'warden1-desk':'office-first_warden', 'warden2-chair-back':'office-second_warden',
+    'secretary-desk-top':'office-secretary', 'orator-desk':'office-orator',
+    'treasurer-table':'office-treasurer', 'hospitalier-chair':'office-hospitalier',
+    'seat-north-front-1':'office-expert', 'seat-north-front-1-back':'office-expert',
+    'mc-seat':'office-master_of_ceremonies', 'tyler-seat':'office-tyler',
+    'tyler-sword-blade':'tyler-sword', 'expert-sword-guard':'expert-sword', 'mc-sceptre-head':'mc-staff',
+    'seat-north-front-2':'seating-north', 'bench-north-wall':'seating-north',
+    'seat-south-front-1':'seating-south', 'bench-south-wall-east':'seating-south', 'bench-south-wall-west':'seating-south',
+  };
+  for(const grade of [1,2,3]) {
+    const scene=manifest(grade);
+    assert.equal(scene.interactives.filter(item=>item.presentation==='architecture').length,{1:51,2:54,3:53}[grade]);
+    for(const [mesh,key] of Object.entries(targets)) {
+      assert.equal(scene.architecture.find(part=>part.id===mesh)?.interactionId,`discover-${key}`,mesh);
+      const item=scene.interactives.find(item=>item.id===`discover-${key}`);
+      assert.equal(item.kind,'symbol'); assert.equal(item.route,'/biblioteca'); assert.ok(!item.capabilities);
+    }
+    const north=scene.interactives.find(item=>item.id==='discover-seating-north');
+    const south=scene.interactives.find(item=>item.id==='discover-seating-south');
+    if(grade===1) { assert.match(north.label,/Ucenicilor/); assert.match(south.label,/Calfelor/); }
+    if(grade===2) { assert.doesNotMatch(north.label,/Ucenicilor/); assert.match(JSON.stringify(north.education),/nu participă Ucenici/); }
+    if(grade===3) { assert.match(north.label,/Maeștri/); assert.match(south.label,/Maeștri/); }
+  }
+});
+
+test('each shared physical element has distinct object-specific study content at each degree', () => {
+  const scenes=[1,2,3].map(manifest);
+  for(const item of scenes[0].interactives.filter(item=>item.presentation==='architecture')) {
+    const bodies=scenes.map(scene=>scene.interactives.find(other=>other.id===item.id).education.sections.find(section=>section.title.startsWith('Studiu propus')).body);
+    assert.equal(new Set(bodies).size,3,item.id);
+    assert.ok(bodies.every(body=>body.length>50));
+  }
+});
+
+test('fellowcraft star stands in front of the altar and all four desk tops sit flat on their bodies', () => {
+  for(const grade of [1,2,3]) {
+    const scene=manifest(grade); const part=id=>scene.architecture.find(item=>item.id===id);
+    for(const [bodyId,topId] of [['secretary-desk','secretary-desk-top'],['orator-desk','orator-desk-top'],['hospitalier-table','hospitalier-desk-top'],['treasurer-table','treasurer-desk-top']]) {
+      const body=part(bodyId),top=part(topId);
+      assert.deepEqual(top.rotation,[0,0,0]);
+      assert.ok(Math.abs(top.position[1]-top.scale[1]/2-(body.position[1]+body.scale[1]/2))<1e-9);
+      assert.ok(top.scale[0]>body.scale[0] && top.scale[2]>body.scale[2]);
+    }
+    if(grade!==2){assert.equal(part('flaming-star'),undefined);continue;}
+    const star=part('flaming-star'),altar=part('altar-top');
+    assert.ok(star.position[2]>altar.position[2]+altar.scale[2]/2+.5);
+    assert.ok(star.position[1]<2); assert.equal(part('flaming-star-base').position[1],.05);
+    assert.equal(part('flaming-star-support').interactionId,'discover-star');
+    assert.ok(part('flaming-star-support').position[1]+part('flaming-star-support').geometry.height/2 >= star.position[1]-.001);
+    assert.equal(part('flaming-star-heart').position[1],star.position[1]);
+  }
+});

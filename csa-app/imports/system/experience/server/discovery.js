@@ -1,14 +1,11 @@
 // Server-only: only the selected, authorized degree is serialized to the client.
 import { ZODIAC_SIGNS } from '../zodiac.js';
+import { OFFICER_CATALOG } from '../../temple/catalog/officers.js';
+import { studyForElement } from './study-notes.js';
 
 const NAMES = { 1: 'Ucenic', 2: 'Calfă', 3: 'Maestru' };
 const SOURCE = 'Ritualul Ucenicului 2012';
 const GRADE_SOURCE = { 1: `${SOURCE}, pp. 120–122`, 2: 'Ritualul Calfei 2012, p. 61', 3: 'Ritualul Maestrului 2012, p. 69' };
-const APPROACH = {
-  1: 'Observă forma, numește elementul și găsește-i locul în ansamblu. Formulează o întrebare pornind de la ceea ce vezi.',
-  2: 'Compară forma și poziția cu reperele deja cunoscute. Urmărește proporțiile și relațiile dintre elemente.',
-  3: 'Privește elementul în ansamblul Camerei de Mijloc. Pregătește o explicație clară și verificabilă, potrivită gradului celui căruia o transmiți.',
-};
 const LIGHTS = {
   1: 'În descrierea gradului de Ucenic, Echerul este așezat deasupra ambelor brațe ale Compasului.',
   2: 'În descrierea gradului de Calfă, un braț al Compasului este deasupra Echerului, iar celălalt dedesubt.',
@@ -44,7 +41,7 @@ export function addTempleDiscovery(scene, grade) {
     add(`column-${key}`, `Coloana ${label}`, `Coloana ${label} se află la Occident, spre ${side}, lângă intrare. Cele două coloane sunt dispuse simetric față de axa longitudinală a templului.`, prefix(`column-${key}-`), 'Cum contribuie perechea de coloane la recunoașterea pragului?', '122', grade === 1 ? 'În gradul de Ucenic, capitelul poartă trei rodii întredeschise.' : 'În această scenă sunt folosite sferele descrise în ritualul Calfei; acestea au și o variantă de reprezentare pe planșă.');
     if (grade >= 2) add(`globe-${key}`, key === 'b' ? 'Sfera terestră' : 'Sfera celestă', key === 'b' ? 'Sfera terestră este reprezentată pe capitelul coloanei Boaz. Ea oferă un reper pentru observarea lumii pământești.' : 'Sfera celestă este reprezentată pe capitelul coloanei Jachin. Ea oferă un reper pentru orientarea privirii către cer.', id => id === `column-${key}-globe` || id === `column-${key}-globe-stand`, 'Cum pui în relație observarea lumii apropiate și a unui ansamblu mai cuprinzător?', '122', 'Ritualul Calfei 2012, p. 61: folosirea sferelor depinde de recuzita disponibilă; alternativa este reprezentarea lor pe planșă.');
   }
-  if (grade === 2) add('star', 'Steaua înflăcărată', 'În Loja Calfelor, Steaua Înflăcărată se află la Orient, în fața mesei Maestrului Venerabil. Este un reper propriu acestei configurații a scenei.', prefix('flaming-star'), 'Ce relație observi între simetrie, proporție și ordinea unei construcții?', '120', 'Amplasare: Ritualul Calfei 2012, p. 61.');
+  if (grade === 2) add('star', 'Steaua înflăcărată', 'În scena Calfei, Steaua Înflăcărată este așezată pe un suport independent, în fața altarului, spre centrul sălii. Are cinci vârfuri și un centru luminos.', prefix('flaming-star'), 'Ce relație observi între simetrie, proporție și ordinea unei construcții?', '120', 'Ritualul Calfei 2012, p. 61, o situează la Orient, în fața mesei Maestrului Venerabil. Poziția din fața altarului este adaptarea cerută pentru acest templu.');
   for (const [key, label, count, page] of [['vm', 'Maestrului Venerabil', 3, '120'], ['warden1', 'Primului Supraveghetor', 2, '122'], ['warden2', 'celui de-al Doilea Supraveghetor', 1, '122']]) {
     add(`candles-${key}`, `Sfeșnicul ${label}`, `Pe masa ${label} se află un sfeșnic cu ${count === 1 ? 'o lumânare' : `${count} lumânări`}. Acest ansamblu este distinct de lumânările celor trei colonete.`, prefix(`${key}-candelabrum-`), 'Cum te ajută numărul și poziția luminilor să recunoști locurile din templu?', page);
     add(`gavel-${key}`, `Ciocanul ${label}`, `Ciocanul de lemn se află pe masa ${label}. Este un obiect al funcției și al conducerii lucrărilor.`, prefix(`${key}-gavel`), 'Cum poți exercita o responsabilitate cu măsură și claritate?', page);
@@ -53,6 +50,34 @@ export function addTempleDiscovery(scene, grade) {
   for (const sign of ZODIAC_SIGNS) {
     const side = sign.side === 'north' ? 'Miazănoapte' : 'Miazăzi';
     add(`zodiac-${sign.id}`, `Zodiac · ${sign.label}`, `${sign.label} face parte din grupa celor șase semne de la ${side}. Medalionul este așezat deasupra coloanei laterale corespunzătoare, în apropierea bolții.`, id => [`zodiac-${sign.id}`, `zodiac-support-${sign.id}`, `zodiac-base-${sign.id}`, `zodiac-capital-${sign.id}`].includes(id), 'Unde se află acest semn față de Orient și față de celelalte semne de pe aceeași latură?', '119–120', 'Ritualul indică grupele pe laturi. Sensul longitudinal din aplicație este o convenție vizuală; nu se atribuie semnului o interpretare astrologică individuală.');
+  }
+  // Physical office cards explain functions to all authorized participants.
+  // They never grant operational permissions or disclose the current officeholder.
+  const officeTargets = {
+    venerable: ['vm-table-', 'vm-throne'], first_warden: ['warden1-desk', 'warden1-top', 'warden1-chair'],
+    second_warden: ['warden2-desk', 'warden2-top', 'warden2-chair'],
+    secretary: ['secretary-desk', 'secretary-chair'], orator: ['orator-desk', 'orator-chair'],
+    treasurer: ['treasurer-table', 'treasurer-desk-top', 'treasurer-chair'],
+    hospitalier: ['hospitalier-table', 'hospitalier-desk-top', 'hospitalier-chair'],
+    master_of_ceremonies: ['mc-seat'], tyler: ['tyler-seat'], expert: ['seat-north-front-1'],
+  };
+  const targetMatches = (id, token) => token.endsWith('-') ? id.startsWith(token) : id === token || id.startsWith(`${token}-`);
+  for (const [code, tokens] of Object.entries(officeTargets)) {
+    const office = OFFICER_CATALOG.find(entry => entry.code === code);
+    add(`office-${code}`, `Funcția · ${office.label}`, `${office.label}: ${office.responsibility}. Însemnul funcției: ${office.jewel}.`, id => tokens.some(token => targetMatches(id, token)), `Cum contribuie ${office.label} la lucrarea comună în gradul afișat?`, '123–125');
+  }
+  add('tyler-sword', 'Spada Acoperitorului', 'Spada verticală este lângă locul Acoperitorului, în interiorul templului, la dreapta intrării. Ea este distinctă de spada Expertului și de cea de la Orient.', prefix('tyler-sword-'), 'Ce presupune păstrarea atentă a unui prag?', '123–125');
+  add('expert-sword', 'Spada Expertului', 'Spada este reprezentată lângă locul Expertului, în vecinătatea Ospitalierului. Însemnul funcției asociază spada, rigla și ochiul.', prefix('expert-sword-'), 'Cum se completează atenția, verificarea și pregătirea unei lucrări?', '123–125');
+  add('mc-staff', 'Bastonul Maestrului de Ceremonii', 'Bastonul se află lângă scaunul Maestrului de Ceremonii, la Occident, în apropierea Primului Supraveghetor. El este legat de coordonarea ordonată a ceremonialului.', prefix('mc-sceptre-'), 'Cum susține orientarea clară participarea întregului grup?', '123–125');
+  const seatLabels = {
+    1: ['Coloana Ucenicilor · Miazănoapte', 'Coloana Calfelor · Miazăzi'],
+    2: ['Miazănoapte · Loja Calfelor', 'Coloana Calfelor · Miazăzi'],
+    3: ['Coloana de Miazănoapte · Maeștri', 'Coloana de Miazăzi · Maeștri'],
+  };
+  for (const [index, side] of ['north', 'south'].entries()) {
+    add(`seating-${side}`, seatLabels[grade][index], `Scaunele și băncile acestei laturi formează o coloană de participanți, diferită de coloanele arhitecturale de la intrare. Așezarea se citește în contextul gradului deschis.`,
+      id => (id.startsWith(`seat-${side}-`) || id.startsWith(`bench-${side}-`)) && !targetMatches(id, 'seat-north-front-1'),
+      'Cum se schimbă participanții acestei coloane atunci când se schimbă gradul lucrărilor?', '125');
   }
   const architecture = scene.architecture.map(part => {
     // Last match wins: a globe has its own card, distinct from its column.
@@ -69,7 +94,7 @@ export function addTempleDiscovery(scene, grade) {
       steps: [],
       sections: [
         ...(item.extra ? [{ title: 'Reper pentru această scenă', body: item.extra }] : []),
-        { title: `Studiu · ${NAMES[grade]}`, body: APPROACH[grade] },
+        studyForElement(item.key, grade, item.label),
         ...(grade > 1 ? [{ title: 'Referința gradului', body: GRADE_SOURCE[grade] }] : []),
       ],
     },

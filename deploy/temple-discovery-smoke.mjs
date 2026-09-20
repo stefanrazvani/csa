@@ -62,18 +62,28 @@ try {
     const scene = await call('temple.experienceManifest', { viewGrade: grade });
     assert.equal(scene.access.viewGrade, grade);
     const discoveries = scene.interactives.filter(item => item.presentation === 'architecture');
-    assert.equal(discoveries.length, {1:36,2:39,3:38}[grade]);
+    assert.equal(discoveries.length, {1:51,2:54,3:53}[grade]);
     assert.ok(scene.interactives.length <= 96);
     assert.equal(new Set(scene.interactives.map(item => item.id)).size, scene.interactives.length);
     assert.ok(scene.architecture.filter(part => part.interactionId).every(part => discoveries.some(item => item.id === part.interactionId)));
     for (const key of ['wisdom','strength','beauty','sun','moon','delta','mosaic','plumb','vault','book','square','compass']) assert.ok(discoveries.some(item => item.id === `discover-${key}`));
     assert.equal(discoveries.filter(item => item.id.startsWith('discover-zodiac-')).length,12);
+    assert.equal(discoveries.filter(item => item.id.startsWith('discover-office-')).length,10);
+    for(const [mesh,target] of [['tyler-sword-blade','tyler-sword'],['expert-sword-guard','expert-sword'],['mc-sceptre-shaft','mc-staff'],['mc-seat','office-master_of_ceremonies'],['seat-north-front-1','office-expert'],['tyler-seat','office-tyler'],['bench-north-wall','seating-north'],['bench-south-wall-east','seating-south']]) assert.equal(scene.architecture.find(part=>part.id===mesh).interactionId,`discover-${target}`);
+    assert.ok(discoveries.every(item=>item.education.sections.some(section=>section.title.startsWith('Studiu propus') && section.body.length>50)));
+    for(const [bodyId,topId] of [['secretary-desk','secretary-desk-top'],['orator-desk','orator-desk-top'],['hospitalier-table','hospitalier-desk-top'],['treasurer-table','treasurer-desk-top']]) {
+      const body=scene.architecture.find(part=>part.id===bodyId),top=scene.architecture.find(part=>part.id===topId);
+      assert.deepEqual(top.rotation,[0,0,0]); assert.ok(Math.abs(top.position[1]-top.scale[1]/2-body.position[1]-body.scale[1]/2)<1e-9);
+    }
+    if(grade===2) { const star=scene.architecture.find(part=>part.id==='flaming-star'),altar=scene.architecture.find(part=>part.id==='altar-top');assert.ok(star.position[2]>altar.position[2]+1);assert.ok(star.position[1]<2); }
+    if(grade===3) for(const side of ['north','south']) assert.match(discoveries.find(item=>item.id===`discover-seating-${side}`).label,/Maeștri/);
+
     assert.equal(discoveries.some(item => item.id === 'discover-star'),grade === 2);
     assert.ok(discoveries.every(item => item.education.sections.length && item.sourceRef));
     if(grade === 1) assert.doesNotMatch(JSON.stringify(scene.interactives),/Ritualul Calfei|Ritualul Maestrului|g2-|g3-/);
     console.log(`PASS LIVE DISCOVERY grade ${grade}: ${discoveries.length} physical targets, sourced descriptions, degree isolation.`);
 
-    assert.ok(scene.version.startsWith('2026.09.20-6:'));
+    assert.ok(scene.version.startsWith('2026.09.20-7:'));
     assert.equal(scene.architecture.filter(item => /ashlar/.test(item.id)).length, 0);
     for (const id of ['hospitalier-table', 'hospitalier-chair', 'treasurer-table', 'treasurer-chair']) assert.ok(scene.architecture.some(item => item.id === id), id);
     if (grade === 2) for (const id of ['concept-vault', 'study-workshop', 'convocations-two']) {
