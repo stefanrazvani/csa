@@ -1,10 +1,14 @@
 # Platformă CSA – stare implementare
 
-Release activ, 21 septembrie 2026: `d831eb7`, tag `release-20260921-temple-refinements`.
+Release activ, 21 septembrie 2026: `4aaf68f`, tag `release-20260921-temple-camera`.
+Camera este în interiorul porții, ușor la stânga; sferele și altarul sunt
+încadrate simultan de la pornire, cu unghi adaptat la lățimea ferestrei.
+Manifest: `2026.09.21-2`; 17 teste locale și smoke live trecute.
+Detalii: `deploy/releases/2026-09-21-temple-camera.md`.
 Pietrele sunt la capetele treptelor dinspre altar; funia este un tub continuu
 cu colțuri rotunjite; plumbul și scaunul VM au materiale cu contrast îmbunătățit.
-Manifest: `2026.09.21-1`; 16 teste locale și verificările live pe toate gradele
-trecute. Detalii: `deploy/releases/2026-09-21-temple-refinements.md`.
+Aceste ajustări din `d831eb7` sunt păstrate; detalii:
+`deploy/releases/2026-09-21-temple-refinements.md`.
 Meniul lateral se ascunde/redeschide și pe desktop; ferestrele se încadrează
 automat în spațiul disponibil. Verificat în portal la 1280 px și 390 px,
 inclusiv păstrarea textului introdus și navigarea mobilă. Detalii:
@@ -22,7 +26,7 @@ Catalogul administratorului respectă și vizualizarea unui grad inferior.
 Colonetele, lumânările și zodiacul din `a10590c`, detaliile Orientului din
 `57ce577`, mobilierul și ochiul din `04d349e` sunt păstrate.
 Referințe: `REFERINTE_TEMPLU.md`.
-16 teste locale și verificările live pentru grade/autentificare/acces au trecut.
+17 teste locale și verificările live pentru grade/autentificare/acces au trecut.
 UI live: căutare, fișe, schimbare grad și tastatură verificate în fallback;
 raycasting automat cu geometriile reale. WebGL nu este disponibil în VM.
 10/10 containere healthy; 153/153 fișiere sursă identice cu arhiva.
