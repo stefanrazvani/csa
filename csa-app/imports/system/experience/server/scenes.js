@@ -523,14 +523,6 @@ function plumbLine() {
   ];
 }
 
-function ashlars() {
-  return [
-    primitive('rough-ashlar', 'dodecahedron', [-5.8, 0.5, -6.55], [1, 0.86, 1], '#6e695d', { geometry: { size: 0.56 }, roughness: 0.98, rotation: [0.35, 0.8, 0.15] }),
-    primitive('perfect-ashlar', 'box', [5.8, 0.37, -6.6], [0.74, 0.74, 0.74], '#b5ac93', { roughness: 0.55 }),
-    primitive('perfect-ashlar-apex', 'cone', [5.8, 0.96, -6.6], [1, 1, 1], '#b5ac93', { geometry: { radius: 0.52, height: 0.44, segments: 4 }, rotation: [0, Math.PI / 4, 0], roughness: 0.55 }),
-  ];
-}
-
 function brotherSeats() {
   const north = [-4.6, -3.3, -2, -0.7, 0.6, 1.9, 3.2, 4.5];
   // Rândurile din Miazăzi lasă locul pupitrului celui de-al Doilea Supraveghetor.
@@ -566,9 +558,8 @@ function lodgeArchitecture(grade) {
     ...candelabrum('vm-candelabrum', 1.02, 1.26, -8.5, 3),
     ...candelabrum('warden1-candelabrum', -5.85, 1.19, 6.5, 2),
     ...candelabrum('warden2-candelabrum', 6.55, 1.19, 1.05, 1),
-    // În gradul 1, spațiul din fața pupitrelor Ospitalierului și
-    // Trezorierului rămâne liber.
-    ...(grade === 1 ? [] : ashlars()),
+    // Spațiul din fața pupitrelor Ospitalierului și Trezorierului
+    // rămâne liber în toate cele trei grade.
     ...brotherSeats(),
   ];
 }
@@ -637,9 +628,9 @@ const SCENES = Object.freeze({
       interactive('geometry-table', 'tool', 'Masa proporțiilor', 'Un spațiu pentru relații, măsură și verificarea ipotezelor.', [-4.9, 1, -1.6], { type: 'icosahedron', size: 0.86, detail: 1 }, ROUTES.library,
         learning('Construiește o legătură', 'Ce relație dintre două idei poți susține printr-un text?', ['Alege două concepte.', 'Caută pasajele care le susțin.', 'Formulează relația și justificarea.']), { sourceRef: 'Catalog intern · gradul 2' }),
       interactive('concept-vault', 'concept', 'Bolta ideilor', 'Navighează legăturile validate dintre texte și concepte.', [4.9, 1.3, -3.2], { type: 'torusKnot', radius: 0.72, tube: 0.18, segments: 72 }, ROUTES.concepts,
-        learning('Relaționare', 'O idee se dezvoltă, contrastează sau exemplifică o alta?', ['Explorează graful.', 'Deschide pasajele ancorate.', 'Propune o relație cu justificare.']), { actionLabel: 'Deschide graful', sourceRef: 'Catalog intern · gradul 2' }),
+        learning('Relaționare', 'O idee se dezvoltă, contrastează sau exemplifică o alta?', ['Explorează graful.', 'Deschide pasajele ancorate.', 'Propune o relație cu justificare.']), { actionLabel: 'Deschide graful', sourceRef: 'Catalog intern · gradul 2', presentation: 'list' }),
       interactive('study-workshop', 'library', 'Atelierul de studiu', 'Capitole, adnotări și conversații disponibile gradului tău.', [-4.9, 1, 2.4], { type: 'octahedron', size: 0.9 }, ROUTES.library,
-        learning('De la lectură la lucrare', 'Cum se schimbă înțelegerea când o idee este discutată?', ['Selectează o ancoră textuală.', 'Scrie interpretarea ta.', 'Invită o perspectivă argumentată.']), { actionLabel: 'Continuă studiul' }),
+        learning('De la lectură la lucrare', 'Cum se schimbă înțelegerea când o idee este discutată?', ['Selectează o ancoră textuală.', 'Scrie interpretarea ta.', 'Invită o perspectivă argumentată.']), { actionLabel: 'Continuă studiul', presentation: 'list' }),
       interactive('convocations-two', 'assembly', 'Cercul participării', 'Pregătire, prezență și contribuție la lucrarea comună.', [4.9, 0.85, 3.6], { type: 'torus', radius: 0.74, tube: 0.17, segments: 40 }, ROUTES.convocations,
         learning('Contribuție', 'Ce poți aduce concret următoarei întâlniri?', ['Consultă temele.', 'Alege o contribuție realistă.', 'Confirmă disponibilitatea.']), { actionLabel: 'Vezi convocatoarele' }),
     ],
