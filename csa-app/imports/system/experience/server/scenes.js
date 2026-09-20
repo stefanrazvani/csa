@@ -207,8 +207,12 @@ function allSeeingEye() {
 
 function venerableStation() {
   return [
-    ...seating('vm-throne-seat', 0, 0.72, -10.15, 0, { width: 1.3, backHeight: 2.6, arms: true }),
-    primitive('vm-canopy', 'box', [0, 3.95, -10.35], [2.6, 0.16, 1.6], '#341721'),
+    ...seating('vm-throne-seat', 0, 0.72, -10.15, 0, { width: 1.3, backHeight: 2.6, arms: true }).map(part => {
+      const fabric = part.id.endsWith('-back') || part.id.endsWith('-cushion');
+      return { ...part, material: { ...part.material, color: fabric ? '#a54050' : '#ad7a48',
+        emissive: fabric ? '#87303f' : '#8c6038', emissiveIntensity: .3, roughness: .72, metalness: .05 } };
+    }),
+    primitive('vm-canopy', 'box', [0, 3.95, -10.35], [2.6, 0.16, 1.6], '#753341', { emissive: '#652c39', emissiveIntensity: .25 }),
     primitive('vm-canopy-post-north', 'cylinder', [-1.2, 2.35, -9.7], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.06, radiusBottom: 0.075, height: 3.3, segments: 12 }, metalness: 0.5, roughness: 0.42 }),
     primitive('vm-canopy-post-south', 'cylinder', [1.2, 2.35, -9.7], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.06, radiusBottom: 0.075, height: 3.3, segments: 12 }, metalness: 0.5, roughness: 0.42 }),
     primitive('vm-table-body', 'box', [0, 0.93, -8.8], [2.4, 0.42, 0.9], COLORS.drape, { roughness: 0.68 }),
@@ -646,7 +650,6 @@ function starryVault() {
 // în formă de opt), câte unul pe laturile de Miazănoapte, Orient și Miazăzi.
 function knottedRope() {
   const rope = '#b38f57';
-  const ropeGeometry = (height) => ({ geometry: { radiusTop: 0.045, radiusBottom: 0.045, height, segments: 10 }, roughness: 0.6 });
   // Nod în formă de opt: două bucle suprapuse de-a lungul funiei.
   const knotEight = (id, position, alongZ) => {
     const rotation = alongZ ? [0, Math.PI / 2, 0] : [0, 0, 0];
@@ -658,12 +661,13 @@ function knottedRope() {
     ];
   };
   const items = [
-    primitive('rope-east', 'cylinder', [0, 6.6, -11.02], [1, 1, 1], rope, { ...ropeGeometry(17.6), rotation: [0, 0, Math.PI / 2] }),
-    // Funia rămâne în fața zidurilor laterale (fața interioară este la ±8,8).
-    primitive('rope-north', 'cylinder', [-8.68, 6.6, 0], [1, 1, 1], rope, { ...ropeGeometry(22.6), rotation: [Math.PI / 2, 0, 0] }),
-    primitive('rope-south', 'cylinder', [8.68, 6.6, 0], [1, 1, 1], rope, { ...ropeGeometry(22.6), rotation: [Math.PI / 2, 0, 0] }),
-    primitive('rope-west-north', 'cylinder', [-5.9, 6.6, 11.02], [1, 1, 1], rope, { ...ropeGeometry(6.6), rotation: [0, 0, Math.PI / 2] }),
-    primitive('rope-west-south', 'cylinder', [5.9, 6.6, 11.02], [1, 1, 1], rope, { ...ropeGeometry(6.6), rotation: [0, 0, Math.PI / 2] }),
+    // One uninterrupted tube; long sides no longer hit the primitive height cap.
+    primitive('rope-continuous', 'tubePath', [0, 0, 0], [1, 1, 1], rope, {
+      geometry: { tube: .045, radius: .24, segments: 96, path: [
+        [-2.6, 6.6, 11.02], [-8.68, 6.6, 11.02], [-8.68, 6.6, -11.02],
+        [8.68, 6.6, -11.02], [8.68, 6.6, 11.02], [2.6, 6.6, 11.02],
+      ] }, roughness: .7, emissive: '#806239', emissiveIntensity: .16,
+    }),
     ...[-5.5, 0, 5.5].flatMap((x, index) => knotEight(`rope-knot-east-${index + 1}`, [x, 6.6, -11.02], false)),
     ...[-6.5, -2, 2.5, 7].flatMap((z, index) => knotEight(`rope-knot-north-${index + 1}`, [-8.68, 6.6, z], true)),
     ...[-6.5, -2, 2.5, 7].flatMap((z, index) => knotEight(`rope-knot-south-${index + 1}`, [8.68, 6.6, z], true)),
@@ -681,7 +685,7 @@ function plumbLine() {
   return [
     primitive('plumb-mount', 'cylinder', [0, 7.26, 1.4], [1, 1, 1], '#3c4653', { geometry: { radiusTop: 0.09, radiusBottom: 0.07, height: 0.12, segments: 12 } }),
     primitive('plumb-cord', 'cylinder', [0, 5.2, 1.4], [0.2, 1, 0.2], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4, segments: 8 } }),
-    primitive('plumb-bob', 'cone', [0, 3.06, 1.4], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
+    primitive('plumb-bob', 'cone', [0, 3.06, 1.4], [1, 1, 1], '#c4ced5', { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.25, roughness: 0.5, emissive: '#84939e', emissiveIntensity: .35 }),
   ];
 }
 

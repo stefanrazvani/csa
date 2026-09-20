@@ -95,6 +95,11 @@ try {
     assert.equal(scene.architecture.find(part=>part.id==='study-rough-stone').position[0],-2.85);
     assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone').position[0],2.85);
     if(grade===2) assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone-point').position[0],2.85);
+    const rope=scene.architecture.find(part=>part.id==='rope-continuous');
+    assert.equal(rope.geometry.type,'tubePath'); assert.equal(rope.geometry.path.length,6);
+    assert.equal(rope.interactionId,'discover-rope');
+    assert.ok(scene.architecture.find(part=>part.id==='plumb-bob').material.emissiveIntensity >= .3);
+    assert.ok(scene.architecture.find(part=>part.id==='vm-throne-seat-back').material.emissiveIntensity >= .3);
     assert.equal(scene.architecture.filter(item => /ashlar/.test(item.id)).length, 0);
     for (const id of ['hospitalier-table', 'hospitalier-chair', 'treasurer-table', 'treasurer-chair']) assert.ok(scene.architecture.some(item => item.id === id), id);
     if (grade === 2) for (const id of ['concept-vault', 'study-workshop', 'convocations-two']) {

@@ -5,6 +5,31 @@ import { getScenePreset } from './server/scenes.js';
 import { normalizeExperienceManifest } from './client/manifest.js';
 import { makeGeometry } from './client/engine.js';
 
+test('rope stays continuous around all four corners after manifest normalization', () => {
+  for (const grade of [1, 2, 3]) {
+    const scene=normalizeExperienceManifest(getScenePreset(grade));
+    const rope=scene.architecture.find(part=>part.id==='rope-continuous');
+    assert.equal(rope.geometry.type,'tubePath');
+    const geometry=makeGeometry(THREE,rope.geometry), positions=geometry.attributes.position;
+    geometry.computeBoundingBox();
+    assert.ok(geometry.boundingBox.min.z < -11 && geometry.boundingBox.max.z > 11, 'full side length survives the height cap');
+    assert.ok(geometry.boundingBox.min.x < -8.65 && geometry.boundingBox.max.x > 8.65);
+    const centers=[];
+    for(let offset=0;offset<positions.count;offset+=11) {
+      const center=new THREE.Vector3();
+      for(let radial=0;radial<10;radial++) center.add(new THREE.Vector3().fromBufferAttribute(positions,offset+radial));
+      center.divideScalar(10); centers.push(center);
+    }
+    assert.ok(centers[0].distanceTo(new THREE.Vector3(-2.6,6.6,11.02))<1e-5);
+    assert.ok(centers.at(-1).distanceTo(new THREE.Vector3(2.6,6.6,11.02))<1e-5);
+    for(let i=1;i<centers.length;i++) assert.ok(centers[i].distanceTo(centers[i-1])<.2, 'adjacent tube rings have no gap');
+    for(const point of [[-8.68,6.6,-11.02],[8.68,6.6,-11.02],[-8.68,6.6,11.02],[8.68,6.6,11.02]]) {
+      assert.ok(centers.some(center=>center.distanceTo(new THREE.Vector3(...point))<.15), 'tube follows each rounded corner');
+    }
+    geometry.dispose();
+  }
+});
+
 test('all grades reach the renderer intact, retaining candles and removing extra desk columns', () => {
   for (const grade of [1, 2, 3]) {
     const raw = getScenePreset(grade);

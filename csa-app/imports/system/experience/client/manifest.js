@@ -19,6 +19,7 @@ const GEOMETRY_TYPES = new Set([
   'star',
   'torus',
   'torusKnot',
+  'tubePath',
 ]);
 
 const FLOOR_TYPES = new Set(['plane', 'checker', 'disc', 'polygon', 'lodge']);
@@ -78,6 +79,7 @@ function geometry(value = {}) {
     innerRadius: number(source.innerRadius, 0.32, 0.002, 8),
     turns: number(source.turns, 1.75, 0.5, 6),
     tilt: number(source.tilt, 0, -1, 1),
+    path: Array.isArray(source.path) ? source.path.slice(0, 16).map(point => vector(point, [0, 0, 0])) : [],
     profile: Array.isArray(source.profile)
       ? source.profile.slice(0, 24).map((pair) => [
         number(Array.isArray(pair) ? pair[0] : NaN, 0.3, 0.01, 8),

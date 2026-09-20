@@ -57,6 +57,24 @@ export function makeGeometry(THREE, definition = {}) {
   const type = definition.type || 'octahedron';
   const segments = Math.round(bounded(definition.segments, 24, 4, 96));
   switch (type) {
+    case 'tubePath': {
+      // A single tube follows bounded straight runs and rounded corners.
+      const points = (definition.path || []).slice(0, 16).map(point => vector3(THREE, point));
+      if (points.length < 2) return new THREE.SphereGeometry(.045, 8, 6);
+      const path = new THREE.CurvePath();
+      let start = points[0];
+      for (let i = 1; i < points.length - 1; i += 1) {
+        const corner = points[i], next = points[i + 1];
+        const radius = Math.min(bounded(definition.radius, .22, .01, 1), corner.distanceTo(start) / 2, corner.distanceTo(next) / 2);
+        const entry = corner.clone().add(start.clone().sub(corner).normalize().multiplyScalar(radius));
+        const exit = corner.clone().add(next.clone().sub(corner).normalize().multiplyScalar(radius));
+        path.add(new THREE.LineCurve3(start, entry));
+        path.add(new THREE.QuadraticBezierCurve3(entry, corner, exit));
+        start = exit;
+      }
+      path.add(new THREE.LineCurve3(start, points[points.length - 1]));
+      return new THREE.TubeGeometry(path, segments * points.length, bounded(definition.tube, .045, .004, .2), 10, false);
+    }
     case 'plane':
       return new THREE.PlaneGeometry(bounded(definition.width, 1, 0.02, 20), bounded(definition.height, 1, 0.04, 20));
     case 'box':

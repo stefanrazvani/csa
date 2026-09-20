@@ -549,3 +549,11 @@ la capetele interioare ale treptelor dinspre altar. Cotele verticale și
 adâncimea rămân aceleași; vârful Calfei se mută împreună cu baza cubică.
 Geometriile rămân integral pe trepte, lăsând centrul scărilor liber.
 Manifest: `2026.09.21-1`; selecțiile și repartizarea pe grade sunt păstrate.
+
+Funia folosește acum un singur `tubePath`, cu patru colțuri rotunjite, între
+ciucurii intrării. Limita de înălțime 20 a cilindrilor trunchia vechile laturi
+de 22.6, provocând goluri la colțuri. Traseul este limitat la 16 puncte și
+folosește aceeași selecție. Sunt acum 684/708/708 piese.
+Plumbul are material argintiu mat, cu metalicitate redusă și luminanță minimă
+prin emisivitate discretă. Scaunul VM folosește lemn mai deschis și tapițerie
+bordo, cu aceeași corecție de contrast; geometria și pozițiile sunt păstrate.
