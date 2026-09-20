@@ -22,6 +22,8 @@
 .csa-open-windows button { border: 0; background: transparent; width: 100%; text-align: left; }
 .csa-open-windows p { font-size: 12px; padding: 10px; }
 .csa-desktop #page-content { position: fixed; inset: 58px 0 0 240px; min-height: 0; background: #e9eff2; }
+.csa-menu-collapsed .csa-sidebar { display: none; }
+.csa-desktop.csa-menu-collapsed #page-content { left: 0; }
 .csa-module-window .wb-body { background: #f5f6f8; }
 .csa-module-window.min { display: none; }
 .csa-module-window .wb-title { font-size: 14px; font-weight: 600; }

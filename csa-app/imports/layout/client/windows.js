@@ -6,6 +6,8 @@ import { Template } from 'meteor/templating';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 export const openWindows = new ReactiveVar([]);
+let mobileLayout = window.innerWidth < 800;
+export const menuExpanded = new ReactiveVar(!mobileLayout);
 const windows = new Map();
 let active = '';
 let clearing = false;
@@ -22,7 +24,13 @@ const titles = {
 function publish() {
   openWindows.set([...windows].map(([id, item]) => ({ id, title: item.title, active: id === active, minimized: Boolean(item.box?.min) })));
 }
-function margins() { return { top: 58, left: window.innerWidth < 800 ? 0 : 240, right: 0, bottom: 0 }; }
+function margins() { return { top: 58, left: window.innerWidth < 800 || !menuExpanded.get() ? 0 : 240, right: 0, bottom: 0 }; }
+export function setMenuExpanded(expanded) {
+  menuExpanded.set(expanded);
+  document.body.classList.toggle('csa-menu-open', expanded);
+  document.body.classList.toggle('csa-menu-collapsed', !expanded);
+  for (const { box } of windows.values()) fitWindow(box);
+}
 function fitWindow(box) {
   const bounds = margins();
   Object.assign(box, bounds);
@@ -95,6 +103,12 @@ export function openModule(template, data, path, onActivate) {
 export function markWindowClean(node) { for(const item of windows.values())if(item.box.dom.contains(node))item.dirty=false; }
 export function closeWindowFor(node) { for(const item of windows.values())if(item.box.dom.contains(node)){item.box.close();return;} }
 window.addEventListener('resize', () => {
+  const mobile = window.innerWidth < 800;
+  if (mobile !== mobileLayout) {
+    mobileLayout = mobile;
+    setMenuExpanded(!mobile);
+    return;
+  }
   for (const { box } of windows.values()) fitWindow(box);
 });
 window.addEventListener('beforeunload', event => {

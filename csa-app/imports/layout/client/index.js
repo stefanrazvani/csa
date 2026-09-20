@@ -1,6 +1,6 @@
 import './index.html';
 import './layout.css';
-import { openModule, closeWindows, confirmWindowChanges, openWindows, focusWindow } from './windows.js';
+import { openModule, closeWindows, confirmWindowChanges, openWindows, focusWindow, menuExpanded, setMenuExpanded } from './windows.js';
 import '/imports/system/auth/client/auth.css';
 import { Accounts } from 'meteor/accounts-base';
 import { Blaze } from 'meteor/blaze';
@@ -126,6 +126,8 @@ Template.csaLayout.onCreated(function layoutCreated() {
 });
 
 Template.csaLayout.helpers({
+  menuExpanded: () => String(menuExpanded.get()),
+  menuToggleLabel: () => menuExpanded.get() ? 'Ascunde meniul' : 'Deschide meniul',
   openWindows: () => openWindows.get(),
   isSuperAdmin() { return Template.instance().adminContext.get()?.superAdmin === true; },
   isTenantAdmin() { return Template.instance().adminContext.get()?.tenantAdmin === true; },
@@ -145,10 +147,16 @@ Template.csaLayout.helpers({
 Template.csaLayout.events({
   'click .js-profile-link'(event) { event.currentTarget.closest('details').open=false; },
   'keydown .csa-account-menu'(event) { if(event.key==='Escape') {event.currentTarget.open=false;event.currentTarget.querySelector('summary').focus();} },
-  'click .js-window-focus'(event) { focusWindow(event.currentTarget.dataset.window); },
-  'click .js-toggle-menu'() { document.body.classList.toggle('csa-menu-open'); },
+  'click .js-window-focus'(event) {
+    focusWindow(event.currentTarget.dataset.window);
+    if (window.innerWidth < 800) setMenuExpanded(false);
+  },
+  'click .js-toggle-menu'() { setMenuExpanded(!menuExpanded.get()); },
+  'keydown .csa-sidebar'(event, instance) {
+    if (event.key === 'Escape') { setMenuExpanded(false); instance.find('.js-toggle-menu').focus(); }
+  },
   'click .csa-sidebar a'(event) {
-    document.body.classList.remove('csa-menu-open');
+    if (window.innerWidth < 800) setMenuExpanded(false);
     if (new URL(event.currentTarget.href).pathname === window.location.pathname) { event.preventDefault(); mountRequestedPage(); }
   },
   async 'change .js-active-tenant'(event, instance) {
