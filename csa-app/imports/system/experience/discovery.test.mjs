@@ -1,0 +1,98 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import * as THREE from 'three';
+import { addTempleDiscovery } from './server/discovery.js';
+import { getScenePreset } from './server/scenes.js';
+import { normalizeExperienceManifest } from './client/manifest.js';
+import { ExperienceRenderer } from './client/engine.js';
+
+function manifest(grade) {
+  return normalizeExperienceManifest(addTempleDiscovery(getScenePreset(grade), grade));
+}
+function renderer(scene) {
+  const value = Object.create(ExperienceRenderer.prototype);
+  Object.assign(value, { THREE, manifest: scene, stage: new THREE.Group(), interactiveMeshes: [], interactiveGroups: new Map(),
+    raycaster: new THREE.Raycaster(), pointer: new THREE.Vector2(), quality: 'low', camera: new THREE.PerspectiveCamera(45, 1, .01, 100),
+    renderer: { domElement: { getBoundingClientRect: () => ({left:0, top:0, width:100, height:100}) } } });
+  return value;
+}
+
+test('discovery covers real symbols and sends only the selected degree, within bounds', () => {
+  for (const grade of [1,2,3]) {
+    const raw = addTempleDiscovery(getScenePreset(grade), grade);
+    const scene = normalizeExperienceManifest(raw);
+    assert.equal(scene.interactives.length, raw.interactives.length);
+    const items = scene.interactives.filter(item => item.presentation === 'architecture');
+    assert.ok(items.length >= 36);
+    assert.equal(new Set(scene.interactives.map(item => item.id)).size, scene.interactives.length);
+    for (const item of items) {
+      assert.ok(item.description && item.sourceRef && item.education.prompt);
+      assert.ok(item.education.sections.length);
+      assert.ok(scene.architecture.some(part => part.interactionId === item.id) || [scene.environment.floor.interactionId, scene.environment.floor.borderInteractionId].includes(item.id), item.id);
+    }
+    for (const part of scene.architecture.filter(part => part.interactionId)) assert.ok(items.some(item => item.id === part.interactionId));
+    for (const [id, target] of [['pillar-wisdom-se-shaft','discover-wisdom'], ['pillar-strength-nw-shaft','discover-strength'], ['pillar-beauty-sw-shaft','discover-beauty'], ['sun-disc','discover-sun'], ['moon-disc','discover-moon'], ['plumb-bob','discover-plumb']]) {
+      assert.equal(scene.architecture.find(part => part.id === id)?.interactionId, target, id);
+    }
+    assert.equal(items.filter(item => item.id.startsWith('discover-zodiac-')).length,12);
+    assert.equal(items.some(item => item.id === 'discover-star'), grade === 2);
+    assert.equal(items.some(item => item.id === 'discover-globe-b'), grade >= 2);
+    const serialized = JSON.stringify(items);
+    if (grade === 1) assert.doesNotMatch(serialized, /Ritualul Calfei|Ritualul Maestrului|ambele brațe|un braț al Compasului/);
+    if (grade === 2) assert.doesNotMatch(serialized, /Ritualul Maestrului|Camera de Mijloc|ambele brațe ale Compasului sunt/);
+  }
+  assert.deepEqual(addTempleDiscovery(getScenePreset(0),0),getScenePreset(0));
+});
+
+test('raycasting selects actual geometry, does not add proxy objects, and respects occlusion', () => {
+  const scene = manifest(1);
+  const engine = renderer(scene);
+  const sun = scene.architecture.find(part => part.id === 'sun-disc');
+  engine.createArchitecture(sun);
+  assert.equal(engine.stage.children.length,1);
+  engine.createInteractive(scene.interactives.find(item => item.id === 'discover-sun'),0);
+  assert.equal(engine.stage.children.length,1);
+  const mesh = engine.stage.children[0];
+  engine.camera.position.set(...sun.position); engine.camera.position.z += 3;
+  engine.camera.lookAt(new THREE.Vector3(...sun.position)); engine.camera.updateMatrixWorld();
+  engine.stage.updateMatrixWorld(true);
+  assert.equal(engine.pick({clientX:50,clientY:50})?.item?.id,'discover-sun');
+  const original = { color: mesh.material.emissive.getHex(), intensity:mesh.material.emissiveIntensity, scale:mesh.scale.toArray(), pos:mesh.position.toArray() };
+  engine.selectInteraction('discover-sun');
+  assert.notEqual(mesh.material.emissive.getHex(),original.color);
+  assert.deepEqual(mesh.scale.toArray(),original.scale); assert.deepEqual(mesh.position.toArray(),original.pos);
+  engine.selectInteraction('');
+  assert.equal(mesh.material.emissive.getHex(),original.color); assert.equal(mesh.material.emissiveIntensity,original.intensity);
+  engine.createArchitecture({ ...sun, id:'blocker', interactionId:'', position:[sun.position[0],sun.position[1],sun.position[2]+1], geometry:{type:'box',width:2,height:2,depth:.1}, scale:[1,1,1] });
+  engine.stage.updateMatrixWorld(true);
+  assert.equal(engine.pick({clientX:50,clientY:50}),null);
+});
+
+test('floor and border have separate targets and reset highlights without shared-material spill', () => {
+  const scene = manifest(1), engine = renderer(scene);
+  engine.createFloor(scene.environment.floor);
+  const tiles = engine.interactiveMeshes.filter(mesh => mesh.userData.interaction?.item.id === 'discover-mosaic');
+  const borders = engine.interactiveMeshes.filter(mesh => mesh.userData.interaction?.item.id === 'discover-border');
+  assert.equal(tiles.length,40); assert.equal(borders.length,4);
+  const originalBorder = borders[0].material.emissiveIntensity;
+  engine.selectInteraction('discover-mosaic');
+  assert.equal(borders[0].material.emissiveIntensity,originalBorder);
+  assert.ok(tiles.every(mesh => mesh.material.emissiveIntensity >= .45));
+  engine.selectInteraction('discover-border');
+  assert.ok(tiles.every(mesh => mesh.material.emissive.getHex() === 0 && mesh.material.emissiveIntensity === mesh.userData.originalEmissiveIntensity));
+  assert.ok(borders.every(mesh => mesh.material.emissiveIntensity >= .45));
+  engine.camera.position.set(.35,5,scene.environment.floor.carpet.z);
+  engine.camera.lookAt(.35,0,scene.environment.floor.carpet.z); engine.camera.updateMatrixWorld(); engine.stage.updateMatrixWorld(true);
+  assert.equal(engine.pick({clientX:50,clientY:50})?.item?.id,'discover-mosaic');
+});
+
+test('unresolved bindings are inert and normalization keeps only bounded plain text', () => {
+  const scene = manifest(1), engine = renderer(scene);
+  const item = {...scene.architecture[0], interactionId:'not-authorized'};
+  engine.createArchitecture(item);
+  assert.equal(engine.stage.children[0].userData.interaction,undefined);
+  const normalized = normalizeExperienceManifest({interactives:Array.from({length:120}, (_,i) => ({id:`x-${i}`,label:'x',presentation:'architecture',education:{sections:Array(10).fill({title:'t',body:'x'.repeat(1000)})}}))});
+  assert.equal(normalized.interactives.length,96);
+  assert.equal(normalized.interactives[0].education.sections.length,5);
+  assert.equal(normalized.interactives[0].education.sections[0].body.length,800);
+});

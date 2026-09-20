@@ -526,7 +526,7 @@ function makeMaterial(THREE, definition = {}, fallback = '#6f7c82') {
   return material;
 }
 
-class ExperienceRenderer {
+export class ExperienceRenderer {
   constructor(THREE, mount, manifest, options = {}) {
     this.THREE = THREE;
     this.mount = mount;
@@ -763,6 +763,7 @@ class ExperienceRenderer {
       );
       base.rotation.x = -Math.PI / 2;
       floorGroup.add(base);
+      this.interactiveMeshes.push(base); // Opaque floor also blocks picking through it.
       const carpet = definition.carpet;
       const tileWidth = carpet.width / carpet.tilesX;
       const tileDepth = carpet.depth / carpet.tilesZ;
@@ -778,6 +779,7 @@ class ExperienceRenderer {
             carpet.z + (z + 0.5) * tileDepth - carpet.depth / 2,
           );
           floorGroup.add(tile);
+          this.bindArchitectureInteraction(tile, definition.interactionId);
         }
       }
       const borderMaterial = new THREE.MeshStandardMaterial({
@@ -798,6 +800,7 @@ class ExperienceRenderer {
         const strip = new THREE.Mesh(new THREE.BoxGeometry(stripWidth, 0.02, stripDepth), borderMaterial);
         strip.position.set(stripX, 0.02, stripZ);
         floorGroup.add(strip);
+        this.bindArchitectureInteraction(strip, definition.borderInteractionId);
       }
       this.stage.add(floorGroup);
       return;
@@ -842,11 +845,24 @@ class ExperienceRenderer {
     mesh.rotation.set(...item.rotation);
     mesh.scale.set(...item.scale);
     this.stage.add(mesh);
+    this.bindArchitectureInteraction(mesh, item.interactionId);
+  }
+
+  bindArchitectureInteraction(mesh, id) {
+    // Every solid participates in picking, so hidden symbols cannot be selected
+    // through desks or walls. Only authorized manifest entries are actionable.
+    this.interactiveMeshes.push(mesh);
+    const item = this.manifest.interactives.find(entry => entry.id === id && entry.presentation === 'architecture');
+    if (!item) return;
+    mesh.userData.interaction = { type: 'item', item };
+    mesh.userData.architectureInteraction = true;
+    mesh.userData.originalEmissive = mesh.material.emissive.clone();
+    mesh.userData.originalEmissiveIntensity = mesh.material.emissiveIntensity;
   }
 
   createInteractive(item, index) {
     // Reperele cu prezentare 'list' rămân numai în navigatorul semantic.
-    if (item.presentation === 'list') return;
+    if (item.presentation === 'list' || item.presentation === 'architecture') return;
     const THREE = this.THREE;
     const group = new THREE.Group();
     group.position.copy(vector3(THREE, item.position));
@@ -937,6 +953,16 @@ class ExperienceRenderer {
 
   selectInteraction(id) {
     this.selectedId = id || '';
+    for (const mesh of this.interactiveMeshes) {
+      if (!mesh.userData.architectureInteraction) continue;
+      const selected = mesh.userData.interaction.item.id === this.selectedId;
+      mesh.material.emissive.copy(mesh.userData.originalEmissive);
+      mesh.material.emissiveIntensity = mesh.userData.originalEmissiveIntensity;
+      if (selected) {
+        mesh.material.emissive.set('#d6b86c');
+        mesh.material.emissiveIntensity = Math.max(0.45, mesh.userData.originalEmissiveIntensity);
+      }
+    }
     for (const [itemId, group] of this.interactiveGroups.entries()) {
       const selected = itemId === this.selectedId;
       const material = group.userData.mesh?.material;

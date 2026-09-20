@@ -248,6 +248,7 @@ Template.csaTempleExperience.onCreated(function experienceCreated() {
   this.knocks = new ReactiveVar(0);
   this.selectedId = new ReactiveVar('');
   this.navigatorOpen = new ReactiveVar(false);
+  this.searchQuery = new ReactiveVar('');
   this.webglFallback = new ReactiveVar(false);
   this.viewGrade = new ReactiveVar(0);
   this.quality = new ReactiveVar(storedQuality());
@@ -300,7 +301,7 @@ Template.csaTempleExperience.helpers({
   webglFallback() { return Template.instance().webglFallback.get(); },
   experienceClass() {
     const instance = Template.instance();
-    const grade = instance.manifest.get()?.access?.grade || 0;
+    const grade = instance.manifest.get()?.access?.viewGrade || 0;
     return `is-${instance.phase.get()} is-grade-${grade} ${instance.webglFallback.get() ? 'is-fallback' : ''}`;
   },
   knockCount() { return Template.instance().knocks.get(); },
@@ -331,6 +332,13 @@ Template.csaTempleExperience.helpers({
     return options;
   },
   navigatorExpanded() { return Template.instance().navigatorOpen.get() ? 'true' : 'false'; },
+  searchQuery() { return Template.instance().searchQuery.get(); },
+  filteredInteractives() {
+    const instance = Template.instance();
+    const fold = value => String(value).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    const query = fold(instance.searchQuery.get()).trim();
+    return (instance.manifest.get()?.interactives || []).filter(item => !query || fold(`${item.label} ${item.description}`).includes(query));
+  },
   navigatorClass() { return Template.instance().navigatorOpen.get() ? 'is-open' : ''; },
   selectedItem() { return findItem(Template.instance(), Template.instance().selectedId.get()); },
   itemSelected(id) { return Template.instance().selectedId.get() === id ? 'true' : 'false'; },
@@ -344,6 +352,9 @@ Template.csaTempleExperience.helpers({
 });
 
 Template.csaTempleExperience.events({
+  'input .js-xp-search'(event, instance) {
+    instance.searchQuery.set(event.currentTarget.value.slice(0, 120));
+  },
   'click .js-xp-knock'(event, instance) {
     event.preventDefault();
     performKnock(instance);

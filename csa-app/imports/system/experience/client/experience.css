@@ -710,3 +710,11 @@ body.csa-xp-active .csa-private-nav { display: none !important; }
   .csa-xp.is-fallback .csa-xp-plan-moon { left: 13%; }
   .csa-xp.is-fallback .csa-xp-plan-sun { right: 13%; }
 }
+
+/* Search and sourced descriptions share the existing accessible navigator. */
+.csa-xp-search { display: grid; gap: 6px; padding: 8px 14px; color: #b7c4c7; font-size: .75rem; }
+.csa-xp-search input { width: 100%; min-height: 44px; padding: 10px; color: #f2e4bd; background: #0b1b25; border: 1px solid #57717b; border-radius: 6px; }
+.csa-xp-search input:focus-visible { outline: 2px solid #d7bd78; outline-offset: 2px; }
+.csa-xp-empty { padding: 14px; color: #b7c4c7; }
+.csa-xp-explanation h3, .csa-xp-reflection-label { margin: 16px 0 6px; color: #eadba9; font-size: .88rem; }
+.csa-xp-explanation p { color: #b7c4c7; font-size: .85rem; line-height: 1.55; }

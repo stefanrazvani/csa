@@ -14,8 +14,9 @@ import { hasActiveOffice, requireCompositeAccess } from '/imports/lib/access/ser
 import { CATALOG_VERSION, getImplementationCatalog } from '/imports/system/temple/catalog/index.js';
 import { TempleExperienceSignals } from '../signals.js';
 import { getScenePreset, gradeName } from './scenes.js';
+import { addTempleDiscovery } from './discovery.js';
 
-const EXPERIENCE_VERSION = '2026.09.20-5';
+const EXPERIENCE_VERSION = '2026.09.20-6';
 
 // Repere care rămân în navigatorul semantic, dar nu primesc corp 3D în scenă:
 // nu au o reprezentare fizică fidelă planșei și încărcau vizual templul.
@@ -176,11 +177,11 @@ export async function buildExperienceManifest(context, options = null) {
   const catalog = getImplementationCatalog({
     grade: viewGrade,
     officeCodes,
-    superAdmin: access.superAdmin,
+    superAdmin: access.superAdmin && viewGrade === 3,
     enabledOptionalSymbolIds: [],
   });
   const preset = getScenePreset(viewGrade, officeCodes);
-  const scene = mergeCatalog(preset, catalog);
+  const scene = addTempleDiscovery(mergeCatalog(preset, catalog), viewGrade);
   const tenant = await Entitati.findOneAsync(access.eId, { fields: { nume: 1, name: 1 } });
   return {
     version: `${EXPERIENCE_VERSION}:${scene.catalogVersion || CATALOG_VERSION}:g${viewGrade}`,

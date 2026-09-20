@@ -93,7 +93,7 @@
         {{#with manifest}}
           <div class="csa-xp-intro">
             <p>{{subtitle}}</p>
-            <small>Atinge un reper luminos sau folosește lista accesibilă.</small>
+            <small>Selectează un simbol din templu sau caută-l în lista de explorare.</small>
           </div>
 
           <button class="csa-xp-mobile-explore js-xp-toggle-navigator" type="button" aria-expanded="{{navigatorExpanded}}" aria-controls="csaXpNavigator">
@@ -102,7 +102,7 @@
 
           <nav class="csa-xp-navigator {{navigatorClass}}" id="csaXpNavigator" aria-label="Repere disponibile în templul activ">
             <div class="csa-xp-navigator-head">
-              <div><span>Planșa activă</span><strong>{{access.gradeLabel}}</strong></div>
+              <div><span>Descoperă templul</span><strong>{{access.viewGradeLabel}}</strong></div>
               <button class="js-xp-close-navigator" type="button" aria-label="Închide lista reperelor">×</button>
             </div>
             {{#if hasOffices access.offices}}
@@ -110,14 +110,19 @@
                 {{#each access.offices}}<span>{{label}}</span>{{/each}}
               </div>
             {{/if}}
+            <label class="csa-xp-search">Caută un element
+              <input class="js-xp-search" type="search" placeholder="Soare, colonetă, pavaj…" value="{{searchQuery}}" autocomplete="off">
+            </label>
             <ol class="csa-xp-object-list">
-              {{#each interactives}}
+              {{#each filteredInteractives}}
                 <li>
                   <button class="js-xp-select {{itemClass id}}" type="button" data-id="{{id}}" aria-pressed="{{itemSelected id}}">
                     <span class="csa-xp-symbol" aria-hidden="true">{{itemSymbol kind}}</span>
                     <span><strong>{{label}}</strong><small>{{description}}</small></span>
                   </button>
                 </li>
+              {{else}}
+                <li class="csa-xp-empty">Niciun element găsit. Încearcă altă denumire.</li>
               {{/each}}
             </ol>
             {{#if hasLearningPath learningPath}}
@@ -136,6 +141,10 @@
               <p class="csa-xp-eyebrow">{{education.objective}}</p>
               <h2 id="csaXpSheetTitle">{{label}}</h2>
               <p id="csaXpSheetDescription">{{description}}</p>
+              {{#each education.sections}}
+                <section class="csa-xp-explanation"><h3>{{title}}</h3><p>{{body}}</p></section>
+              {{/each}}
+              <h3 class="csa-xp-reflection-label">Întrebare de reflecție</h3>
               <blockquote>{{education.prompt}}</blockquote>
               {{#if hasSteps education.steps}}
                 <ol class="csa-xp-steps">

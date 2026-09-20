@@ -102,6 +102,7 @@ function architectureItem(value, index) {
   if (!value || typeof value !== 'object') return null;
   return {
     id: identifier(value.id, `architecture-${index}`),
+    interactionId: identifier(value.interactionId, ''),
     geometry: geometry(value.geometry),
     position: vector(value.position, [0, 0, -5]),
     rotation: vector(value.rotation, [0, 0, 0], -Math.PI * 2, Math.PI * 2),
@@ -118,6 +119,9 @@ function education(value = {}) {
     steps: Array.isArray(source.steps)
       ? source.steps.slice(0, 6).map((step) => text(step, '', 220)).filter(Boolean)
       : [],
+    sections: Array.isArray(source.sections) ? source.sections.slice(0, 5).map(section => ({
+      title: text(section?.title, '', 120), body: text(section?.body, '', 800),
+    })).filter(section => section.title && section.body) : [],
   };
 }
 
@@ -138,7 +142,7 @@ function interactiveItem(value, index) {
     haloColor: color(value.haloColor, '#f7e3a6'),
     education: education(value.education || value.learning),
     sourceRef: text(value.sourceRef, '', 140),
-    presentation: value.presentation === 'list' ? 'list' : 'scene',
+    presentation: ['list', 'architecture'].includes(value.presentation) ? value.presentation : 'scene',
   };
 }
 
@@ -162,6 +166,8 @@ function floor(value = {}) {
   const type = FLOOR_TYPES.has(source.type) ? source.type : 'plane';
   return {
     type,
+    interactionId: identifier(source.interactionId, ''),
+    borderInteractionId: identifier(source.borderInteractionId, ''),
     width: number(source.width, 18, 4, 40),
     depth: number(source.depth, 22, 4, 50),
     radius: number(source.radius, 11, 2, 25),
@@ -221,7 +227,7 @@ export function normalizeExperienceManifest(value) {
   const tenant = source.tenant && typeof source.tenant === 'object' ? source.tenant : {};
   const grade = Math.round(number(access.grade, 0, 0, 3));
   const interactives = Array.isArray(source.interactives)
-    ? source.interactives.slice(0, 36).map(interactiveItem).filter(Boolean)
+    ? source.interactives.slice(0, 96).map(interactiveItem).filter(Boolean)
     : [];
   return {
     version: text(source.version, 'experience-v1', 80),

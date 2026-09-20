@@ -470,3 +470,27 @@ corintică are fus cu 20 de caneluri, două coroane de câte opt frunze de
 acant, nervuri și rozetă florală. Helperul `candle` păstrează nouă lumânări
 (3 pe stâlpi + 3/2/1 pe mese), cu ceară profilată, picătură, fitil și flacără
 netedă cu miez luminos. Rotația sfeșnicului Primului Supraveghetor se păstrează.
+
+### Descoperirea elementelor reale — 20 septembrie 2026
+
+`server/discovery.js` leagă fișele educative direct de piesele arhitecturale:
+36 elemente la Ucenic, 39 la Calfă, 38 la Maestru. Fiecare colonetă, luminar,
+medalion zodiacal și coloana lui laterală, pavajul, bordura, bolta, funia,
+firul cu plumb, altarul, Cartea, Echerul, Compasul și planșa au ținte proprii.
+Sferele apar de la gradul 2; Steaua Înflăcărată este selectabilă în scena gradului 2.
+Fișele descriu configurația gradului selectat și indică documentul/pagina;
+întrebările sunt propuneri pedagogice, distincte de descrierea ritualului.
+
+Manifestul transmite `interactionId` pe arhitectură și pe pardoseală.
+Reperele `presentation: architecture` reutilizează geometria statică; nu adaugă
+corpuri, halouri sau animații. Obiectele opace opresc selecția prin pereți/mobilier.
+Evidențierea modifică temporar emisivitatea, fără deplasare sau scalare.
+Navigatorul permite căutare fără diacritice și oferă aceleași fișe fără WebGL.
+Limita de 96 repere păstrează și instrumentele funcțiilor, fără trunchiere.
+
+Catalogul rămâne pe server. În vizualizarea unui grad inferior, administratorul
+primește catalogul acelui grad, fără forțarea catalogului de Maestru.
+Gradele, profilul și sursele superioare nu sunt serializate pentru Ucenic.
+Schimbarea gradului reîncarcă manifestul și închide detaliile vechi.
+Geometria uneltelor de pe altar rămâne schematică; fișa explică configurația
+rituală a gradului, fără a pretinde că modelul simplificat este o planșă exactă.
