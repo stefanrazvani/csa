@@ -1,13 +1,13 @@
 # Platformă CSA – stare implementare
 
-Release activ, 20 septembrie 2026: `04d349e`, tag `release-20260920-temple-furniture`.
-Templu: eliminate coloanele cilindrice suplimentare de pe mesele Venerabilului și
-Supraveghetorilor, păstrate sfeșnicele 3/2/1. Scaune cu șezut, picioare și spătar;
-bănci la pereții laterali. Ochi migdalat în relief cu iris, pupilă, triunghi și raze.
+Release activ, 20 septembrie 2026: `57ce577`, tag `release-20260920-temple-orient`.
+Templu: fir cu plumb de cinci ori mai subțire, soare în relief cu 24 de raze,
+coloana Înțelepciunii cu fus canelat și volute ionice, sfeșnicul Primului
+Supraveghetor rotit 45°. Mobilierul și ochiul din `04d349e` sunt păstrate.
 Manifestele live pentru toate gradele, autentificarea și accesul au fost verificate.
 Previzualizarea vectorială a geometriilor reale a fost inspectată; WebGL nu este
 disponibil în VM. 10/10 containere healthy, 148/148 fișiere sursă identice cu arhiva.
-Detalii: `deploy/releases/2026-09-20-temple-furniture.md`.
+Detalii: `deploy/releases/2026-09-20-temple-orient.md`.
 Eliminările decorative din release-urile `ebf3465` și `dc360f1` sunt păstrate.
 Profilul, editoarele și istoricul pe obiect din release-ul `39e1b2e` sunt păstrate;
 standard: `MODULE_OBJECTS.md`; detalii: `deploy/releases/2026-09-20-profile-editors.md`.
