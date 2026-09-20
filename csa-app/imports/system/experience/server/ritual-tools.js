@@ -33,9 +33,9 @@ export function compassTool(p, id, x, y, z, length=.42, grade=3) {
 export function ritualTools(p, grade) {
   const steel={metalness:.7,roughness:.35};
   const items=[
-    // Modest stones on the actual Orient steps, away from the side officer desks.
-    p('study-rough-stone','roughStone',[-3.6,.44,-6.4],[1,1,1],'#858881',{geometry:{size:.29},roughness:1}),
-    p('study-cubic-stone','box',[3.6,.68,-7.1],[.4,.4,.4],'#b2ac97',{roughness:.86}),
+    // Stones rest at the inner ends of the Orient steps, next to the altar.
+    p('study-rough-stone','roughStone',[-2.85,.44,-6.4],[1,1,1],'#858881',{geometry:{size:.29},roughness:1}),
+    p('study-cubic-stone','box',[2.85,.68,-7.1],[.4,.4,.4],'#b2ac97',{roughness:.86}),
     p('study-mallet-handle','box',[-1.5,.09,-6.2],[.045,.05,.42],'#806345'),
     p('study-mallet-head','cylinder',[-1.5,.11,-6.4],[1,1,1],'#806345',{geometry:{radiusTop:.09,radiusBottom:.09,height:.27,segments:16},rotation:[0,0,Math.PI/2]}),
     p('study-chisel-shaft','box',[-1.15,.055,-6.28],[.055,.05,.4],'#9ba9b2',steel),
@@ -52,7 +52,7 @@ export function ritualTools(p, grade) {
     items.push(p('study-lever-toe','box',[-4.67,.125,5.95],[.11,.035,.07],'#bac7cc',{rotation:[0,0,-.3],...steel}));
   }
   if(grade===2) {
-    items.push(p('study-cubic-stone-point','cone',[3.6,1.015,-7.1],[1,1,1],'#b2ac97',{geometry:{radius:.283,height:.27,segments:4},rotation:[0,Math.PI/4,0]}));
+    items.push(p('study-cubic-stone-point','cone',[2.85,1.015,-7.1],[1,1,1],'#b2ac97',{geometry:{radius:.283,height:.27,segments:4},rotation:[0,Math.PI/4,0]}));
     items.push(p('study-wheat-stem','cylinder',[2.9,.3,8.15],[.5,1,.5],'#cbb36f',{geometry:{radiusTop:.02,radiusBottom:.02,height:.6,segments:8}}));
     for(let n=0;n<4;n++) for(const sign of [-1,1]) items.push(p(`study-wheat-grain-${n}-${sign<0 ? "left" : "right"}`,'sphere',[2.9+sign*.034,.43+n*.05,8.15],[.33,.65,.25],'#e4cb85',{geometry:{size:.08,segments:10},rotation:[0,0,-sign*.45]}));
   }

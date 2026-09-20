@@ -91,7 +91,10 @@ try {
     if(grade === 1) assert.doesNotMatch(JSON.stringify(scene.interactives),/Ritualul Calfei|Ritualul Maestrului|g2-|g3-/);
     console.log(`PASS LIVE DISCOVERY grade ${grade}: ${discoveries.length} physical targets, sourced descriptions, degree isolation.`);
 
-    assert.ok(scene.version.startsWith('2026.09.20-9:'));
+    assert.ok(scene.version.startsWith('2026.09.21-1:'));
+    assert.equal(scene.architecture.find(part=>part.id==='study-rough-stone').position[0],-2.85);
+    assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone').position[0],2.85);
+    if(grade===2) assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone-point').position[0],2.85);
     assert.equal(scene.architecture.filter(item => /ashlar/.test(item.id)).length, 0);
     for (const id of ['hospitalier-table', 'hospitalier-chair', 'treasurer-table', 'treasurer-chair']) assert.ok(scene.architecture.some(item => item.id === id), id);
     if (grade === 2) for (const id of ['concept-vault', 'study-workshop', 'convocations-two']) {

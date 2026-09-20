@@ -33,6 +33,20 @@ test('small ritual objects and the reserved grand-master chair have distinct deg
     assert.ok(Math.abs(stone.position[1]+roughGeometry.boundingBox.min.y-.24)<1e-6); roughGeometry.dispose();
     const cube=part('study-cubic-stone'); assert.ok(Math.abs(cube.position[1]-cube.scale[1]/2-.48)<1e-8);
     assert.ok(stone.position[0]<0 && cube.position[0]>0 && cube.scale[0]<.5);
+    for (const [object, stepId] of [[stone,'orient-step-north-low'],[cube,'orient-step-south-mid'], ...(grade===2 ? [[part('study-cubic-stone-point'),'orient-step-south-mid']] : [])]) {
+      const step=part(stepId), mesh=new THREE.Mesh(makeGeometry(THREE,object.geometry));
+      mesh.position.fromArray(object.position); mesh.rotation.fromArray(object.rotation); mesh.scale.fromArray(object.scale); mesh.updateMatrixWorld();
+      const box=new THREE.Box3().setFromObject(mesh, true);
+      assert.ok(box.min.x>=step.position[0]-step.scale[0]/2 && box.max.x<=step.position[0]+step.scale[0]/2, 'stone stays fully over its step');
+      assert.ok(box.min.z>=step.position[2]-step.scale[2]/2 && box.max.z<=step.position[2]+step.scale[2]/2, 'stone does not overhang the tread');
+      assert.ok(step.position[0]<0 ? box.min.x>step.position[0]+.4 : box.max.x<step.position[0]-.4, 'stone leaves the middle of the stairs clear, towards the altar');
+      mesh.geometry.dispose();
+    }
+    if (grade===2) {
+      const tip=part('study-cubic-stone-point');
+      assert.equal(tip.position[0],cube.position[0]); assert.equal(tip.position[2],cube.position[2]);
+      assert.ok(Math.abs(tip.position[1]-tip.geometry.height/2-cube.position[1]-cube.scale[1]/2)<1e-8);
+    }
     for(const id of ['tyler','expert']) {
       assert.equal(part(`${id}-sword-blade`).geometry.type,'blade');
       assert.equal(part(`${id}-sword-pommel`).interactionId,`discover-${id}-sword`);

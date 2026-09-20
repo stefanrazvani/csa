@@ -541,3 +541,11 @@ Blatul, cartea, Echerul și Compasul sunt rotite ca un ansamblu rigid cu 25°
 la y=1.27, cu un suport scurt deasupra coloanei altarului. Pozițiile relative
 și suprapunerea brațelor pe grad sunt păstrate. Sunt 688/712/712 piese;
 numărul fișelor rămâne 56/64/64. Manifest: `2026.09.20-9`.
+
+### Extensia 10 — pietre lângă altar
+
+Piatra brută și piatra cubică sunt mutate de la x=±3.6 la x=±2.85,
+la capetele interioare ale treptelor dinspre altar. Cotele verticale și
+adâncimea rămân aceleași; vârful Calfei se mută împreună cu baza cubică.
+Geometriile rămân integral pe trepte, lăsând centrul scărilor liber.
+Manifest: `2026.09.21-1`; selecțiile și repartizarea pe grade sunt păstrate.
