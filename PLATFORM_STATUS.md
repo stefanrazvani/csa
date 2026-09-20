@@ -1,12 +1,13 @@
 # Platformă CSA – stare implementare
 
-Release activ, 20 septembrie 2026: `ebf3465`, tag `release-20260920-temple-g23`.
+Release activ, 20 septembrie 2026: `dc360f1`, tag `release-20260920-temple-ring`.
 Templu: pietrele decorative din fața Ospitalierului/Trezorierului sunt eliminate
 și la gradele 2/3; nodul și octaedrul pentru Concepte/Bibliotecă din gradul 2
-rămân numai în navigator, fără geometrie sau halo.
+rămân numai în navigator, fără geometrie sau halo. Inelul „Cercul participării”
+din Calfă este de asemenea numai în navigator, cu accesul la convocatoare păstrat.
 Manifestele live pentru toate gradele, autentificarea și accesul au fost verificate.
 10/10 containere healthy, 147/147 fișiere sursă identice cu arhiva publicată.
-Detalii: `deploy/releases/2026-09-20-temple-g23.md`.
+Detalii: `deploy/releases/2026-09-20-temple-ring.md` și `deploy/releases/2026-09-20-temple-g23.md`.
 Profilul, editoarele și istoricul pe obiect din release-ul `39e1b2e` sunt păstrate;
 standard: `MODULE_OBJECTS.md`; detalii: `deploy/releases/2026-09-20-profile-editors.md`.
 Publicarea inițială: 13 iulie 2026.
