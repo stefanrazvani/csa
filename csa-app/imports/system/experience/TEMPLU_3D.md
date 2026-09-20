@@ -557,3 +557,13 @@ folosește aceeași selecție. Sunt acum 684/708/708 piese.
 Plumbul are material argintiu mat, cu metalicitate redusă și luminanță minimă
 prin emisivitate discretă. Scaunul VM folosește lemn mai deschis și tapițerie
 bordo, cu aceeași corecție de contrast; geometria și pozițiile sunt păstrate.
+
+### Extensia 11 — perspectivă comună pentru sfere și altar
+
+Camera pornește la [-0.6, 3.8, 11.05], în interiorul porții și ușor spre
+stânga, privind spre [0, 2.15, -5.2]. Unghiul vertical de bază este 84°,
+cu minimum 116° pe orizontală; se adaptează la redimensionarea ferestrei
+(plafon vertical 155° pentru formate înguste). Ambele sfere și altarul
+sunt vizibile simultan din pornire, fără comutator separat de perspectivă.
+Pozițiile coloanelor și ale obiectelor nu se schimbă; Ucenicul păstrează
+rodiile. Rotirea prin tragere rămâne disponibilă. Manifest: `2026.09.21-2`.

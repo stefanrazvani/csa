@@ -5,7 +5,7 @@ import { addTempleDiscovery } from './server/discovery.js';
 import { getScenePreset } from './server/scenes.js';
 import { normalizeExperienceManifest } from './client/manifest.js';
 import { ExperienceRenderer } from './client/engine.js';
-import { makeGeometry } from './client/engine.js';
+import { makeGeometry, cameraFieldOfView } from './client/engine.js';
 
 function manifest(grade) {
   return normalizeExperienceManifest(addTempleDiscovery(getScenePreset(grade), grade));
@@ -61,7 +61,7 @@ test('small ritual objects and the reserved grand-master chair have distinct deg
 
 test('star and plumb clear the book in the actual initial camera projection', () => {
   const scene=manifest(2), part=id=>scene.architecture.find(item=>item.id===id);
-  const camera=new THREE.PerspectiveCamera(45,16/9,.1,100);
+  const camera=new THREE.PerspectiveCamera(cameraFieldOfView(scene.environment,1600,900),16/9,.1,100);
   camera.position.fromArray(scene.environment.camera); camera.lookAt(...scene.environment.target); camera.updateMatrixWorld();
   const bounds=id=>{
     const p=part(id),m=new THREE.Mesh(makeGeometry(THREE,p.geometry));m.position.fromArray(p.position);m.rotation.fromArray(p.rotation);m.scale.fromArray(p.scale);m.updateMatrixWorld();
@@ -70,8 +70,9 @@ test('star and plumb clear the book in the actual initial camera projection', ()
     m.geometry.dispose();return [Math.min(...ys),Math.max(...ys)];
   };
   const star=bounds('flaming-star'),book=bounds('vsl-page-north'),bob=bounds('plumb-bob');
-  assert.ok(star[1]<book[0]-.025,'star below book in screen space');
-  assert.ok(bob[0]>book[1]+.08,'plumb above book in screen space');
+  // At 900 px tall, .02 NDC retains at least 9 px between silhouettes in the wider view.
+  assert.ok(star[1]<book[0]-.02,'star below book in screen space');
+  assert.ok(bob[0]>book[1]+.02,'plumb above book in screen space');
   const cord=part('plumb-cord');assert.ok(Math.abs(cord.position[1]+cord.geometry.height/2-7.2)<1e-8);
   assert.ok(Math.abs(cord.position[1]-cord.geometry.height/2-(part('plumb-bob').position[1]+.15))<.02);
 });

@@ -91,7 +91,10 @@ try {
     if(grade === 1) assert.doesNotMatch(JSON.stringify(scene.interactives),/Ritualul Calfei|Ritualul Maestrului|g2-|g3-/);
     console.log(`PASS LIVE DISCOVERY grade ${grade}: ${discoveries.length} physical targets, sourced descriptions, degree isolation.`);
 
-    assert.ok(scene.version.startsWith('2026.09.21-1:'));
+    assert.ok(scene.version.startsWith('2026.09.21-2:'));
+    assert.deepEqual(scene.environment.camera,[-.6,3.8,11.05]);
+    assert.equal(scene.environment.cameraFov,84);
+    assert.equal(scene.environment.cameraMinHorizontalFov,116);
     assert.equal(scene.architecture.find(part=>part.id==='study-rough-stone').position[0],-2.85);
     assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone').position[0],2.85);
     if(grade===2) assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone-point').position[0],2.85);

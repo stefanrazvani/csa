@@ -201,6 +201,8 @@ function environment(value = {}) {
     keyIntensity: number(source.keyIntensity, 2.4, 0, 8),
     keyPosition: vector(source.keyPosition, [0, 8, 3]),
     camera: vector(source.camera, [0, 3.2, 12], -50, 50),
+    cameraFov: number(source.cameraFov, 42, 35, 110),
+    cameraMinHorizontalFov: number(source.cameraMinHorizontalFov, 0, 0, 130),
     target: vector(source.target, [0, 1.2, -2], -50, 50),
     floor: floor(source.floor),
     motes: {

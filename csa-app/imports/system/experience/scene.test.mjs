@@ -3,7 +3,33 @@ import assert from 'node:assert/strict';
 import * as THREE from 'three';
 import { getScenePreset } from './server/scenes.js';
 import { normalizeExperienceManifest } from './client/manifest.js';
-import { makeGeometry } from './client/engine.js';
+import { makeGeometry, cameraFieldOfView } from './client/engine.js';
+
+test('initial view frames both entrance globes and the altar without a wall blocking them', () => {
+  for (const grade of [2, 3]) {
+    const scene=normalizeExperienceManifest(getScenePreset(grade));
+    const meshes=scene.architecture.map(part=>{
+      const mesh=new THREE.Mesh(makeGeometry(THREE,part.geometry)); mesh.name=part.id;
+      mesh.position.fromArray(part.position); mesh.rotation.fromArray(part.rotation); mesh.scale.fromArray(part.scale); mesh.updateMatrixWorld(); return mesh;
+    });
+    assert.ok(scene.environment.camera[0]<0, 'camera is slightly left of the aisle');
+    for(const [width,height] of [[1600,900],[1100,900],[600,900],[390,844]]) {
+      const camera=new THREE.PerspectiveCamera(cameraFieldOfView(scene.environment,width,height),width/height,.1,140);
+      camera.position.fromArray(scene.environment.camera); camera.lookAt(...scene.environment.target); camera.updateMatrixWorld();
+      for(const id of ['column-b-globe','column-j-globe','vsl-page-north','vsl-page-south']) {
+        const mesh=meshes.find(item=>item.name===id);
+        for(let i=0;i<mesh.geometry.attributes.position.count;i++) {
+          const point=new THREE.Vector3().fromBufferAttribute(mesh.geometry.attributes.position,i).applyMatrix4(mesh.matrixWorld).project(camera);
+          assert.ok(Math.abs(point.x)<.98 && Math.abs(point.y)<.98 && point.z>-1 && point.z<1, `${id} is fully in frame at ${width}x${height}`);
+        }
+        const ray=new THREE.Raycaster(camera.position,mesh.position.clone().sub(camera.position).normalize());
+        const hit=ray.intersectObjects(meshes,false)[0];
+        assert.ok(hit && (hit.object.name===id || (id.startsWith('vsl-') && /^(vsl-|altar-)/.test(hit.object.name))), `${id} is visible, first hit: ${hit?.object.name}`);
+      }
+    }
+    meshes.forEach(mesh=>{mesh.geometry.dispose();mesh.material.dispose();});
+  }
+});
 
 test('rope stays continuous around all four corners after manifest normalization', () => {
   for (const grade of [1, 2, 3]) {

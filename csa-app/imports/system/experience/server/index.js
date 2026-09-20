@@ -16,7 +16,7 @@ import { TempleExperienceSignals } from '../signals.js';
 import { getScenePreset, gradeName } from './scenes.js';
 import { addTempleDiscovery } from './discovery.js';
 
-const EXPERIENCE_VERSION = '2026.09.21-1';
+const EXPERIENCE_VERSION = '2026.09.21-2';
 
 // Repere care rămân în navigatorul semantic, dar nu primesc corp 3D în scenă:
 // nu au o reprezentare fizică fidelă planșei și încărcau vizual templul.
