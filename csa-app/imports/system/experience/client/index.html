@@ -96,8 +96,8 @@
             <small>Selectează un simbol din templu sau caută-l în lista de explorare.</small>
           </div>
 
-          <button class="csa-xp-mobile-explore js-xp-toggle-navigator" type="button" aria-expanded="{{navigatorExpanded}}" aria-controls="csaXpNavigator">
-            <span aria-hidden="true">✦</span> Explorează reperele
+          <button class="csa-xp-explore-toggle js-xp-toggle-navigator" type="button" aria-expanded="{{navigatorExpanded}}" aria-controls="csaXpNavigator">
+            <span aria-hidden="true">✦</span> {{navigatorToggleLabel}}
           </button>
 
           <nav class="csa-xp-navigator {{navigatorClass}}" id="csaXpNavigator" aria-label="Repere disponibile în templul activ">
@@ -161,7 +161,7 @@
 
     {{#if webglFallback}}
       <div class="csa-xp-webgl-note" role="status">
-        Modul grafic simplificat este activ. Toate reperele rămân accesibile din listă.
+        Modul grafic simplificat este activ. Deschide „Descoperă templul” pentru lista reperelor.
       </div>
     {{/if}}
     <span class="visually-hidden" role="status" aria-live="polite">{{screenReaderStatus}}</span>

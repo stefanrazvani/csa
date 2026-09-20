@@ -107,10 +107,9 @@ function focusSheet(instance) {
 }
 
 function closeSheet(instance) {
-  const id = instance.selectedId.get();
   instance.selectedId.set('');
   instance.renderer?.selectInteraction('');
-  focusAfterFlush(instance, mobileExperience() ? '.js-xp-toggle-navigator' : `.js-xp-select[data-id="${id}"]`);
+  focusAfterFlush(instance, '.js-xp-toggle-navigator');
 }
 
 function selectItem(instance, id, { focus = true } = {}) {
@@ -332,6 +331,7 @@ Template.csaTempleExperience.helpers({
     return options;
   },
   navigatorExpanded() { return Template.instance().navigatorOpen.get() ? 'true' : 'false'; },
+  navigatorToggleLabel() { return Template.instance().navigatorOpen.get() ? 'Ascunde lista' : 'Descoperă templul'; },
   searchQuery() { return Template.instance().searchQuery.get(); },
   filteredInteractives() {
     const instance = Template.instance();
@@ -407,6 +407,12 @@ Template.csaTempleExperience.events({
     if (instance.navigatorOpen.get()) focusAfterFlush(instance, '.js-xp-close-navigator');
   },
   'click .js-xp-close-navigator'(event, instance) {
+    event.preventDefault();
+    instance.navigatorOpen.set(false);
+    focusAfterFlush(instance, '.js-xp-toggle-navigator');
+  },
+  'keydown .csa-xp-navigator'(event, instance) {
+    if (event.key !== 'Escape') return;
     event.preventDefault();
     instance.navigatorOpen.set(false);
     focusAfterFlush(instance, '.js-xp-toggle-navigator');
