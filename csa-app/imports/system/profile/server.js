@@ -11,6 +11,7 @@ Meteor.publish('profile.identity', function profileIdentityPublication() {
   return BrotherDossiers.find({ userId: this.userId }, {
     fields: { userId: 1, eId: 1, 'identity.givenName': 1, 'identity.familyName': 1, 'identity.preferredName': 1 },
   });
+});
 
 Meteor.methods({
   async 'profile.mine'() {

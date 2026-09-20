@@ -6,14 +6,6 @@ const QUALITY = Object.freeze({
   high: { pixelRatio: 1.8, particleFactor: 1, targetFps: 60 },
 });
 
-export function cameraFieldOfView(environment, width, height) {
-  const base = environment?.cameraFov || (width < 560 ? 50 : 42);
-  const horizontal = environment?.cameraMinHorizontalFov || 0;
-  const aspect = Math.max(.1, width / Math.max(1, height));
-  const fitted = 2 * Math.atan(Math.tan(horizontal * Math.PI / 360) / aspect) * 180 / Math.PI;
-  return Math.min(155, Math.max(base, fitted));
-}
-
 function bounded(value, fallback, minimum, maximum) {
   const number = Number(value);
   return Number.isFinite(number) ? Math.min(maximum, Math.max(minimum, number)) : fallback;
@@ -676,7 +668,7 @@ export class ExperienceRenderer {
     const height = Math.max(1, this.mount.clientHeight || 1);
     this.renderer.setSize(width, height, false);
     this.camera.aspect = width / height;
-    this.camera.fov = cameraFieldOfView(this.phase === 'atrium' ? this.manifest.environment : null, width, height);
+    this.camera.fov = width < 560 ? 50 : 42;
     this.camera.updateProjectionMatrix();
   }
 
@@ -712,7 +704,6 @@ export class ExperienceRenderer {
     this.camera.position.copy(this.baseCamera);
     this.clockTarget.copy(vector3(THREE, gate ? [0, 2.05, -1.3] : environment.target));
     this.camera.lookAt(this.clockTarget);
-    this.resize();
   }
 
   buildGate() {
@@ -1064,7 +1055,7 @@ export class ExperienceRenderer {
       // Privirea se poate întoarce aproape complet, inclusiv spre coloanele
       // B și J din spatele punctului de observație.
       this.orbitTargetYaw = Math.max(-3.05, Math.min(3.05, drag.startYaw + deltaX * 0.0042));
-      this.orbitTargetPitch = Math.max(-0.32, Math.min(0.44, drag.startPitch + deltaY * 0.0028));
+      this.orbitTargetPitch = Math.max(-0.75, Math.min(0.95, drag.startPitch + deltaY * 0.0028));
       return;
     }
     if (this.mobile || event.pointerType === 'touch') return;

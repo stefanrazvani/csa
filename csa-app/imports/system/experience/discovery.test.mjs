@@ -5,7 +5,7 @@ import { addTempleDiscovery } from './server/discovery.js';
 import { getScenePreset } from './server/scenes.js';
 import { normalizeExperienceManifest } from './client/manifest.js';
 import { ExperienceRenderer } from './client/engine.js';
-import { makeGeometry, cameraFieldOfView } from './client/engine.js';
+import { makeGeometry } from './client/engine.js';
 
 function manifest(grade) {
   return normalizeExperienceManifest(addTempleDiscovery(getScenePreset(grade), grade));
@@ -17,6 +17,38 @@ function renderer(scene) {
     renderer: { domElement: { getBoundingClientRect: () => ({left:0, top:0, width:100, height:100}) } } });
   return value;
 }
+
+test('dragging from the original left-offset view reaches entrance globes and officer stations', () => {
+  for (const grade of [2, 3]) {
+    const scene=manifest(grade), r=renderer(scene);
+    Object.assign(r,{phase:'atrium',pointerDrift:new THREE.Vector2(),lookDirection:new THREE.Vector3(),lookRight:new THREE.Vector3(),lookUp:new THREE.Vector3(0,1,0),clockTarget:new THREE.Vector3(...scene.environment.target)});
+    r.camera.fov=42; r.camera.aspect=16/9; r.camera.updateProjectionMatrix();
+    r.camera.position.fromArray(scene.environment.camera);
+    scene.architecture.forEach(part=>r.createArchitecture({...part,material:{...part.material,map:null}})); r.stage.updateMatrixWorld(true);
+    assert.deepEqual(scene.environment.camera,[-.6,3.1,6.6]);
+    const forward=r.clockTarget.clone().sub(r.camera.position).normalize();
+    for (const id of ['column-b-globe','column-j-globe','warden1-top','mc-seat-cushion','tyler-seat-cushion']) {
+      const part=scene.architecture.find(item=>item.id===id);
+      // From inside the room, the near capital masks the bottom of its globe.
+      const visiblePoint=new THREE.Vector3(...part.position);
+      if (id.endsWith('-globe')) visiblePoint.y+=.2;
+      const direction=visiblePoint.clone().sub(r.camera.position).normalize();
+      const rawYaw=Math.atan2(direction.x,direction.z)-Math.atan2(forward.x,forward.z);
+      const yaw=Math.atan2(Math.sin(rawYaw),Math.cos(rawYaw)), pitch=Math.asin(direction.y)-Math.asin(forward.y);
+      r.orbitYaw=0; r.orbitPitch=0; r.orbitTargetYaw=0; r.orbitTargetPitch=0;
+      r.handlePointerDown({clientX:0,clientY:0,pointerId:1});
+      r.handlePointerMove({clientX:yaw/.0042,clientY:pitch/.0028,pointerId:1});
+      for(let frame=0;frame<100;frame++) r.applyOrbitLook();
+      r.camera.updateMatrixWorld();
+      const screen=visiblePoint.clone().project(r.camera);
+      assert.ok(Math.abs(screen.x)<.01 && Math.abs(screen.y)<.01 && screen.z<1, `${id} can be centered by dragging`);
+      r.raycaster.setFromCamera(new THREE.Vector2(0,0),r.camera);
+      const hit=r.raycaster.intersectObjects(r.stage.children,true)[0];
+      assert.equal(hit?.object.userData.interaction?.item?.id,part.interactionId,`${id} is not hidden by another object`);
+    }
+    r.stage.traverse(object=>{object.geometry?.dispose();object.material?.dispose();});
+  }
+});
 
 test('small ritual objects and the reserved grand-master chair have distinct degree-scoped targets', () => {
   for(const grade of [1,2,3]) {
@@ -61,7 +93,7 @@ test('small ritual objects and the reserved grand-master chair have distinct deg
 
 test('star and plumb clear the book in the actual initial camera projection', () => {
   const scene=manifest(2), part=id=>scene.architecture.find(item=>item.id===id);
-  const camera=new THREE.PerspectiveCamera(cameraFieldOfView(scene.environment,1600,900),16/9,.1,100);
+  const camera=new THREE.PerspectiveCamera(45,16/9,.1,100);
   camera.position.fromArray(scene.environment.camera); camera.lookAt(...scene.environment.target); camera.updateMatrixWorld();
   const bounds=id=>{
     const p=part(id),m=new THREE.Mesh(makeGeometry(THREE,p.geometry));m.position.fromArray(p.position);m.rotation.fromArray(p.rotation);m.scale.fromArray(p.scale);m.updateMatrixWorld();
@@ -70,9 +102,8 @@ test('star and plumb clear the book in the actual initial camera projection', ()
     m.geometry.dispose();return [Math.min(...ys),Math.max(...ys)];
   };
   const star=bounds('flaming-star'),book=bounds('vsl-page-north'),bob=bounds('plumb-bob');
-  // At 900 px tall, .02 NDC retains at least 9 px between silhouettes in the wider view.
-  assert.ok(star[1]<book[0]-.02,'star below book in screen space');
-  assert.ok(bob[0]>book[1]+.02,'plumb above book in screen space');
+  assert.ok(star[1]<book[0]-.025,'star below book in screen space');
+  assert.ok(bob[0]>book[1]+.08,'plumb above book in screen space');
   const cord=part('plumb-cord');assert.ok(Math.abs(cord.position[1]+cord.geometry.height/2-7.2)<1e-8);
   assert.ok(Math.abs(cord.position[1]-cord.geometry.height/2-(part('plumb-bob').position[1]+.15))<.02);
 });

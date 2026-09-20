@@ -61,6 +61,7 @@ try {
   for (const grade of [1, 2, 3]) {
     const scene = await call('temple.experienceManifest', { viewGrade: grade });
     assert.equal(scene.access.viewGrade, grade);
+    assert.deepEqual(scene.environment.camera, [-0.6, 3.1, 6.6]);
     const discoveries = scene.interactives.filter(item => item.presentation === 'architecture');
     assert.equal(discoveries.length, {1:56,2:64,3:64}[grade]);
     assert.ok(scene.interactives.length <= 96);
@@ -91,10 +92,7 @@ try {
     if(grade === 1) assert.doesNotMatch(JSON.stringify(scene.interactives),/Ritualul Calfei|Ritualul Maestrului|g2-|g3-/);
     console.log(`PASS LIVE DISCOVERY grade ${grade}: ${discoveries.length} physical targets, sourced descriptions, degree isolation.`);
 
-    assert.ok(scene.version.startsWith('2026.09.21-2:'));
-    assert.deepEqual(scene.environment.camera,[-.6,3.8,11.05]);
-    assert.equal(scene.environment.cameraFov,84);
-    assert.equal(scene.environment.cameraMinHorizontalFov,116);
+    assert.ok(scene.version.startsWith('2026.09.21-3:'));
     assert.equal(scene.architecture.find(part=>part.id==='study-rough-stone').position[0],-2.85);
     assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone').position[0],2.85);
     if(grade===2) assert.equal(scene.architecture.find(part=>part.id==='study-cubic-stone-point').position[0],2.85);
