@@ -441,3 +441,15 @@ mobilierului din ultimele rânduri.
 Delta folosește un triunghi cu chenar auriu, fond închis și raze fine. Geometria
 `almond` extrudează conturul migdalat al ochiului; irisul, pupila și reflexia
 sunt straturi separate în relief, cu emisivitate redusă pentru lizibilitate.
+
+### Detalii Orient și rotația sfeșnicului
+
+Firul cu plumb păstrează lungimea și prinderile, cu raza efectivă 0,004 prin
+scalare radială (de cinci ori mai subțire). Soarele este un medalion în relief
+cu 24 de raze alternante. Coloana Înțelepciunii folosește `flutedColumn`,
+cu 16 caneluri modelate în geometrie, bază profilată și volute spiralate
+pe ambele fețe ale capitelului.
+
+Sfeșnicul Primului Supraveghetor este rotit cu +45° în jurul axei verticale
+a bazei: pozițiile lumânărilor/flăcărilor și orientarea brațului se rotesc
+împreună; galeria orizontală rămâne orizontală. Celelalte sfeșnice sunt păstrate.

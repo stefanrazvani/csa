@@ -216,15 +216,37 @@ function venerableStation() {
   ];
 }
 
+function orientSun() {
+  const x = 4.9;
+  const y = 5.5;
+  const z = -10.94;
+  const gold = { metalness: 0.45, roughness: 0.42, emissive: '#be7925', emissiveIntensity: 0.35 };
+  const items = [];
+  // Coroană solară în relief: raze drepte alternate cu raze ondulate.
+  for (let index = 0; index < 24; index += 1) {
+    const angle = index * Math.PI / 12;
+    const curved = index % 2 === 1;
+    const radius = curved ? 0.54 : 0.73;
+    items.push(primitive(`sun-ray-${index}`, curved ? 'leaf' : 'cone',
+      [x + Math.cos(angle) * radius, y + Math.sin(angle) * radius, z - 0.015], curved ? [1, 1, 1] : [1, 1, 0.2], curved ? '#d4a247' : '#e4b653',
+      { geometry: curved ? { width: 0.12, height: 0.34, depth: 0.025 } : { radius: 0.075, height: 0.42, segments: 4 }, rotation: [0, 0, angle - Math.PI / 2], ...gold }));
+  }
+  items.push(
+    primitive('sun-disc', 'sphere', [x, y, z], [1, 1, 0.2], '#e8bb60', { geometry: { size: 0.54, segments: 48 }, ...gold }),
+    primitive('sun-rim', 'torus', [x, y, z + 0.03], [1, 1, 1], '#f2d38a', { geometry: { radius: 0.515, tube: 0.022, segments: 64 }, ...gold }),
+    primitive('sun-inner-rim', 'torus', [x, y, z + 0.105], [1, 1, 0.55], '#b98735', { geometry: { radius: 0.435, tube: 0.012, segments: 64 }, ...gold }),
+    primitive('sun-heart', 'sphere', [x, y, z + 0.08], [1, 1, 0.12], '#f6d793', { geometry: { size: 0.415, segments: 48 }, emissive: '#d4a04c', emissiveIntensity: 0.45, roughness: 0.55, metalness: 0.2 }),
+  );
+  return items;
+}
+
 function orientLuminaries(grade) {
   const items = [
     ...allSeeingEye(),
     // Luna la Miazănoapte: sfera palidă cu umbra care lasă vizibilă secera.
     primitive('moon-disc', 'sphere', [-4.9, 5.5, -10.95], [1, 1, 1], '#e6ecf4', { geometry: { size: 0.55, segments: 28 }, emissive: '#c3d2e2', emissiveIntensity: 1.05 }),
     primitive('moon-shadow', 'sphere', [-4.62, 5.56, -10.7], [1, 1, 1], '#0d1a26', { geometry: { size: 0.5, segments: 28 }, roughness: 1 }),
-    // Soarele la Miazăzi.
-    primitive('sun-disc', 'sphere', [4.9, 5.5, -10.95], [1, 1, 1], '#ffdf8f', { geometry: { size: 0.55, segments: 28 }, emissive: '#f6c14f', emissiveIntensity: 1.7 }),
-    primitive('sun-corona', 'torus', [4.9, 5.5, -10.95], [1, 1, 1], '#f7c95e', { geometry: { radius: 0.82, tube: 0.05, segments: 40 }, emissive: '#f7c95e', emissiveIntensity: 1.1, opacity: 0.85 }),
+    ...orientSun(),
   ];
   if (grade === 2) {
     // Steaua flamboyantă cu litera G apare numai în Loja Calfelor.
@@ -293,18 +315,38 @@ function doricPillar(id, x, z) {
 }
 
 function ionicPillar(id, x, z) {
-  // Ionic: bază cu mulură torică, fus zvelt, capitel cu două volute laterale
-  // legate printr-o pernă, abacă subțire.
-  return [
-    primitive(`${id}-base`, 'box', [x, 0.08, z], [0.4, 0.16, 0.4], '#242e38'),
-    primitive(`${id}-base-torus`, 'torus', [x, 0.2, z], [1, 1, 1], COLORS.ivory, { geometry: { radius: 0.115, tube: 0.035, segments: 20 }, rotation: [Math.PI / 2, 0, 0] }),
-    primitive(`${id}-shaft`, 'cylinder', [x, 0.86, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.085, radiusBottom: 0.105, height: 1.32, segments: 20 } }),
-    primitive(`${id}-echinus`, 'cylinder', [x, 1.55, z], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.12, radiusBottom: 0.085, height: 0.06, segments: 16 } }),
-    primitive(`${id}-volute-cushion`, 'box', [x, 1.62, z], [0.3, 0.07, 0.09], COLORS.ivory),
-    primitive(`${id}-volute-north`, 'torus', [x - 0.15, 1.62, z], [1, 1, 1], '#cfc4a4', { geometry: { radius: 0.055, tube: 0.028, segments: 20 } }),
-    primitive(`${id}-volute-south`, 'torus', [x + 0.15, 1.62, z], [1, 1, 1], '#cfc4a4', { geometry: { radius: 0.055, tube: 0.028, segments: 20 } }),
-    primitive(`${id}-abacus`, 'box', [x, 1.685, z], [0.3, 0.05, 0.26], '#cfc4a4'),
+  const stone = COLORS.ivory;
+  const shade = '#b4a685';
+  const items = [
+    primitive(`${id}-base`, 'box', [x, 0.065, z], [0.4, 0.13, 0.4], '#242e38'),
+    // Bază profilată cu două toruri și scotie, sub fusul canelat.
+    primitive(`${id}-base-moulding`, 'lathe', [x, 0.13, z], [1, 1, 1], stone,
+      { geometry: { profile: [[0.14, 0], [0.16, 0.025], [0.15, 0.05], [0.12, 0.065], [0.105, 0.085], [0.12, 0.1], [0.137, 0.12], [0.13, 0.14], [0.115, 0.155]], segments: 48 }, roughness: 0.72 }),
+    primitive(`${id}-shaft`, 'flutedColumn', [x, 0.86, z], [1, 1, 1], stone,
+      { geometry: { radiusTop: 0.092, radiusBottom: 0.115, height: 1.16, flutes: 16, segments: 96 }, roughness: 0.75 }),
+    primitive(`${id}-neck`, 'lathe', [x, 1.43, z], [1, 1, 1], stone,
+      { geometry: { profile: [[0.092, 0], [0.108, 0.012], [0.11, 0.025], [0.095, 0.04], [0.095, 0.065], [0.12, 0.085]], segments: 40 } }),
+    primitive(`${id}-echinus`, 'lathe', [x, 1.5, z], [1, 1, 1], stone,
+      { geometry: { profile: [[0.095, 0], [0.11, 0.015], [0.145, 0.035], [0.155, 0.055], [0.155, 0.065]], segments: 40 } }),
+    primitive(`${id}-volute-cushion`, 'box', [x, 1.6, z], [0.33, 0.09, 0.23], stone),
+    primitive(`${id}-abacus`, 'box', [x, 1.685, z], [0.48, 0.05, 0.32], stone),
+    primitive(`${id}-abacus-lip`, 'box', [x, 1.65, z], [0.44, 0.025, 0.29], shade),
   ];
+  // Volute spiralate în oglindă pe ambele fețe; sulurile sunt legate în adâncime.
+  for (const [side, sign] of [['left', -1], ['right', 1]]) {
+    items.push(primitive(`${id}-scroll-roll-${side}`, 'cylinder', [x + sign * 0.17, 1.59, z], [1, 1, 1], stone,
+      { geometry: { radiusTop: 0.09, radiusBottom: 0.09, height: 0.25, segments: 32 }, rotation: [Math.PI / 2, 0, 0] }));
+    for (const [face, direction] of [['front', 1], ['back', -1]]) {
+      items.push(primitive(`${id}-scroll-field-${side}-${face}`, 'sphere', [x + sign * 0.17, 1.59, z + direction * 0.13], [1, 1, 0.12], shade, { geometry: { size: 0.084, segments: 32 } }));
+      items.push(primitive(`${id}-volute-${side}-${face}`, 'spiral', [x + sign * 0.17, 1.59, z + direction * 0.15], [1, 1, 1], stone,
+        { geometry: { radius: 0.08, innerRadius: 0.009, tube: 0.009, turns: 1.65 }, rotation: [0, sign < 0 ? Math.PI : 0, 0], roughness: 0.65 }));
+    }
+  }
+  // Ove sculptate, vizibile sub perna capitelului.
+  for (let index = -2; index <= 2; index += 1) {
+    items.push(primitive(`${id}-egg-${index + 2}`, 'sphere', [x + index * 0.05, 1.535, z + 0.14], [0.22, 0.34, 0.15], stone, { geometry: { size: 0.08, segments: 16 } }));
+  }
+  return items;
 }
 
 function corinthianPillar(id, x, z) {
@@ -427,7 +469,7 @@ function wardenStations() {
 
 // Sfeșnicele ritualice: trei lumânări la Maestrul Venerabil, două la
 // Primul Supraveghetor, una la al Doilea Supraveghetor.
-function candelabrum(prefix, x, y, z, candleCount) {
+function candelabrum(prefix, x, y, z, candleCount, yaw = 0) {
   const items = [];
   // Alamă/aur — aceeași finisare ca restul pieselor de cult.
   const brass = { roughness: 0.36, metalness: 0.55 };
@@ -490,7 +532,20 @@ function candelabrum(prefix, x, y, z, candleCount) {
         emissive: '#f3b74a', emissiveIntensity: 3, roughness: 0.4, metalness: 0 }));
   }
 
-  return items;
+  if (!yaw) return items;
+  const cos = Math.cos(yaw);
+  const sin = Math.sin(yaw);
+  return items.map((item) => {
+    const dx = item.position[0] - x;
+    const dz = item.position[2] - z;
+    return {
+      ...item,
+      position: [x + dx * cos + dz * sin, item.position[1], z - dx * sin + dz * cos],
+      // Torurile orizontale sunt simetrice în jurul axei Y. Celelalte
+      // piese au X=0, deci Euler XYZ compune corect yaw cu rotația brațului.
+      rotation: item.geometry.type === 'torus' ? item.rotation : [0, yaw, item.rotation[2]],
+    };
+  });
 }
 
 function officerTables() {
@@ -562,7 +617,7 @@ function knottedRope() {
 function plumbLine() {
   return [
     primitive('plumb-mount', 'cylinder', [0, 7.26, 1.4], [1, 1, 1], '#3c4653', { geometry: { radiusTop: 0.09, radiusBottom: 0.07, height: 0.12, segments: 12 } }),
-    primitive('plumb-cord', 'cylinder', [0, 4.85, 1.4], [1, 1, 1], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4.7, segments: 8 } }),
+    primitive('plumb-cord', 'cylinder', [0, 4.85, 1.4], [0.2, 1, 0.2], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4.7, segments: 8 } }),
     primitive('plumb-bob', 'cone', [0, 2.36, 1.4], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
   ];
 }
@@ -598,7 +653,7 @@ function lodgeArchitecture(grade) {
     ...wardenStations(),
     ...officerTables(),
     ...candelabrum('vm-candelabrum', 1.02, 1.26, -8.5, 3),
-    ...candelabrum('warden1-candelabrum', -5.85, 1.19, 6.5, 2),
+    ...candelabrum('warden1-candelabrum', -5.85, 1.19, 6.5, 2, Math.PI / 4),
     ...candelabrum('warden2-candelabrum', 6.55, 1.19, 1.05, 1),
     // Spațiul din fața pupitrelor Ospitalierului și Trezorierului
     // rămâne liber în toate cele trei grade.

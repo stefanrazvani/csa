@@ -74,6 +74,25 @@ export function makeGeometry(THREE, definition = {}) {
         bounded(definition.height, 1, 0.04, 20),
         segments,
       );
+    case 'flutedColumn': {
+      const top = bounded(definition.radiusTop, 0.092, 0.02, 8);
+      const bottom = bounded(definition.radiusBottom, 0.115, 0.02, 8);
+      const height = bounded(definition.height, 1.16, 0.04, 20);
+      const flutes = Math.round(bounded(definition.flutes, 16, 8, 24));
+      const geometry = new THREE.CylinderGeometry(top, bottom, height, flutes * 6);
+      const positions = geometry.attributes.position;
+      for (let index = 0; index < positions.count; index += 1) {
+        const x = positions.getX(index);
+        const z = positions.getZ(index);
+        const radius = Math.hypot(x, z);
+        if (radius < 0.00001) continue; // Centrele capacelor rămân pe axă.
+        const angle = Math.atan2(z, x);
+        const carved = radius * (1 - 0.085 * (1 + Math.cos(flutes * angle)));
+        positions.setXYZ(index, x * carved / radius, positions.getY(index), z * carved / radius);
+      }
+      geometry.computeVertexNormals();
+      return geometry;
+    }
     case 'dodecahedron':
       return new THREE.DodecahedronGeometry(
         bounded(definition.size, 0.75, 0.04, 8),

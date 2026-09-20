@@ -57,3 +57,39 @@ test('eye has almond silhouette and distinct relief layers; manifest remains bou
   assert.ok(depths.every((depth, index) => index === 0 || depth > depths[index - 1]));
   assert.equal(normalizeExperienceManifest({ ...raw, architecture: Array(1000).fill(raw.architecture[0]) }).architecture.length, 768);
 });
+
+test('plumb remains thin after normalization and warden candles rotate with their arm', () => {
+  for (const grade of [1, 2, 3]) {
+    const items = normalizeExperienceManifest(getScenePreset(grade)).architecture;
+    const find = id => items.find(item => item.id === id);
+    const cord = find('plumb-cord');
+    const geometry = makeGeometry(THREE, cord.geometry);
+    geometry.scale(...cord.scale);
+    geometry.computeBoundingBox();
+    const size = geometry.boundingBox.getSize(new THREE.Vector3());
+    assert.ok(size.x < 0.009 && size.z < 0.009 && size.y > 4.69);
+    geometry.dispose();
+    const first = find('warden1-candelabrum-candle-0');
+    const second = find('warden1-candelabrum-candle-1');
+    const direction = new THREE.Vector3().fromArray(second.position).sub(new THREE.Vector3().fromArray(first.position));
+    assert.ok(Math.abs(direction.length() - 0.24) < 1e-9);
+    assert.ok(Math.abs(Math.atan2(-direction.z, direction.x) - Math.PI / 4) < 1e-9);
+    const arm = find('warden1-candelabrum-arm');
+    const axis = new THREE.Vector3(0, 1, 0).applyEuler(new THREE.Euler(...arm.rotation));
+    assert.ok(Math.abs(axis.dot(direction.normalize())) > 0.9999, 'arm connects rotated candle positions');
+    for (const index of [0, 1]) {
+      const candle = find(`warden1-candelabrum-candle-${index}`);
+      const flame = find(`warden1-candelabrum-flame-${index}`);
+      assert.equal(candle.position[0], flame.position[0]);
+      assert.equal(candle.position[2], flame.position[2]);
+    }
+    const shaft = find('pillar-wisdom-se-shaft');
+    assert.equal(shaft.geometry.type, 'flutedColumn');
+    const column = makeGeometry(THREE, shaft.geometry);
+    const radii = Array.from({ length: shaft.geometry.flutes * 6 }, (_, index) => Math.hypot(column.attributes.position.getX(index), column.attributes.position.getZ(index)));
+    assert.ok(Math.max(...radii) - Math.min(...radii) > 0.01, 'flutes are carved into shaft geometry');
+    column.dispose();
+    assert.equal(items.filter(item => item.id.startsWith('sun-ray-')).length, 24);
+    assert.equal(items.filter(item => item.id.startsWith('pillar-wisdom-se-volute-') && item.geometry.type === 'spiral').length, 4);
+  }
+});
