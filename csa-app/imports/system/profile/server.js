@@ -5,6 +5,13 @@ import { requireUser, getActiveEId, getEffectiveGrade } from '/imports/lib/acces
 import { BrotherDossiers } from '/imports/modules/dossiers/api/collections.js';
 import { LodgeMemberships } from '/imports/api/collections.js';
 
+// Only the signed-in user's names, reactive across dossier edits and tenant switches.
+Meteor.publish('profile.identity', function profileIdentityPublication() {
+  if (!this.userId) return this.ready();
+  return BrotherDossiers.find({ userId: this.userId }, {
+    fields: { userId: 1, eId: 1, 'identity.givenName': 1, 'identity.familyName': 1, 'identity.preferredName': 1 },
+  });
+
 Meteor.methods({
   async 'profile.mine'() {
     const userId = await requireUser(this);

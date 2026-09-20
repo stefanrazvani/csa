@@ -9,6 +9,7 @@ import { ReactiveVar } from 'meteor/reactive-var';
 import { Template } from 'meteor/templating';
 import { Tracker } from 'meteor/tracker';
 import { FlowRouter } from 'meteor/ostrio:flow-router-extra';
+import { BrotherDossiers } from '/imports/modules/dossiers/api/collections.js';
 import { startNovaParticles } from '/imports/system/auth/client/particles.js';
 import {
   appPath,
@@ -27,6 +28,18 @@ let mountGeneration = 0;
 const resetToken = new ReactiveVar('');
 let finishResetFlow = null;
 const EXPERIENCE_GATE_STORAGE_PREFIX = 'csa.temple-experience.gate.v1';
+
+function accountDisplayName() {
+  const user = Meteor.user();
+  const eId = Object.entries(user?.entitati || {}).find(([id, value]) => id !== 'all' && Number(value?.activ) === 1)?.[0];
+  const identity = user && eId ? BrotherDossiers.findOne({ userId: user._id, eId })?.identity : null;
+  const clean = value => typeof value === 'string' ? value.trim().replace(/\s+/g, ' ') : '';
+  const givenName = clean(identity?.givenName) || clean(user?.setari?.prenume) || clean(user?.profileExt?.prenume);
+  const familyName = clean(identity?.familyName) || clean(user?.setari?.nume) || clean(user?.profileExt?.nume);
+  return [givenName, familyName].filter(Boolean).join(' ')
+    || clean(identity?.preferredName) || clean(user?.profile?.name)
+    || clean(user?.emails?.[0]?.address) || 'Contul meu';
+}
 
 function callbackPromise(action) {
   return new Promise((resolve, reject) => action((error) => (error ? reject(error) : resolve())));
@@ -121,6 +134,7 @@ Template.csaLayout.onCreated(function layoutCreated() {
       return;
     }
     this.subscribe('admin.self');
+    this.subscribe('profile.identity');
     Meteor.callAsync('admin.context').then((context) => this.adminContext.set(context)).catch(() => this.adminContext.set({}));
   });
 });
@@ -133,8 +147,11 @@ Template.csaLayout.helpers({
   isTenantAdmin() { return Template.instance().adminContext.get()?.tenantAdmin === true; },
   appPath(path) { return appPath(path); },
   currentUserEmail() { return Meteor.user()?.emails?.[0]?.address || ''; },
-  userDisplayName() { const u=Meteor.user(); return u?.profile?.name || [u?.setari?.prenume,u?.setari?.nume].filter(Boolean).join(' ') || u?.emails?.[0]?.address || 'Contul meu'; },
-  userInitials() { const u=Meteor.user(); return String(u?.profile?.name || u?.setari?.nume || u?.emails?.[0]?.address || 'ME').split(/\s+/).slice(0,2).map(part=>part[0]).join('').toUpperCase(); },
+  userDisplayName: accountDisplayName,
+  userInitials() {
+    const parts = accountDisplayName().split(' ');
+    return (parts[0][0] + (parts.length > 1 ? parts.at(-1)[0] : '')).toUpperCase();
+  },
   hasTenants() { return Object.keys(Meteor.user()?.entitati || {}).some((id) => id !== 'all'); },
   tenantOptions() {
     const context = Template.instance().adminContext.get() || {};

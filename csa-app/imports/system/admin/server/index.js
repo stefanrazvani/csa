@@ -163,7 +163,7 @@ Meteor.publish('admin.self', async function adminSelfPublication() {
   const user = await Meteor.users.findOneAsync(this.userId, { fields: { entitati: 1 } });
   const tenantIds = Object.keys(user?.entitati || {}).filter((id) => id !== 'all' && /^[A-Za-z0-9_-]+$/.test(id));
   return [
-    Meteor.users.find({ _id: this.userId }, { fields: { emails: 1, profile: 1, entitati: 1 } }),
+    Meteor.users.find({ _id: this.userId }, { fields: { emails: 1, profile: 1, entitati: 1, 'setari.prenume': 1, 'setari.nume': 1, 'profileExt.prenume': 1, 'profileExt.nume': 1 } }),
     Entitati.find({ _id: { $in: tenantIds } }, { fields: { nume: 1, cui: 1, status: 1 } }),
   ];
 });
