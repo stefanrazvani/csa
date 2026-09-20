@@ -4,6 +4,8 @@ const GEOMETRY_TYPES = new Set([
   'almond',
   'plane',
   'box',
+  'blade',
+  'roughStone',
   'cone',
   'cylinder',
   'flutedColumn',

@@ -65,6 +65,28 @@ export function makeGeometry(THREE, definition = {}) {
         bounded(definition.height, 1, 0.04, 20),
         bounded(definition.depth, 1, 0.04, 20),
       );
+    case 'blade': {
+      // A tapered, bevelled blade, point down. No decorative proxy geometry.
+      const w = bounded(definition.width, .11, .02, 2), h = bounded(definition.height, 1.2, .04, 4);
+      const d = bounded(definition.depth, .024, .01, .2);
+      const shape = new THREE.Shape();
+      shape.moveTo(-w / 2, h / 2); shape.lineTo(w / 2, h / 2);
+      shape.lineTo(w * .3, -h * .34); shape.lineTo(0, -h / 2);
+      shape.lineTo(-w * .3, -h * .34); shape.closePath();
+      const mesh = new THREE.ExtrudeGeometry(shape, { depth:d / 2, bevelEnabled:true, bevelThickness:d / 4, bevelSize:w * .12, bevelSegments:1, steps:1 });
+      mesh.translate(0, 0, -d / 4);
+      return mesh;
+    }
+    case 'roughStone': {
+      const mesh = new THREE.IcosahedronGeometry(bounded(definition.size, .3, .04, 2), 1);
+      const points = mesh.attributes.position;
+      for (let i = 0; i < points.count; i += 1) {
+        const x = points.getX(i), y = points.getY(i), z = points.getZ(i);
+        const r = 1 + .13 * Math.sin(x * 43 + y * 17 + z * 29);
+        points.setXYZ(i, x * r, Math.max(-.2, y * r * .8), z * r);
+      }
+      mesh.computeVertexNormals(); return mesh;
+    }
     case 'cone':
       return new THREE.ConeGeometry(
         bounded(definition.radius, 0.72, 0.04, 8),
@@ -217,7 +239,7 @@ const PROCEDURAL_TEXTURES = new Set([...ZODIAC_MAPS, 'terrestrial', 'celestial',
 
 // Tabloul Lojii: desen stilizat pe pergament — chenar, pavaj, coloanele B/J,
 // trepte, Soare/Lună/Delta și motivele gradului. Determinist, fără text.
-function drawTracingBoard(context, width, height, kind) {
+export function drawTracingBoard(context, width, height, kind) {
   const ink = '#4a3f2c';
   const parchment = '#e6d9b8';
   const seeded = (index) => {
@@ -288,7 +310,7 @@ function drawTracingBoard(context, width, height, kind) {
   context.fill();
   context.fillStyle = ink;
   // Treptele care urcă spre Orient: 3 / 5 / 7 după grad.
-  const steps = kind === 'board-apprentice' ? 3 : kind === 'board-fellowcraft' ? 5 : 7;
+  const steps = kind === 'board-apprentice' ? 3 : kind === 'board-fellowcraft' ? 5 : 0;
   let stepY = bandTop - 10;
   let stepWidth = 96;
   for (let index = 0; index < steps; index += 1) {
@@ -350,24 +372,32 @@ function drawTracingBoard(context, width, height, kind) {
     context.closePath();
     context.stroke();
     context.beginPath();
-    context.arc(starX, starY, 5, 0, Math.PI * 2);
-    context.stroke();
-    for (let index = 0; index < 3; index += 1) {
-      context.beginPath();
-      context.arc(74, midY + 44, 26 - index * 8, Math.PI * 1.2, Math.PI * 1.95);
-      context.stroke();
-    }
-    context.beginPath();
-    context.moveTo(width - 84, midY + 66);
-    context.lineTo(width - 66, midY + 30);
-    context.lineTo(width - 48, midY + 66);
-    context.closePath();
-    context.stroke();
-    context.beginPath();
-    context.moveTo(width - 75, midY + 52);
-    context.lineTo(width - 57, midY + 52);
-    context.stroke();
+    context.font = 'bold 15px Georgia'; context.textAlign = 'center'; context.fillText('G',starX,starY+5);
+    context.strokeRect(width-76,midY+5,25,23);
+    context.beginPath();context.moveTo(width-76,midY+5);context.lineTo(width-63.5,midY-12);context.lineTo(width-51,midY+5);context.stroke();
+    context.beginPath();context.moveTo(42,midY+12);context.lineTo(47,midY-5);context.lineTo(65,midY-9);context.lineTo(72,midY+8);context.lineTo(62,midY+23);context.closePath();context.stroke();
+    context.strokeRect(96,midY+4,5,60);
+    context.beginPath();context.moveTo(152,midY+4);context.lineTo(152,midY+54);context.lineTo(161,midY+61);context.stroke();
+    context.beginPath();context.moveTo(width-24,midY+75);context.lineTo(width-24,midY+22);context.stroke();
+    for(let i=0;i<4;i++)for(const side of [-1,1]) {context.beginPath();context.ellipse(width-24+side*4,midY+29+i*8,5,2,side*.7,0,Math.PI*2);context.stroke();}
+
   } else {
+    // Ritualul Maestrului, p.14: coffin, compass at Orient, square at
+    // Occident, ruler south, lever north, tracing tablet and nine tears.
+    context.beginPath();
+    for(const [i,[x,y]] of [[-25,-45],[25,-45],[34,-20],[26,65],[-26,65],[-34,-20]].entries()) {
+      if(i===0) context.moveTo(width/2+x,midY+y); else context.lineTo(width/2+x,midY+y);
+    }
+    context.closePath(); context.stroke();
+    context.strokeRect(width/2+44,midY-30,5,85);
+    context.beginPath(); context.moveTo(width/2-47,midY-30); context.lineTo(width/2-47,midY+48); context.lineTo(width/2-55,midY+55); context.stroke();
+    context.strokeRect(35,midY-69,28,22);
+    context.beginPath(); context.moveTo(39,midY-60); context.lineTo(58,midY-60); context.moveTo(46,midY-66); context.lineTo(46,midY-50); context.stroke();
+    for(let i=0;i<9;i++) {
+      const x=width-67+(i%3)*10,y=midY-65+Math.floor(i/3)*12;
+      context.beginPath(); context.moveTo(x,y-5); context.quadraticCurveTo(x+5,y+4,x,y+4); context.quadraticCurveTo(x-5,y+4,x,y-5); context.fill();
+    }
+    context.beginPath();context.moveTo(width/2-19,midY+70);context.lineTo(width/2,midY+87);context.lineTo(width/2+19,midY+70);context.stroke();
     // Ramura de acacia și uneltele reunite.
     const acaciaX = width / 2;
     context.beginPath();
@@ -382,7 +412,7 @@ function drawTracingBoard(context, width, height, kind) {
       context.ellipse(acaciaX + side * 11, leafY, 9, 4.5, side * 0.55, 0, Math.PI * 2);
       context.stroke();
     }
-    tools(width / 2, midY - 66, 18);
+    context.beginPath();context.moveTo(width/2-17,midY-55);context.lineTo(width/2,midY-83);context.lineTo(width/2+17,midY-55);context.stroke();
   }
 }
 

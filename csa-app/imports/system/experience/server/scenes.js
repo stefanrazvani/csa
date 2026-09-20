@@ -1,3 +1,4 @@
+import { ceremonialSword, squareTool, compassTool, ritualTools } from './ritual-tools.js';
 import { ZODIAC_SIGNS } from '../zodiac.js';
 
 // Scenele templului sunt construite după „Planșa nr. 1" din documentele-sursă:
@@ -252,10 +253,10 @@ function orientLuminaries(grade) {
   ];
   if (grade === 2) {
     // Steaua Calfei, independentă pe suport, în fața altarului, conform cerinței Lojei.
-    items.push(primitive('flaming-star', 'star', [0, 1.85, -5.65], [1, 1, 1], '#ffd061', { geometry: { points: 5, radius: 0.65, innerRadius: 0.28, depth: 0.12 }, emissive: '#ffbe3d', emissiveIntensity: 2.1, metalness: 0.2, roughness: 0.3 }));
-    items.push(primitive('flaming-star-heart', 'sphere', [0, 1.85, -5.53], [1, 1, 1], '#fff3cf', { geometry: { size: 0.16, segments: 20 }, emissive: '#ffe9b0', emissiveIntensity: 2.6 }));
+    items.push(primitive('flaming-star', 'star', [0, .53, -5.65], [1, 1, 1], '#ffd061', { geometry: { points: 5, radius: 0.4, innerRadius: 0.175, depth: 0.08 }, emissive: '#ffbe3d', emissiveIntensity: 2.1, metalness: 0.2, roughness: 0.3 }));
+    items.push(primitive('flaming-star-heart', 'sphere', [0, .53, -5.56], [1, 1, 1], '#fff3cf', { geometry: { size: 0.075, segments: 20 }, emissive: '#ffe9b0', emissiveIntensity: 2.6 }));
     items.push(primitive('flaming-star-base', 'cylinder', [0, 0.05, -5.65], [1, 1, 1], '#3a3325', { geometry: { radiusTop: 0.23, radiusBottom: 0.28, height: 0.1, segments: 24 }, metalness: 0.5 }));
-    items.push(primitive('flaming-star-support', 'cylinder', [0, 0.975, -5.65], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.025, radiusBottom: 0.03, height: 1.75, segments: 12 }, metalness: 0.6 }));
+    items.push(primitive('flaming-star-support', 'cylinder', [0, .315, -5.65], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.025, radiusBottom: 0.03, height: .43, segments: 12 }, metalness: 0.6 }));
   }
   return items;
 }
@@ -264,7 +265,7 @@ function orientSeating() {
   return [
     ...seating('orient-bench-north', -3.5, 0.72, -10.4, 0, { width: 2.6 }),
     ...seating('orient-bench-south', 3.7, 0.72, -10.4, 0, { width: 3.4 }),
-    ...seating('orient-seat-adjunct', -1.75, 0.72, -9.55),
+    ...seating('grand-master-seat', -1.85, 0.72, -9.75, 0, { width: .9, backHeight: 1.65, arms: true }),
     // Pe estradă: Secretarul (Miazănoapte) și Oratorul (Miazăzi), cu blatul
     // simplu, orizontal, ca la Supraveghetori, și scaunele spre Orient.
     primitive('secretary-desk', 'box', [-6.5, 1.14, -9.55], [1.5, 0.84, 1], COLORS.wood),
@@ -276,7 +277,7 @@ function orientSeating() {
   ];
 }
 
-function altarOfLights() {
+function altarOfLights(grade) {
   return [
     primitive('altar-plinth', 'box', [0, 0.09, -6.95], [1, 0.18, 1], '#20282f'),
     primitive('altar-shaft', 'cylinder', [0, 0.62, -6.95], [1, 1, 1], '#c7bb9d', { geometry: { radiusTop: 0.36, radiusBottom: 0.46, height: 0.9, segments: 20 } }),
@@ -284,8 +285,8 @@ function altarOfLights() {
     // Volumul Legii Sacre deschis, cu echerul și compasul suprapuse.
     primitive('vsl-page-north', 'box', [-0.2, 1.2, -6.95], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, 0.18] }),
     primitive('vsl-page-south', 'box', [0.2, 1.2, -6.95], [0.4, 0.05, 0.6], '#efe6cd', { rotation: [0, 0, -0.18] }),
-    primitive('vsl-square', 'box', [0.02, 1.27, -6.87], [0.42, 0.02, 0.05], COLORS.gold, { rotation: [0, 0.7, 0], emissive: '#6b5116', emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.35 }),
-    primitive('vsl-compass', 'box', [-0.02, 1.29, -6.95], [0.42, 0.02, 0.05], COLORS.gold, { rotation: [0, -0.7, 0], emissive: '#6b5116', emissiveIntensity: 0.5, metalness: 0.6, roughness: 0.35 }),
+    ...squareTool(primitive, 'vsl-square', 0, 1.29, -6.74, .35),
+    ...compassTool(primitive, 'vsl-compass', 0, 1.29, -7.09, .4, grade),
   ];
 }
 
@@ -518,9 +519,7 @@ function wardenStations() {
     // Acoperitorul, în dreapta Coloanei Jachin (spre Miazăzi, cum intri),
     // cu fața spre Orient și spada verticală alături.
     ...seating('tyler-seat', 3.9, 0, 6.6, Math.PI),
-    primitive('tyler-sword-blade', 'box', [4.35, 0.95, 6.45], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
-    primitive('tyler-sword-guard', 'box', [4.35, 1.58, 6.45], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
-    primitive('tyler-sword-grip', 'cylinder', [4.35, 1.72, 6.45], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
+    ...ceremonialSword(primitive, 'tyler-sword', 4.35, 6.45),
   ];
 }
 
@@ -611,9 +610,7 @@ function officerTables() {
     primitive('treasurer-table', 'box', [6.7, 0.55, -5.75], [1, 0.82, 1.6], COLORS.wood),
     primitive('treasurer-desk-top', 'box', [6.7, 1.005, -5.75], [1.15, 0.09, 1.75], COLORS.woodDark),
     ...seating('treasurer-chair', 7.55, 0, -5.75, -Math.PI / 2),
-    primitive('expert-sword-blade', 'box', [-6.15, 0.95, -4.45], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
-    primitive('expert-sword-guard', 'box', [-6.15, 1.58, -4.45], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
-    primitive('expert-sword-grip', 'cylinder', [-6.15, 1.72, -4.45], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
+    ...ceremonialSword(primitive, 'expert-sword', -6.15, -4.45),
   ];
 }
 
@@ -668,8 +665,8 @@ function knottedRope() {
 function plumbLine() {
   return [
     primitive('plumb-mount', 'cylinder', [0, 7.26, 1.4], [1, 1, 1], '#3c4653', { geometry: { radiusTop: 0.09, radiusBottom: 0.07, height: 0.12, segments: 12 } }),
-    primitive('plumb-cord', 'cylinder', [0, 4.85, 1.4], [0.2, 1, 0.2], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4.7, segments: 8 } }),
-    primitive('plumb-bob', 'cone', [0, 2.36, 1.4], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
+    primitive('plumb-cord', 'cylinder', [0, 5.2, 1.4], [0.2, 1, 0.2], '#d9d2c0', { geometry: { radiusTop: 0.02, radiusBottom: 0.02, height: 4, segments: 8 } }),
+    primitive('plumb-bob', 'cone', [0, 3.06, 1.4], [1, 1, 1], COLORS.gold, { geometry: { radius: 0.1, height: 0.3, segments: 14 }, rotation: [Math.PI, 0, 0], metalness: 0.55, roughness: 0.35 }),
   ];
 }
 
@@ -697,7 +694,8 @@ function lodgeArchitecture(grade) {
     ...venerableStation(),
     ...orientLuminaries(grade),
     ...orientSeating(),
-    ...altarOfLights(),
+    ...altarOfLights(grade),
+    ...ritualTools(primitive, grade),
     ...tracingBoard(grade),
     ...threePillars(),
     ...plumbLine(),

@@ -62,7 +62,7 @@ try {
     const scene = await call('temple.experienceManifest', { viewGrade: grade });
     assert.equal(scene.access.viewGrade, grade);
     const discoveries = scene.interactives.filter(item => item.presentation === 'architecture');
-    assert.equal(discoveries.length, {1:51,2:54,3:53}[grade]);
+    assert.equal(discoveries.length, {1:56,2:64,3:64}[grade]);
     assert.ok(scene.interactives.length <= 96);
     assert.equal(new Set(scene.interactives.map(item => item.id)).size, scene.interactives.length);
     assert.ok(scene.architecture.filter(part => part.interactionId).every(part => discoveries.some(item => item.id === part.interactionId)));
@@ -75,7 +75,15 @@ try {
       const body=scene.architecture.find(part=>part.id===bodyId),top=scene.architecture.find(part=>part.id===topId);
       assert.deepEqual(top.rotation,[0,0,0]); assert.ok(Math.abs(top.position[1]-top.scale[1]/2-body.position[1]-body.scale[1]/2)<1e-9);
     }
-    if(grade===2) { const star=scene.architecture.find(part=>part.id==='flaming-star'),altar=scene.architecture.find(part=>part.id==='altar-top');assert.ok(star.position[2]>altar.position[2]+1);assert.ok(star.position[1]<2); }
+    if(grade===2) { const star=scene.architecture.find(part=>part.id==='flaming-star'),altar=scene.architecture.find(part=>part.id==='altar-top');assert.ok(star.position[2]>altar.position[2]+1);assert.ok(star.position[1]+star.geometry.radius<altar.position[1]); }
+    for(const [mesh,target] of [['grand-master-seat-back','grand-master-seat'],['study-rough-stone','rough-stone'],['study-cubic-stone','cubic-stone'],['study-mallet-head','mallet'],['study-chisel-edge','chisel']]) assert.equal(scene.architecture.find(part=>part.id===mesh).interactionId,`discover-${target}`);
+    for(const key of ['ruler','lever','working-square','working-compass']) assert.equal(discoveries.some(item=>item.id===`discover-${key}`),grade>=2);
+    assert.equal(discoveries.some(item=>item.id==='discover-trowel'),grade===3);
+    assert.equal(discoveries.some(item=>item.id==='discover-wheat'),grade===2);
+    const mesh=id=>scene.architecture.find(part=>part.id===id);
+    assert.ok(mesh('plumb-bob').position[1]>3);
+    assert.equal(['vsl-compass','vsl-compass-arm'].filter(id=>mesh(id).position[1]>mesh('vsl-square').position[1]).length,grade-1);
+    for(const id of ['tyler','expert']) {assert.equal(mesh(`${id}-sword-blade`).geometry.type,'blade');assert.equal(mesh(`${id}-sword-pommel`).interactionId,`discover-${id}-sword`);}
     if(grade===3) for(const side of ['north','south']) assert.match(discoveries.find(item=>item.id===`discover-seating-${side}`).label,/Maeștri/);
 
     assert.equal(discoveries.some(item => item.id === 'discover-star'),grade === 2);
@@ -83,7 +91,7 @@ try {
     if(grade === 1) assert.doesNotMatch(JSON.stringify(scene.interactives),/Ritualul Calfei|Ritualul Maestrului|g2-|g3-/);
     console.log(`PASS LIVE DISCOVERY grade ${grade}: ${discoveries.length} physical targets, sourced descriptions, degree isolation.`);
 
-    assert.ok(scene.version.startsWith('2026.09.20-7:'));
+    assert.ok(scene.version.startsWith('2026.09.20-8:'));
     assert.equal(scene.architecture.filter(item => /ashlar/.test(item.id)).length, 0);
     for (const id of ['hospitalier-table', 'hospitalier-chair', 'treasurer-table', 'treasurer-chair']) assert.ok(scene.architecture.some(item => item.id === id), id);
     if (grade === 2) for (const id of ['concept-vault', 'study-workshop', 'convocations-two']) {
@@ -120,7 +128,7 @@ try {
     console.log(`PASS LIVE ZODIAC grade ${grade}: twelve signs on ritual sides, nine redesigned candles, refined capitals.`);
     console.log(`PASS LIVE ORIENT grade ${grade}: thin cord, detailed sun, ionic flutes/scrolls, warden candelabrum 45 degrees.`);
     console.log(`PASS LIVE FURNITURE grade ${grade}: no extra desk cylinders; candles 3/2/1 retained; chairs, benches and eye present.`);
-    console.log(`PASS LIVE TEMPLE grade ${grade}: no ashlars; desks/chairs preserved; scene version current.`);
+    console.log(`PASS LIVE TEMPLE grade ${grade}: no obsolete large ashlars; small study stones present; desks/chairs preserved; scene version current.`);
   }
   for (const actualGrade of [1,2]) {
     await db.collection('lodge_memberships').updateOne({_id:id},{$set:{currentGrade:actualGrade}});

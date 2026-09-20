@@ -516,3 +516,20 @@ sălii față de altarul aflat la z=-6.95. Amplasarea este cerința explicită a
 utilizatorului; fișa distinge aceasta de formularea sursei (Calfa, p. 61).
 Fallback-ul reflectă mutarea. Blaturile Secretarului, Oratorului, Ospitalierului
 și Trezorierului sunt orizontale, în contact cu corpul pupitrului, ca S1/S2.
+
+
+### Extensia 8 — unelte mici și vizibilitatea Altarului
+
+Manifest `2026.09.20-8`: 56/64/64 fișe arhitecturale, 687/711/711 piese.
+Locul Marelui Maestru are țintă proprie. Uneltele mici și pietrele sunt
+selectabile individual; legăturile și textele sunt filtrate server-side pe grad.
+Vezi inventarul și distincțiile între recuzită, planșă și convenții în
+`REFERINTE_TEMPLU.md`. Mistria este explicit suplimentară.
+
+Cotele actuale înlocuiesc descrierile release-urilor anterioare: plumbul este
+la y=3.06, firul are lungime 4; Steaua este la y=0.53, rază 0.4, z=-5.65.
+Testul proiecției prin camera inițială verifică separarea lor de carte.
+Spadele folosesc lame teșite, canelură centrală, gardă și mâner cu inele.
+Echerul și Compasul au brațe separate și suprapunere în funcție de grad.
+Planșele procedurale completează reperele lipsă, fără recuzită ceremonială
+mare adăugată în camera navigabilă.

@@ -39,3 +39,29 @@ regula primului rând și libertatea de așezare a Maeștrilor. Participarea pe
 scene este precizată în Calfa p. 61 și Maestrul p. 69. Mutarea Stelei în fața
 altarului este cerută explicit de utilizator și este descrisă ca adaptare
 în fișă; nu este atribuită ca atare formulării ritualului.
+
+
+## Unelte mici și loc rezervat la Orient (20 septembrie, extensia 8)
+
+- Ucenicul, p. 124: primul scaun la dreapta Venerabilului este rezervat
+  Marelui Maestru. Scaunul independent înlocuiește identificatorul ambiguu
+  `orient-seat-adjunct`; nu înlocuiește tronul Venerabilului.
+- Ucenicul, p. 121: piatră brută pe prima treaptă nordică, ciocan și daltă
+  lângă Altar la nord; piatră cubică pe a doua treaptă sudică. Modele mici,
+  distincte de volumele decorative mari eliminate anterior.
+- Calfa, pp. 14–15: cub cu vârf, riglă, levier, spic de grâu lângă Jachin
+  în Tablou. P. 30: lista celor șase unelte lângă S1 pentru ceremonie.
+  Modelele individuale sunt repere de studiu; platoul de prezentare este o
+  convenție digitală, nu o activare a dispunerii ceremoniale.
+- Ucenicul p. 121, Calfa p. 61 și Maestrul p. 69: brațele reale ale
+  Compasului sunt sub Echer / unul deasupra / ambele deasupra.
+- Maestrul, p. 14: planșa completată cu sicriu, acacia, echer, compas,
+  riglă, levier, planșă de trasat și nouă lacrimi. Acacia are și relief
+  selectabil; celelalte detalii grafice rămân parte a fișei planșei.
+- Mistria nu apare în listele identificate din cele trei ritualuri și nici
+  în căutarea textului ghidului furnizat. Se afișează numai la gradul III,
+  explicit drept studiu suplimentar solicitat de Lojă, fără atestare atribuită.
+
+Înălțimea plumbului și suportul jos al Stelei sunt ajustări de vizibilitate
+cerute de utilizator; sursele nu prescriu cotele numerice ale modelului.
+Geometria spadelor este stilizată, fără a pretinde reproducerea unui exemplar.

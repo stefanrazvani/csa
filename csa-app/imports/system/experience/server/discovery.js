@@ -34,14 +34,14 @@ export function addTempleDiscovery(scene, grade) {
   add('orient', 'Orientul și treptele', 'Orientul se află opus intrării, ridicat pe trei trepte. În centrul său este locul Maestrului Venerabil, iar reperele luminoase sunt dispuse pe peretele din spate.', prefix('orient-'), 'Cum te orientezi înainte de a începe explorarea unui spațiu nou?', '120');
   add('altar', 'Altarul și Marile Lumini', 'Altarul se află la baza Orientului. Pe el sunt Cartea Legii Sacre, Echerul și Compasul, cele Trei Mari Lumini.', prefix('altar-'), 'Cum se susțin reciproc un reper de sens, o regulă și o măsură?', '120–121', LIGHTS[grade]);
   add('book', 'Cartea Legii Sacre', 'Cartea deschisă pe Altar face parte din cele Trei Mari Lumini. Ritualul precizează că volumele corespunzătoare religiilor Fraților prezenți se așază alături, nu unul peste altul.', prefix('vsl-page-'), 'Cum păstrezi respectul pentru convingerile altuia într-o lucrare comună?', '120–121');
-  add('square', 'Echerul', 'Echerul este una dintre uneltele simbolice așezate pe Cartea Legii Sacre. Relația sa cu brațele Compasului este specifică gradului.', id => id === 'vsl-square', 'Cum verifici corectitudinea unei decizii folosind un reper stabil?', '121', LIGHTS[grade]);
-  add('compass', 'Compasul', 'Compasul este așezat pe Cartea Legii Sacre, împreună cu Echerul. Descrierea ritualului stabilește poziția brațelor sale în raport cu Echerul.', id => id === 'vsl-compass', 'Cum alegi măsura potrivită pentru o acțiune sau o judecată?', '121', LIGHTS[grade]);
+  add('square', 'Echerul', 'Echerul este una dintre uneltele simbolice așezate pe Cartea Legii Sacre. Relația sa cu brațele Compasului este specifică gradului.', prefix('vsl-square'), 'Cum verifici corectitudinea unei decizii folosind un reper stabil?', '121', LIGHTS[grade]);
+  add('compass', 'Compasul', 'Compasul este așezat pe Cartea Legii Sacre, împreună cu Echerul. Descrierea ritualului stabilește poziția brațelor sale în raport cu Echerul.', prefix('vsl-compass'), 'Cum alegi măsura potrivită pentru o acțiune sau o judecată?', '121', LIGHTS[grade]);
   add('board', `Planșa gradului · ${NAMES[grade]}`, 'Planșa se află pe pavajul mozaicat, între cei trei stâlpi. Ea reunește reperele gradului într-un suport pentru observare și studiu.', id => id === 'tracing-board', 'Ce legătură poți explica între două repere ale planșei?', '122', `Este afișată planșa pentru ${NAMES[grade]}. Desenul din aplicație este stilizat.`);
   for (const [key, label, side] of [['b', 'Boaz', 'Miazănoapte'], ['j', 'Jachin', 'Miazăzi']]) {
     add(`column-${key}`, `Coloana ${label}`, `Coloana ${label} se află la Occident, spre ${side}, lângă intrare. Cele două coloane sunt dispuse simetric față de axa longitudinală a templului.`, prefix(`column-${key}-`), 'Cum contribuie perechea de coloane la recunoașterea pragului?', '122', grade === 1 ? 'În gradul de Ucenic, capitelul poartă trei rodii întredeschise.' : 'În această scenă sunt folosite sferele descrise în ritualul Calfei; acestea au și o variantă de reprezentare pe planșă.');
     if (grade >= 2) add(`globe-${key}`, key === 'b' ? 'Sfera terestră' : 'Sfera celestă', key === 'b' ? 'Sfera terestră este reprezentată pe capitelul coloanei Boaz. Ea oferă un reper pentru observarea lumii pământești.' : 'Sfera celestă este reprezentată pe capitelul coloanei Jachin. Ea oferă un reper pentru orientarea privirii către cer.', id => id === `column-${key}-globe` || id === `column-${key}-globe-stand`, 'Cum pui în relație observarea lumii apropiate și a unui ansamblu mai cuprinzător?', '122', 'Ritualul Calfei 2012, p. 61: folosirea sferelor depinde de recuzita disponibilă; alternativa este reprezentarea lor pe planșă.');
   }
-  if (grade === 2) add('star', 'Steaua înflăcărată', 'În scena Calfei, Steaua Înflăcărată este așezată pe un suport independent, în fața altarului, spre centrul sălii. Are cinci vârfuri și un centru luminos.', prefix('flaming-star'), 'Ce relație observi între simetrie, proporție și ordinea unei construcții?', '120', 'Ritualul Calfei 2012, p. 61, o situează la Orient, în fața mesei Maestrului Venerabil. Poziția din fața altarului este adaptarea cerută pentru acest templu.');
+  if (grade === 2) add('star', 'Steaua înflăcărată', 'În scena Calfei, Steaua Înflăcărată este așezată pe un suport jos, în fața bazei altarului, sub nivelul Cărții Legii Sacre. Are cinci vârfuri și un centru luminos.', prefix('flaming-star'), 'Ce relație observi între simetrie, proporție și ordinea unei construcții?', '120', 'Ritualul Calfei 2012, p. 61, o situează la Orient, în fața mesei Maestrului Venerabil. Poziția din fața altarului este adaptarea cerută pentru acest templu.');
   for (const [key, label, count, page] of [['vm', 'Maestrului Venerabil', 3, '120'], ['warden1', 'Primului Supraveghetor', 2, '122'], ['warden2', 'celui de-al Doilea Supraveghetor', 1, '122']]) {
     add(`candles-${key}`, `Sfeșnicul ${label}`, `Pe masa ${label} se află un sfeșnic cu ${count === 1 ? 'o lumânare' : `${count} lumânări`}. Acest ansamblu este distinct de lumânările celor trei colonete.`, prefix(`${key}-candelabrum-`), 'Cum te ajută numărul și poziția luminilor să recunoști locurile din templu?', page);
     add(`gavel-${key}`, `Ciocanul ${label}`, `Ciocanul de lemn se află pe masa ${label}. Este un obiect al funcției și al conducerii lucrărilor.`, prefix(`${key}-gavel`), 'Cum poți exercita o responsabilitate cu măsură și claritate?', page);
@@ -79,6 +79,31 @@ export function addTempleDiscovery(scene, grade) {
       id => (id.startsWith(`seat-${side}-`) || id.startsWith(`bench-${side}-`)) && !targetMatches(id, 'seat-north-front-1'),
       'Cum se schimbă participanții acestei coloane atunci când se schimbă gradul lucrărilor?', '125');
   }
+  add('grand-master-seat', 'Scaunul Marelui Maestru', 'Primul scaun din dreapta Maestrului Venerabil, privind de la Orient către Occident, este rezervat Marelui Maestru. Este un loc distinct de scaunul Venerabilului și de băncile pentru ceilalți oficiali.', prefix('grand-master-seat'), 'Cum deosebești locul rezervat unui oaspete de funcția care conduce lucrarea Lojei?', '124');
+  add('rough-stone', 'Piatra brută', 'Piatra brută este așezată la Miazănoapte, pe prima treaptă a Orientului. Modelul mic, cu fețe neregulate, este separat de pupitrul Ospitalierului.', prefix('study-rough-stone'), 'Ce parte a unei lucrări cere mai întâi observare și pregătire?', '121');
+  add('cubic-stone', grade === 2 ? 'Piatra cubică cu vârf' : 'Piatra cubică', 'Piatra cubică se află la Miazăzi, pe a doua treaptă a Orientului. Dimensiunea redusă păstrează libere pupitrele și zona centrală.', prefix('study-cubic-stone'), 'Cum verifici forma și măsura unei lucrări finisate?', '121', grade === 2 ? 'Vârful piramidal este menționat în descrierea Tabloului Calfei, p. 15. Reprezentarea sa în volum este o transpunere pentru explorarea digitală.' : '');
+  add('mallet', 'Ciocanul de lucru', 'Ciocanul de lucru se află lângă Altar, pe latura de Miazănoapte, alături de Daltă. Este distinct de ciocanele funcțiilor de conducere.', prefix('study-mallet'), 'Cum adaptezi forța la materialul și scopul lucrării?', '121');
+  add('chisel', 'Dalta', 'Dalta este așezată lângă ciocanul de lucru, la Miazănoapte de Altar. Modelul are o tijă și o muchie de lucru distincte.', prefix('study-chisel'), 'Cum transformi un efort general într-o intervenție precisă?', '121');
+  if (grade >= 2) {
+    const explanation = grade === 2 ? 'Ritualul Calfei, p. 30, enumeră uneltele lângă platforma Primului Supraveghetor. Platoul redus este o convenție de prezentare pentru studiu; nu simulează ceremonia.' : 'Ritualul Maestrului, p. 14, reprezintă aceste unelte în Tabloul Camerei de Mijloc. Exemplarele de studiu sunt prezentate separat, lângă Primul Supraveghetor; dispunerea ceremonială nu este activată.';
+    for (const [key, label, description] of [
+      ['ruler', 'Rigla', 'Rigla gradată permite observarea măsurii și compararea lungimilor.'],
+      ['lever', 'Levierul', 'Levierul are o tijă și un capăt de sprijin; se studiază împreună cu Rigla.'],
+      ['working-square', 'Echerul de lucru', 'Echerul cu două brațe perpendiculare este separat de Echerul de pe Cartea Legii Sacre.'],
+      ['working-compass', 'Compasul de lucru', 'Compasul de lucru are două brațe și o articulație; este separat de Compasul Marilor Lumini.'],
+    ]) add(key, label, description, prefix(`study-${key.replace('working-', '')}`), 'Cum folosești observația și măsura pentru a verifica lucrarea?', '121', explanation);
+  }
+  if (grade === 2) add('wheat', 'Spicul de grâu', 'Spicul este reprezentat lângă Coloana Jachin, conform descrierii Tabloului Calfei. Micul model tridimensional este o transpunere pentru explorare.', prefix('study-wheat'), 'Ce relație observi între germinare, timp și maturizarea unei lucrări?', '121');
+  if (grade === 3) {
+    add('acacia', 'Ramura de Acacia · planșă', 'O ramură stilizată de Acacia este reprezentată în relief pe planșa Maestrului. Ea completează desenul Tabloului Camerei de Mijloc.', prefix('study-acacia'), 'Ce alegi să păstrezi și să transmiți dintr-o lucrare comună?', '121');
+    add('trowel', 'Mistria · studiu suplimentar', 'Mistrie cu lamă triunghiulară și mâner ridicat, adăugată la cererea Lojei ca reper suplimentar de studiu.', prefix('study-trowel'), 'Cum poate finisarea unei lucrări să unească părțile într-un ansamblu coerent?', '121', 'Mistria nu a fost identificată în listele de unelte din ritualurile 2012 furnizate. Prezența sa aici este o convenție pedagogică a aplicației, nu o cerință atribuită acelor ritualuri.');
+  }
+  const extraSources = {
+    'grand-master-seat': `${SOURCE}, p. 124`,
+    ...(grade >= 2 ? Object.fromEntries(['ruler','lever','working-square','working-compass'].map(key => [key, grade === 2 ? 'Ritualul Calfei 2012, p. 30' : 'Ritualul Maestrului 2012, p. 14'])) : {}),
+    ...(grade === 2 ? {wheat:'Ritualul Calfei 2012, p. 15', 'cubic-stone':`${SOURCE}, p. 121; Ritualul Calfei 2012, p. 15`} : {}),
+    ...(grade === 3 ? {acacia:'Ritualul Maestrului 2012, p. 14', trowel:'Reper suplimentar solicitat de Lojă; fără atestare în ritualurile furnizate'} : {}),
+  };
   const architecture = scene.architecture.map(part => {
     // Last match wins: a globe has its own card, distinct from its column.
     const match = definitions.filter(item => item.selector(part.id)).at(-1);
@@ -87,7 +112,7 @@ export function addTempleDiscovery(scene, grade) {
   const items = definitions.filter(item => ['mosaic', 'border'].includes(item.key) || architecture.some(part => part.interactionId === `discover-${item.key}`)).map(item => ({
     id: `discover-${item.key}`, kind: 'symbol', label: item.label, description: item.description,
     presentation: 'architecture', route: '/biblioteca', actionLabel: 'Deschide biblioteca',
-    sourceRef: ['globe-b', 'globe-j', 'star'].includes(item.key) ? 'Ritualul Calfei 2012, p. 61' : item.source,
+    sourceRef: extraSources[item.key] || (['globe-b', 'globe-j', 'star'].includes(item.key) ? 'Ritualul Calfei 2012, p. 61' : item.source),
     education: {
       objective: `Descoperă templul · ${NAMES[grade]}`,
       prompt: item.prompt,
@@ -99,7 +124,7 @@ export function addTempleDiscovery(scene, grade) {
       ],
     },
   }));
-  const replaced = new Set(['g1-plumb-axis', 'g1-mosaic-floor', 'g1-three-pillars', 'g1-threshold-columns', 'g1-great-lights', 'g1-star-vault', 'g2-blazing-star', 'g2-paired-spheres', 'g2-great-lights', 'g2-tracing-board', 'g3-great-lights', 'g3-master-board']);
+  const replaced = new Set(['g1-rough-stone', 'g2-cubic-stone', 'g3-acacia', 'g1-plumb-axis', 'g1-mosaic-floor', 'g1-three-pillars', 'g1-threshold-columns', 'g1-great-lights', 'g1-star-vault', 'g2-blazing-star', 'g2-paired-spheres', 'g2-great-lights', 'g2-tracing-board', 'g3-great-lights', 'g3-master-board']);
   return {
     ...scene, architecture,
     environment: { ...scene.environment, floor: { ...scene.environment.floor, interactionId: 'discover-mosaic', borderInteractionId: 'discover-border' } },

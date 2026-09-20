@@ -67,7 +67,7 @@ test('plumb remains thin after normalization and warden candles rotate with thei
     geometry.scale(...cord.scale);
     geometry.computeBoundingBox();
     const size = geometry.boundingBox.getSize(new THREE.Vector3());
-    assert.ok(size.x < 0.009 && size.z < 0.009 && size.y > 4.69);
+    assert.ok(size.x < 0.009 && size.z < 0.009 && size.y > 3.99 && size.y < 4.01);
     geometry.dispose();
     const first = find('warden1-candelabrum-candle-0');
     const second = find('warden1-candelabrum-candle-1');

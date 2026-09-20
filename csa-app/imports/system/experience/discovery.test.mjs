@@ -5,6 +5,7 @@ import { addTempleDiscovery } from './server/discovery.js';
 import { getScenePreset } from './server/scenes.js';
 import { normalizeExperienceManifest } from './client/manifest.js';
 import { ExperienceRenderer } from './client/engine.js';
+import { makeGeometry } from './client/engine.js';
 
 function manifest(grade) {
   return normalizeExperienceManifest(addTempleDiscovery(getScenePreset(grade), grade));
@@ -16,6 +17,50 @@ function renderer(scene) {
     renderer: { domElement: { getBoundingClientRect: () => ({left:0, top:0, width:100, height:100}) } } });
   return value;
 }
+
+test('small ritual objects and the reserved grand-master chair have distinct degree-scoped targets', () => {
+  for(const grade of [1,2,3]) {
+    const scene=manifest(grade), part=id=>scene.architecture.find(item=>item.id===id);
+    assert.equal(part('grand-master-seat-back').interactionId,'discover-grand-master-seat');
+    assert.notEqual(part('grand-master-seat-back').interactionId,part('vm-throne-seat-back').interactionId);
+    assert.ok(part('grand-master-seat').position[0]<part('vm-throne-seat').position[0]);
+    for(const [mesh,key] of [['study-rough-stone','rough-stone'],['study-cubic-stone','cubic-stone'],['study-mallet-head','mallet'],['study-chisel-edge','chisel']]) assert.equal(part(mesh).interactionId,`discover-${key}`);
+    for(const key of ['ruler','lever','working-square','working-compass']) assert.equal(scene.interactives.some(item=>item.id===`discover-${key}`),grade>=2);
+    assert.equal(!!part('study-wheat-stem'),grade===2); assert.equal(!!part('study-cubic-stone-point'),grade===2);
+    assert.equal(!!part('study-acacia-stem'),grade===3); assert.equal(!!part('study-trowel-blade'),grade===3);
+    if(grade===3) assert.match(scene.interactives.find(item=>item.id==='discover-trowel').sourceRef,/fără atestare/);
+    const stone=part('study-rough-stone'), roughGeometry=makeGeometry(THREE,stone.geometry); roughGeometry.computeBoundingBox();
+    assert.ok(Math.abs(stone.position[1]+roughGeometry.boundingBox.min.y-.24)<1e-6); roughGeometry.dispose();
+    const cube=part('study-cubic-stone'); assert.ok(Math.abs(cube.position[1]-cube.scale[1]/2-.48)<1e-8);
+    assert.ok(stone.position[0]<0 && cube.position[0]>0 && cube.scale[0]<.5);
+    for(const id of ['tyler','expert']) {
+      assert.equal(part(`${id}-sword-blade`).geometry.type,'blade');
+      assert.equal(part(`${id}-sword-pommel`).interactionId,`discover-${id}-sword`);
+      assert.ok(scene.architecture.filter(item=>item.id.startsWith(`${id}-sword-`)).every(item=>item.interactionId===`discover-${id}-sword`));
+    }
+    const square=part('vsl-square'),left=part('vsl-compass'),right=part('vsl-compass-arm');
+    assert.equal(part('vsl-square-arm').interactionId,'discover-square');
+    assert.equal(part('vsl-compass-hinge').interactionId,'discover-compass');
+    assert.equal([left,right].filter(leg=>leg.position[1]>square.position[1]).length,grade-1);
+  }
+});
+
+test('star and plumb clear the book in the actual initial camera projection', () => {
+  const scene=manifest(2), part=id=>scene.architecture.find(item=>item.id===id);
+  const camera=new THREE.PerspectiveCamera(45,16/9,.1,100);
+  camera.position.fromArray(scene.environment.camera); camera.lookAt(...scene.environment.target); camera.updateMatrixWorld();
+  const bounds=id=>{
+    const p=part(id),m=new THREE.Mesh(makeGeometry(THREE,p.geometry));m.position.fromArray(p.position);m.rotation.fromArray(p.rotation);m.scale.fromArray(p.scale);m.updateMatrixWorld();
+    const b=new THREE.Box3().setFromObject(m), ys=[];
+    for(const x of [b.min.x,b.max.x])for(const y of [b.min.y,b.max.y])for(const z of [b.min.z,b.max.z])ys.push(new THREE.Vector3(x,y,z).project(camera).y);
+    m.geometry.dispose();return [Math.min(...ys),Math.max(...ys)];
+  };
+  const star=bounds('flaming-star'),book=bounds('vsl-page-north'),bob=bounds('plumb-bob');
+  assert.ok(star[1]<book[0]-.025,'star below book in screen space');
+  assert.ok(bob[0]>book[1]+.08,'plumb above book in screen space');
+  const cord=part('plumb-cord');assert.ok(Math.abs(cord.position[1]+cord.geometry.height/2-7.2)<1e-8);
+  assert.ok(Math.abs(cord.position[1]-cord.geometry.height/2-(part('plumb-bob').position[1]+.15))<.02);
+});
 
 test('discovery covers real symbols and sends only the selected degree, within bounds', () => {
   for (const grade of [1,2,3]) {
@@ -112,7 +157,7 @@ test('officer desks, seats, swords and staff resolve to educational cards, witho
   };
   for(const grade of [1,2,3]) {
     const scene=manifest(grade);
-    assert.equal(scene.interactives.filter(item=>item.presentation==='architecture').length,{1:51,2:54,3:53}[grade]);
+    assert.equal(scene.interactives.filter(item=>item.presentation==='architecture').length,{1:56,2:64,3:64}[grade]);
     for(const [mesh,key] of Object.entries(targets)) {
       assert.equal(scene.architecture.find(part=>part.id===mesh)?.interactionId,`discover-${key}`,mesh);
       const item=scene.interactives.find(item=>item.id===`discover-${key}`);
@@ -147,7 +192,7 @@ test('fellowcraft star stands in front of the altar and all four desk tops sit f
     if(grade!==2){assert.equal(part('flaming-star'),undefined);continue;}
     const star=part('flaming-star'),altar=part('altar-top');
     assert.ok(star.position[2]>altar.position[2]+altar.scale[2]/2+.5);
-    assert.ok(star.position[1]<2); assert.equal(part('flaming-star-base').position[1],.05);
+    assert.ok(star.position[1]+star.geometry.radius<altar.position[1]); assert.equal(part('flaming-star-base').position[1],.05);
     assert.equal(part('flaming-star-support').interactionId,'discover-star');
     assert.ok(part('flaming-star-support').position[1]+part('flaming-star-support').geometry.height/2 >= star.position[1]-.001);
     assert.equal(part('flaming-star-heart').position[1],star.position[1]);
