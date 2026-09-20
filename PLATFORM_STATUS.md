@@ -1,10 +1,12 @@
 # Platformă CSA – stare implementare
 
-Release activ, 21 septembrie 2026: `4aaf68f`, tag `release-20260921-temple-camera`.
-Camera este în interiorul porții, ușor la stânga; sferele și altarul sunt
-încadrate simultan de la pornire, cu unghi adaptat la lățimea ferestrei.
-Manifest: `2026.09.21-2`; 17 teste locale și smoke live trecute.
-Detalii: `deploy/releases/2026-09-21-temple-camera.md`.
+Release activ, 21 septembrie 2026: `e4d0752`, tag `release-20260921-profile-camera`.
+Camera revine la perspectiva apropiată inițială, deplasată doar puțin la stânga;
+sferele se văd prin întoarcerea camerei. Privirea verticală permite centrarea
+sferelor și a locurilor S1, MC și Acoperitor. Meniul de profil afișează prenumele
+și numele disponibile, cu email ca rezervă.
+Manifest: `2026.09.21-3`; 17 teste locale și smoke live trecute.
+Detalii: `deploy/releases/2026-09-21-profile-camera.md`.
 Pietrele sunt la capetele treptelor dinspre altar; funia este un tub continuu
 cu colțuri rotunjite; plumbul și scaunul VM au materiale cu contrast îmbunătățit.
 Aceste ajustări din `d831eb7` sunt păstrate; detalii:
