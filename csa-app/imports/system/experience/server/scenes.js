@@ -632,7 +632,7 @@ const SCENES = Object.freeze({
       interactive('study-workshop', 'library', 'Atelierul de studiu', 'Capitole, adnotări și conversații disponibile gradului tău.', [-4.9, 1, 2.4], { type: 'octahedron', size: 0.9 }, ROUTES.library,
         learning('De la lectură la lucrare', 'Cum se schimbă înțelegerea când o idee este discutată?', ['Selectează o ancoră textuală.', 'Scrie interpretarea ta.', 'Invită o perspectivă argumentată.']), { actionLabel: 'Continuă studiul', presentation: 'list' }),
       interactive('convocations-two', 'assembly', 'Cercul participării', 'Pregătire, prezență și contribuție la lucrarea comună.', [4.9, 0.85, 3.6], { type: 'torus', radius: 0.74, tube: 0.17, segments: 40 }, ROUTES.convocations,
-        learning('Contribuție', 'Ce poți aduce concret următoarei întâlniri?', ['Consultă temele.', 'Alege o contribuție realistă.', 'Confirmă disponibilitatea.']), { actionLabel: 'Vezi convocatoarele' }),
+        learning('Contribuție', 'Ce poți aduce concret următoarei întâlniri?', ['Consultă temele.', 'Alege o contribuție realistă.', 'Confirmă disponibilitatea.']), { actionLabel: 'Vezi convocatoarele', presentation: 'list' }),
     ],
   },
   3: {
