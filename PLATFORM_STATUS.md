@@ -1,19 +1,22 @@
 # Platformă CSA – stare implementare
 
-Release activ, 20 septembrie 2026: `f752c06`, tag `release-20260920-temple-stations`.
+Release activ, 20 septembrie 2026: `b2d73ca`, tag `release-20260920-temple-tools`.
 Templu: elementele arhitecturale sunt selectabile direct sau din lista cu căutare;
-51/54/53 fișe la Ucenic/Calfă/Maestru, cu descrieri, surse și texte de studiu distincte pe grad.
+56/64/64 fișe la Ucenic/Calfă/Maestru, cu descrieri, surse și texte de studiu distincte pe grad.
 Pupitrele și scaunele funcțiilor, spadele, bastonul MC și băncile laterale deschid fișele asociate.
-Steaua Calfei este în fața altarului; cele patru pupitre laterale au blaturi simple, orizontale.
+Steaua Calfei este jos în fața bazei altarului, plumbul ridicat pentru vizibilitatea cărții;
+cele patru pupitre laterale au blaturi simple, orizontale. Scaunul Marelui Maestru are fișă
+proprie; uneltele mici sunt selectabile pe grad, iar spadele au geometrie detaliată.
+Echerul și Compasul au brațe distincte, suprapuse conform gradului.
 Catalogul administratorului respectă și vizualizarea unui grad inferior.
 Colonetele, lumânările și zodiacul din `a10590c`, detaliile Orientului din
 `57ce577`, mobilierul și ochiul din `04d349e` sunt păstrate.
 Referințe: `REFERINTE_TEMPLU.md`.
-13 teste locale și verificările live pentru grade/autentificare/acces au trecut.
+15 teste locale și verificările live pentru grade/autentificare/acces au trecut.
 UI live: căutare, fișe, schimbare grad și tastatură verificate în fallback;
 raycasting automat cu geometriile reale. WebGL nu este disponibil în VM.
-10/10 containere healthy; 152/152 fișiere sursă identice cu arhiva.
-Detalii: `deploy/releases/2026-09-20-temple-stations.md`.
+10/10 containere healthy; 153/153 fișiere sursă identice cu arhiva.
+Detalii: `deploy/releases/2026-09-20-temple-tools.md`.
 Eliminările decorative din release-urile `ebf3465` și `dc360f1` sunt păstrate.
 Profilul, editoarele și istoricul pe obiect din release-ul `39e1b2e` sunt păstrate;
 standard: `MODULE_OBJECTS.md`; detalii: `deploy/releases/2026-09-20-profile-editors.md`.
