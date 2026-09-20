@@ -190,7 +190,7 @@ Orient la `-Z`, Occident cu intrarea la `+Z`, Miazănoapte la `-X`, Miazăzi la 
 Elementele comune, prezente la toate gradele (~121 de piese de arhitectură):
 
 - Orientul supraînălțat pe estradă, cu trepte centrale și balustradă aurie;
-- fotoliul Maestrului Venerabil cu baldachin și masa cu spada flamboyantă, ciocanul și cele trei coloane mici;
+- fotoliul Maestrului Venerabil cu baldachin și masa cu spada flamboyantă, ciocanul și sfeșnicul cu trei lumânări; cilindrii separați de pe această masă și de pe pupitrele Supraveghetorilor sunt eliminați;
 - Delta luminoasă cu ochiul atoatevăzător pe peretele de Orient, flancată de Lună (Miazănoapte) și Soare (Miazăzi);
 - băncile demnitarilor și mesele în romb din Orient (Ospitalier la Miazănoapte, Trezorier la Miazăzi, conform catalogului);
 - mesele Secretarului (Miazănoapte) și Oratorului (Miazăzi), sub estradă;
@@ -198,12 +198,12 @@ Elementele comune, prezente la toate gradele (~121 de piese de arhitectură):
 - pavajul mozaicat central, cu laturile în raportul „Secțiunii de aur" și pătrate `5 × 8` (termeni Fibonacci, conform ritualului), bordură dantelată și planșa de trasat a gradului;
 - Cei Trei Mari Stâlpi, strânși la colțurile pavajului conform ritualului, fiecare construit în ordinul său arhitectural și purtând o lumânare: Ionic la S-E (Înțelepciunea — bază cu mulură torică, fus zvelt, capitel cu două volute), Doric la N-V (Forța — fus masiv fațetat cu conicitate accentuată, echin evazat și abacă pătrată), Corintic la S-V (Frumusețea — fusul cel mai zvelt, capitel-clopot cu frunze de acant și abacă evazată);
 - firul cu plumb care atârnă din boltă deasupra centrului pavajului (Axis Mundi, conform ritualului);
-- piatra brută (Miazănoapte) și piatra cubică cu vârf (Miazăzi), la limita Orientului;
+- spațiu liber în fața Ospitalierului și Trezorierului, fără pietrele decorative în toate gradele;
 - pupitrele celor doi Supraveghetori (Occident, respectiv Miazăzi), fiecare cu coloana mică, și pupitrul Maestrului de Ceremonii lângă Primul Supraveghetor;
 - coloanele Boaz (Miazănoapte) și Jachin (Miazăzi) la Occident, cu vestibulul în unghi al intrării; capitelurile diferă pe grad: la Ucenic câte trei rodii întredeschise, de la Calfă Sfera Terestră pe Boaz și Sfera Celestă pe Jachin, cu texturi procedurale (continente/graticulă, respectiv stele și constelații) desenate pe canvas și aplicate ca `map` + `emissiveMap`;
 - funia cu noduri (lacs d'amour) în partea de sus a pereților, cu ciucurii coborâți de o parte și de alta a intrării;
 - bolta cerească: tavan albastru-adânc cu stele fixe, sub care plutesc particulele;
-- rândurile de scaune ale Fraților pe Miazănoapte și Miazăzi.
+- scaune cu șezut tapițat, patru picioare și spătar orientate spre centru; bănci la pereții de Miazănoapte și Miazăzi, cu întrerupere lângă al Doilea Supraveghetor.
 
 ### Scena Gradului 1 — Loja Ucenicilor
 
@@ -429,3 +429,15 @@ O versiune a templului poate fi considerată validă când:
 - layout-ul nu produce overflow la 360, 390 și 768 px;
 - schimbarea accesului reîncarcă sau retrage manifestul;
 - niciun asset public nu conține texte ori elemente rezervate altui grad.
+
+### Mobilier și Delta — 20 septembrie 2026
+
+Helperul `seating` compune scaunele, jilțurile și băncile din aceleași piese, cu
+rotație în jurul axei Y și bază la nivelul pardoselii/estradei. Băncile au
+suporturi la maximum 1,6 m. Manifestul acceptă maximum 768 de piese (scenele
+actuale rămân sub această limită); verificarea de regresie previne trunchierea
+mobilierului din ultimele rânduri.
+
+Delta folosește un triunghi cu chenar auriu, fond închis și raze fine. Geometria
+`almond` extrudează conturul migdalat al ochiului; irisul, pupila și reflexia
+sunt straturi separate în relief, cu emisivitate redusă pentru lizibilitate.

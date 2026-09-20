@@ -51,7 +51,7 @@ function webglAvailable() {
   }
 }
 
-function makeGeometry(THREE, definition = {}) {
+export function makeGeometry(THREE, definition = {}) {
   const type = definition.type || 'octahedron';
   const segments = Math.round(bounded(definition.segments, 24, 4, 96));
   switch (type) {
@@ -94,6 +94,20 @@ function makeGeometry(THREE, definition = {}) {
         bounded(pair?.[1], 0, -8, 8),
       ));
       return new THREE.LatheGeometry(points, segments);
+    }
+    case 'almond': {
+      // Ochi stilizat în relief, cu pleoape curbe și colțuri ascuțite.
+      const width = bounded(definition.width, 1.1, 0.02, 4);
+      const height = bounded(definition.height, 0.45, 0.04, 2);
+      const depth = bounded(definition.depth, 0.035, 0.01, 1);
+      const shape = new THREE.Shape();
+      shape.moveTo(-width / 2, 0);
+      shape.bezierCurveTo(-width * 0.18, height * 2 / 3, width * 0.18, height * 2 / 3, width / 2, 0);
+      shape.bezierCurveTo(width * 0.18, -height * 2 / 3, -width * 0.18, -height * 2 / 3, -width / 2, 0);
+      shape.closePath();
+      const geometry = new THREE.ExtrudeGeometry(shape, { depth, curveSegments: 24, bevelEnabled: false });
+      geometry.translate(0, 0, -depth / 2);
+      return geometry;
     }
     case 'leaf': {
       // Frunză de acant: siluetă lobată extrudată, cu vârful în sus și

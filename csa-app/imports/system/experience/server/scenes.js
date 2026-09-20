@@ -145,32 +145,80 @@ function orientPlatform() {
   ];
 }
 
+// Mobilier orientat cu fața spre +Z înainte de rotație; baseY este pardoseala.
+// Piesele separate lasă vizibil spațiul de sub șezut și dintre montanți.
+function seating(id, x, baseY, z, yaw = 0, { width = 0.72, backHeight = 1.18, arms = false } = {}) {
+  const items = [];
+  const cos = Math.cos(yaw);
+  const sin = Math.sin(yaw);
+  const part = (suffix, px, py, pz, size, color = COLORS.wood, options = {}) => {
+    items.push(primitive(suffix ? `${id}-${suffix}` : id, 'box',
+      [x + px * cos + pz * sin, baseY + py, z - px * sin + pz * cos], size, color,
+      { rotation: [0, yaw, 0], roughness: 0.66, ...options }));
+  };
+  part('', 0, 0.49, 0, [width, 0.12, 0.65]);
+  part('cushion', 0, 0.565, 0.015, [width - 0.1, 0.06, 0.54], COLORS.crimson);
+  const supportCount = width > 2 ? Math.ceil(width / 1.6) + 1 : 2;
+  const supports = Array.from({ length: supportCount }, (_, index) => -width / 2 + 0.07 + index * (width - 0.14) / (supportCount - 1));
+  supports.forEach((px, index) => {
+    part(`leg-front-${index}`, px, 0.225, 0.24, [0.085, 0.45, 0.085]);
+    part(`back-post-${index}`, px, backHeight / 2, -0.27, [0.085, backHeight, 0.085]);
+  });
+  part('back', 0, 0.79 + (backHeight - 1.18) / 2, -0.27, [width - 0.16, backHeight - 0.72, 0.075], COLORS.crimson);
+  part('crest', 0, backHeight - 0.035, -0.27, [width + 0.02, 0.1, 0.12]);
+  part('stretcher', 0, 0.22, -0.27, [width - 0.1, 0.07, 0.07]);
+  if (arms) for (const sign of [-1, 1]) {
+    part(`arm-${sign < 0 ? 'left' : 'right'}`, sign * (width / 2 - 0.025), 0.83, 0, [0.1, 0.085, 0.66]);
+    part(`arm-support-${sign < 0 ? 'left' : 'right'}`, sign * (width / 2 - 0.025), 0.67, 0.24, [0.065, 0.3, 0.065]);
+  }
+  return items;
+}
+
+function allSeeingEye() {
+  const items = [];
+  // Raze fine în spatele triunghiului în relief; fețele privesc spre sală (+Z).
+  for (let index = 0; index < 24; index += 1) {
+    const angle = index * Math.PI / 12;
+    const length = index % 2 ? 0.18 : 0.3;
+    const radius = 1.3 + length / 2;
+    items.push(primitive(`delta-ray-${index}`, 'box',
+      [Math.cos(angle) * radius, 5.6 + Math.sin(angle) * radius, -11.03], [length, 0.025, 0.035], COLORS.gold,
+      { rotation: [0, 0, angle], emissive: '#94702d', emissiveIntensity: 0.35, metalness: 0.55 }));
+  }
+  items.push(
+    primitive('delta-plaque', 'star', [0, 5.6, -10.99], [1, 1, 1], COLORS.gold,
+      { geometry: { points: 3, radius: 1.2, innerRadius: 0.6, depth: 0.08 }, metalness: 0.55, roughness: 0.4, emissive: '#705018', emissiveIntensity: 0.25 }),
+    primitive('delta-inset', 'star', [0, 5.6, -10.94], [1, 1, 1], '#162c38',
+      { geometry: { points: 3, radius: 1.08, innerRadius: 0.54, depth: 0.035 }, roughness: 0.8 }),
+    primitive('delta-eye-outline', 'almond', [0, 5.53, -10.88], [1, 1, 1], COLORS.gold,
+      { geometry: { width: 1.27, height: 0.55, depth: 0.04 }, metalness: 0.45, roughness: 0.4 }),
+    primitive('delta-eye', 'almond', [0, 5.53, -10.85], [1, 1, 1], '#ece5cf',
+      { geometry: { width: 1.13, height: 0.43, depth: 0.035 }, roughness: 0.55, emissive: '#c6bda2', emissiveIntensity: 0.18 }),
+    primitive('delta-iris-rim', 'sphere', [0, 5.53, -10.82], [1, 1, 0.15], '#142e35', { geometry: { size: 0.21, segments: 32 } }),
+    primitive('delta-iris', 'sphere', [0, 5.53, -10.785], [1, 1, 0.15], '#548a88', { geometry: { size: 0.18, segments: 32 }, roughness: 0.4 }),
+    primitive('delta-pupil', 'sphere', [0, 5.53, -10.75], [1, 1, 0.15], '#071219', { geometry: { size: 0.09, segments: 32 }, roughness: 0.3 }),
+    primitive('delta-eye-glint', 'sphere', [-0.046, 5.592, -10.73], [0.3, 0.3, 0.08], '#fff9e7', { geometry: { size: 0.08, segments: 16 }, emissive: '#fff9e7', emissiveIntensity: 0.45 }),
+  );
+  return items;
+}
+
 function venerableStation() {
   return [
-    primitive('vm-throne-seat', 'box', [0, 1.02, -10.15], [1.35, 0.55, 1], COLORS.crimson, { roughness: 0.6 }),
-    primitive('vm-throne-back', 'box', [0, 2.1, -10.55], [1.5, 2.4, 0.22], COLORS.crimson, { roughness: 0.6 }),
-    primitive('vm-throne-crest', 'box', [0, 3.42, -10.55], [1.7, 0.24, 0.3], COLORS.gold, { metalness: 0.5, roughness: 0.4 }),
+    ...seating('vm-throne-seat', 0, 0.72, -10.15, 0, { width: 1.3, backHeight: 2.6, arms: true }),
     primitive('vm-canopy', 'box', [0, 3.95, -10.35], [2.6, 0.16, 1.6], '#341721'),
     primitive('vm-canopy-post-north', 'cylinder', [-1.2, 2.35, -9.7], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.06, radiusBottom: 0.075, height: 3.3, segments: 12 }, metalness: 0.5, roughness: 0.42 }),
     primitive('vm-canopy-post-south', 'cylinder', [1.2, 2.35, -9.7], [1, 1, 1], COLORS.gold, { geometry: { radiusTop: 0.06, radiusBottom: 0.075, height: 3.3, segments: 12 }, metalness: 0.5, roughness: 0.42 }),
     primitive('vm-table-body', 'box', [0, 0.93, -8.8], [2.4, 0.42, 0.9], COLORS.drape, { roughness: 0.68 }),
     primitive('vm-table-top', 'box', [0, 1.19, -8.8], [2.6, 0.14, 1.05], COLORS.woodDark),
-    // Recuzita mesei din planșă: spada flamboyantă, ciocanul și cele trei coloane mici.
+    // Recuzita mesei din planșă: spada flamboyantă și ciocanul; sfeșnicul este compus separat.
     primitive('vm-sword', 'box', [-0.62, 1.3, -8.72], [0.85, 0.04, 0.09], '#cad3dc', { metalness: 0.85, roughness: 0.25, rotation: [0, 0.4, 0] }),
     primitive('vm-gavel', 'box', [-0.15, 1.3, -8.95], [0.34, 0.07, 0.07], COLORS.wood, { rotation: [0, -0.5, 0] }),
-    primitive('vm-column-small-1', 'cylinder', [0.42, 1.43, -8.75], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.05, radiusBottom: 0.06, height: 0.34, segments: 10 } }),
-    primitive('vm-column-small-2', 'cylinder', [0.68, 1.43, -8.75], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.05, radiusBottom: 0.06, height: 0.34, segments: 10 } }),
-    primitive('vm-column-small-3', 'cylinder', [0.94, 1.43, -8.75], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.05, radiusBottom: 0.06, height: 0.34, segments: 10 } }),
   ];
 }
 
 function orientLuminaries(grade) {
   const items = [
-    // Delta luminoasă cu ochiul atoatevăzător, deasupra fotoliului din Orient.
-    primitive('delta-plaque', 'star', [0, 5.6, -11.05], [1, 1, 1], COLORS.gold, { geometry: { points: 3, radius: 1.2, innerRadius: 0.6, depth: 0.12 }, metalness: 0.35, roughness: 0.35, emissive: '#8f6a1d', emissiveIntensity: 0.85 }),
-    primitive('delta-halo', 'torus', [0, 5.55, -11.1], [1, 1, 1], '#f3d382', { geometry: { radius: 1.5, tube: 0.03, segments: 48 }, emissive: '#f3d382', emissiveIntensity: 0.9, opacity: 0.7 }),
-    primitive('delta-eye', 'sphere', [0, 5.48, -10.9], [1, 1, 1], '#f4f7f9', { geometry: { size: 0.21, segments: 24 }, emissive: '#dfe8ee', emissiveIntensity: 1.1 }),
-    primitive('delta-pupil', 'sphere', [0, 5.48, -10.75], [1, 1, 1], '#182531', { geometry: { size: 0.085, segments: 16 } }),
+    ...allSeeingEye(),
     // Luna la Miazănoapte: sfera palidă cu umbra care lasă vizibilă secera.
     primitive('moon-disc', 'sphere', [-4.9, 5.5, -10.95], [1, 1, 1], '#e6ecf4', { geometry: { size: 0.55, segments: 28 }, emissive: '#c3d2e2', emissiveIntensity: 1.05 }),
     primitive('moon-shadow', 'sphere', [-4.62, 5.56, -10.7], [1, 1, 1], '#0d1a26', { geometry: { size: 0.5, segments: 28 }, roughness: 1 }),
@@ -188,19 +236,17 @@ function orientLuminaries(grade) {
 
 function orientSeating() {
   return [
-    primitive('orient-bench-north', 'box', [-3.5, 1.02, -10.4], [2.6, 0.6, 0.75], COLORS.woodDark),
-    primitive('orient-bench-north-back', 'box', [-3.5, 1.55, -10.72], [2.6, 0.8, 0.14], COLORS.woodDark),
-    primitive('orient-bench-south', 'box', [3.7, 1.02, -10.4], [3.4, 0.6, 0.75], COLORS.woodDark),
-    primitive('orient-bench-south-back', 'box', [3.7, 1.55, -10.72], [3.4, 0.8, 0.14], COLORS.woodDark),
-    primitive('orient-seat-adjunct', 'box', [-1.75, 1, -9.55], [0.7, 0.56, 0.66], COLORS.woodDark),
+    ...seating('orient-bench-north', -3.5, 0.72, -10.4, 0, { width: 2.6 }),
+    ...seating('orient-bench-south', 3.7, 0.72, -10.4, 0, { width: 3.4 }),
+    ...seating('orient-seat-adjunct', -1.75, 0.72, -9.55),
     // Pe estradă: Secretarul (Miazănoapte) și Oratorul (Miazăzi), cu blatul
     // înclinat spre pupitrele de jos (spre Occident) și scaunele spre Orient.
     primitive('secretary-desk', 'box', [-6.5, 1.14, -9.55], [1.5, 0.84, 1], COLORS.wood),
     primitive('secretary-desk-top', 'box', [-6.5, 1.62, -9.55], [1.4, 0.07, 0.95], COLORS.woodDark, { rotation: [0.18, 0, 0] }),
-    primitive('secretary-chair', 'box', [-6.5, 1.05, -10.35], [0.62, 0.66, 0.62], COLORS.woodDark),
+    ...seating('secretary-chair', -6.5, 0.72, -10.35),
     primitive('orator-desk', 'box', [6.5, 1.14, -9.55], [1.5, 0.84, 1], COLORS.wood),
     primitive('orator-desk-top', 'box', [6.5, 1.62, -9.55], [1.4, 0.07, 0.95], COLORS.woodDark, { rotation: [0.18, 0, 0] }),
-    primitive('orator-chair', 'box', [6.5, 1.05, -10.35], [0.62, 0.66, 0.62], COLORS.woodDark),
+    ...seating('orator-chair', 6.5, 0.72, -10.35),
   ];
 }
 
@@ -359,21 +405,19 @@ function wardenStations() {
     // intrării (stânga cum intri), cu fața spre Orient.
     primitive('warden1-desk', 'box', [-5.4, 0.62, 6.7], [1.7, 0.95, 1], COLORS.wood),
     primitive('warden1-top', 'box', [-5.4, 1.14, 6.7], [1.85, 0.09, 1.15], COLORS.woodDark),
-    primitive('warden1-chair', 'box', [-5.4, 0.62, 7.8], [0.66, 1.24, 0.6], COLORS.woodDark),
-    primitive('warden1-column', 'cylinder', [-4.95, 1.4, 6.55], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.045, radiusBottom: 0.055, height: 0.42, segments: 10 } }),
+    ...seating('warden1-chair', -5.4, 0, 7.8, Math.PI, { width: 0.8, backHeight: 1.45, arms: true }),
     // Al Doilea Supraveghetor, la Miazăzi.
     primitive('warden2-desk', 'box', [6.4, 0.62, 0.6], [1, 0.95, 1.7], COLORS.wood),
     primitive('warden2-top', 'box', [6.4, 1.14, 0.6], [1.15, 0.09, 1.85], COLORS.woodDark),
-    primitive('warden2-chair', 'box', [7.5, 0.62, 0.6], [0.6, 1.24, 0.66], COLORS.woodDark),
-    primitive('warden2-column', 'cylinder', [6.25, 1.4, 0.15], [1, 1, 1], COLORS.ivory, { geometry: { radiusTop: 0.045, radiusBottom: 0.055, height: 0.42, segments: 10 } }),
+    ...seating('warden2-chair', 7.5, 0, 0.6, -Math.PI / 2, { width: 0.8, backHeight: 1.45, arms: true }),
     // Maestrul de Ceremonii, în stânga Coloanei Boaz (spre Miazănoapte,
     // cum intri): scaun și sceptrul de ceremonii.
-    primitive('mc-seat', 'box', [-3.9, 0.5, 6.6], [0.6, 1, 0.6], COLORS.woodDark),
+    ...seating('mc-seat', -3.9, 0, 6.6, Math.PI),
     primitive('mc-sceptre-shaft', 'cylinder', [-3.5, 0.8, 6.45], [1, 1, 1], COLORS.wood, { geometry: { radiusTop: 0.022, radiusBottom: 0.028, height: 1.5, segments: 10 }, rotation: [0, 0, 0.1], roughness: 0.6 }),
     primitive('mc-sceptre-head', 'sphere', [-3.575, 1.57, 6.45], [1, 1, 1], COLORS.gold, { geometry: { size: 0.08, segments: 14 }, metalness: 0.55, roughness: 0.35, emissive: '#4d3a12', emissiveIntensity: 0.3 }),
     // Acoperitorul, în dreapta Coloanei Jachin (spre Miazăzi, cum intri),
     // cu fața spre Orient și spada verticală alături.
-    primitive('tyler-seat', 'box', [3.9, 0.5, 6.6], [0.6, 1, 0.6], COLORS.woodDark),
+    ...seating('tyler-seat', 3.9, 0, 6.6, Math.PI),
     primitive('tyler-sword-blade', 'box', [4.35, 0.95, 6.45], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
     primitive('tyler-sword-guard', 'box', [4.35, 1.58, 6.45], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
     primitive('tyler-sword-grip', 'cylinder', [4.35, 1.72, 6.45], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
@@ -457,10 +501,10 @@ function officerTables() {
   return [
     primitive('hospitalier-table', 'box', [-6.7, 0.55, -5.75], [1, 0.82, 1.6], COLORS.wood),
     primitive('hospitalier-desk-top', 'box', [-6.7, 1.02, -5.75], [0.95, 0.06, 1.45], COLORS.woodDark, { rotation: [0, 0, -0.15] }),
-    primitive('hospitalier-chair', 'box', [-7.55, 0.55, -5.75], [0.62, 1.1, 0.6], COLORS.woodDark),
+    ...seating('hospitalier-chair', -7.55, 0, -5.75, Math.PI / 2),
     primitive('treasurer-table', 'box', [6.7, 0.55, -5.75], [1, 0.82, 1.6], COLORS.wood),
     primitive('treasurer-desk-top', 'box', [6.7, 1.02, -5.75], [0.95, 0.06, 1.45], COLORS.woodDark, { rotation: [0, 0, 0.15] }),
-    primitive('treasurer-chair', 'box', [7.55, 0.55, -5.75], [0.62, 1.1, 0.6], COLORS.woodDark),
+    ...seating('treasurer-chair', 7.55, 0, -5.75, -Math.PI / 2),
     primitive('expert-sword-blade', 'box', [-6.15, 0.95, -4.45], [0.05, 1.2, 0.1], '#cad3dc', { metalness: 0.85, roughness: 0.25 }),
     primitive('expert-sword-guard', 'box', [-6.15, 1.58, -4.45], [0.26, 0.05, 0.06], COLORS.gold, { metalness: 0.55, roughness: 0.35 }),
     primitive('expert-sword-grip', 'cylinder', [-6.15, 1.72, -4.45], [1, 1, 1], COLORS.woodDark, { geometry: { radiusTop: 0.03, radiusBottom: 0.03, height: 0.22, segments: 10 } }),
@@ -528,14 +572,12 @@ function brotherSeats() {
   // Rândurile din Miazăzi lasă locul pupitrului celui de-al Doilea Supraveghetor.
   const south = [-4.6, -3.3, -2, 2.2, 3.5, 4.8];
   return [
-    ...north.flatMap((z, index) => ([
-      primitive(`seat-north-front-${index + 1}`, 'box', [-6.55, 0.44, z], [0.74, 0.88, 0.72], COLORS.woodDark, { roughness: 0.85 }),
-      primitive(`seat-north-back-${index + 1}`, 'box', [-7.75, 0.44, z], [0.74, 0.88, 0.72], COLORS.woodShade, { roughness: 0.85 }),
-    ])),
-    ...south.flatMap((z, index) => ([
-      primitive(`seat-south-front-${index + 1}`, 'box', [6.55, 0.44, z], [0.74, 0.88, 0.72], COLORS.woodDark, { roughness: 0.85 }),
-      primitive(`seat-south-back-${index + 1}`, 'box', [7.75, 0.44, z], [0.74, 0.88, 0.72], COLORS.woodShade, { roughness: 0.85 }),
-    ])),
+    ...north.flatMap((z, index) => seating(`seat-north-front-${index + 1}`, -6.55, 0, z, Math.PI / 2)),
+    ...south.flatMap((z, index) => seating(`seat-south-front-${index + 1}`, 6.55, 0, z, -Math.PI / 2)),
+    ...seating('bench-north-wall', -7.85, 0, -0.05, Math.PI / 2, { width: 10 }),
+    // Două bănci lasă liber accesul la scaunul celui de-al Doilea Supraveghetor.
+    ...seating('bench-south-wall-east', 7.85, 0, -3.3, -Math.PI / 2, { width: 3.4 }),
+    ...seating('bench-south-wall-west', 7.85, 0, 3.5, -Math.PI / 2, { width: 3.4 }),
   ];
 }
 
