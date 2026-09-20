@@ -1,11 +1,15 @@
 # Platformă CSA – stare implementare
 
-Release activ, 20 septembrie 2026: `6c7cf7c`, tag `release-20260920-menu-toggle`.
+Release activ, 21 septembrie 2026: `d831eb7`, tag `release-20260921-temple-refinements`.
+Pietrele sunt la capetele treptelor dinspre altar; funia este un tub continuu
+cu colțuri rotunjite; plumbul și scaunul VM au materiale cu contrast îmbunătățit.
+Manifest: `2026.09.21-1`; 16 teste locale și verificările live pe toate gradele
+trecute. Detalii: `deploy/releases/2026-09-21-temple-refinements.md`.
 Meniul lateral se ascunde/redeschide și pe desktop; ferestrele se încadrează
 automat în spațiul disponibil. Verificat în portal la 1280 px și 390 px,
 inclusiv păstrarea textului introdus și navigarea mobilă. Detalii:
 `deploy/releases/2026-09-20-menu-toggle.md`.
-Templul păstrează versiunea din `9f31f7d` (manifest `2026.09.20-9`).
+Înclinarea altarului din `9f31f7d` este păstrată.
 Templu: elementele arhitecturale sunt selectabile direct sau din lista cu căutare;
 56/64/64 fișe la Ucenic/Calfă/Maestru, cu descrieri, surse și texte de studiu distincte pe grad.
 Pupitrele și scaunele funcțiilor, spadele, bastonul MC și băncile laterale deschid fișele asociate.
@@ -18,7 +22,7 @@ Catalogul administratorului respectă și vizualizarea unui grad inferior.
 Colonetele, lumânările și zodiacul din `a10590c`, detaliile Orientului din
 `57ce577`, mobilierul și ochiul din `04d349e` sunt păstrate.
 Referințe: `REFERINTE_TEMPLU.md`.
-15 teste locale și verificările live pentru grade/autentificare/acces au trecut.
+16 teste locale și verificările live pentru grade/autentificare/acces au trecut.
 UI live: căutare, fișe, schimbare grad și tastatură verificate în fallback;
 raycasting automat cu geometriile reale. WebGL nu este disponibil în VM.
 10/10 containere healthy; 153/153 fișiere sursă identice cu arhiva.
